@@ -1,0 +1,211 @@
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Star, MapPin, Clock, Award, ShieldCheck, Play, Video, Calendar, CheckCircle2, Loader2 } from 'lucide-react';
+import { db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import BookingModal from '@/components/booking/BookingModal';
+import AvailabilityMap from '@/components/booking/AvailabilityMap';
+import { useAuth } from '@/lib/auth-context';
+
+export default function TeacherProfilePublic() {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const { user } = useAuth();
+    const [showBookingModal, setShowBookingModal] = useState(false);
+    const [teacher, setTeacher] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchTeacher() {
+            if (!id) return;
+            try {
+                const docRef = doc(db, 'users', id);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    setTeacher({ uid: docSnap.id, ...docSnap.data() });
+                }
+            } catch (error) {
+                console.error("Error fetching teacher:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchTeacher();
+    }, [id]);
+
+    if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin text-indigo-600" /></div>;
+    if (!teacher) return <div className="flex items-center justify-center min-h-screen">Teacher not found</div>;
+
+    return (
+        <div className="min-h-screen bg-[#FDFCF8] pb-20">
+            {/* Header / Breadcrumb */}
+            <div className="bg-white border-b border-slate-100">
+                <div className="max-w-6xl mx-auto px-6 py-4">
+                    <button onClick={() => navigate(-1)} className="text-sm text-slate-500 hover:text-indigo-600">
+                        &larr; Back to Search
+                    </button>
+                </div>
+            </div>
+
+            <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left Column: Main Content */}
+                <div className="lg:col-span-2 space-y-8">
+
+                    {/* Profile Header */}
+                    <div className="flex gap-6 items-start">
+                        <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full ${teacher.avatarColor || 'bg-indigo-100'} flex-shrink-0 flex items-center justify-center text-4xl font-bold text-indigo-600 border-4 border-white shadow-lg`}>
+                            {teacher.photoURL ? (
+                                <img src={teacher.photoURL} alt={teacher.name} className="w-full h-full rounded-full object-cover" />
+                            ) : (
+                                teacher.name.charAt(0)
+                            )}
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2">
+                                {teacher.name}
+                                {teacher.kycStatus === 'verified' && <ShieldCheck className="text-emerald-500" fill="currentColor" stroke="white" />}
+                            </h1>
+                            <p className="text-lg text-slate-600 font-medium mb-2">{teacher.subject} Expert • {teacher.experience} Experience</p>
+                            <div className="flex items-center gap-4 text-sm text-slate-500">
+                                <div className="flex items-center gap-1">
+                                    <MapPin size={16} /> {teacher.college || 'Online'}
+                                </div>
+                                <div className="flex items-center gap-1 text-amber-500 font-bold">
+                                    <Star size={16} fill="currentColor" /> {teacher.rating || 'New'} ({teacher.reviewCount || 0} reviews)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Video Intro */}
+                    <div className="bg-slate-900 rounded-2xl overflow-hidden aspect-video relative group cursor-pointer shadow-xl">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <Play size={32} className="text-white ml-1" fill="currentColor" />
+                            </div>
+                        </div>
+                        <img
+                            src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                            alt="Video Thumbnail"
+                            className="w-full h-full object-cover opacity-60"
+                        />
+                        <div className="absolute bottom-4 left-4 text-white">
+                            <div className="font-bold text-lg">Meet {teacher.name.split(' ')[0]}</div>
+                            <div className="text-sm opacity-80">Watch introduction video</div>
+                        </div>
+                    </div>
+
+                    {/* About Section */}
+                    <section>
+                        <h2 className="text-xl font-bold text-slate-900 mb-4">About {teacher.name.split(' ')[0]}</h2>
+                        <p className="text-slate-600 leading-relaxed text-lg">
+                            {teacher.bio}
+                            <br /><br />
+                            I believe in a conceptual approach to learning. My teaching methodology focuses on real-world examples and problem-solving techniques that help students not just memorize, but understand the core principles.
+                        </p>
+                    </section>
+
+                    {/* Education & Certifications */}
+                    <section>
+                        <h2 className="text-xl font-bold text-slate-900 mb-4">Education & Qualifications</h2>
+                        <div className="space-y-4">
+                            <div className="flex gap-4">
+                                <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                                    <Award size={24} />
+                                </div>
+                                <div>
+                                    <div className="font-bold text-slate-900">PhD in {teacher.subject}</div>
+                                    <div className="text-slate-500">{teacher.college || 'University'}, 2018</div>
+                                </div>
+                            </div>
+                            <div className="flex gap-4">
+                                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
+                                    <CheckCircle2 size={24} />
+                                </div>
+                                <div>
+                                    <div className="font-bold text-slate-900">Certified Online Educator</div>
+                                    <div className="text-slate-500">Global Teaching Association, 2020</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Reviews Preview */}
+                    <section>
+                        <h2 className="text-xl font-bold text-slate-900 mb-4">Student Reviews</h2>
+                        <div className="grid gap-4">
+                            {[1, 2].map((i) => (
+                                <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="flex text-amber-400">
+                                            {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} fill="currentColor" />)}
+                                        </div>
+                                        <span className="text-sm font-bold text-slate-900">Excellent Teacher!</span>
+                                    </div>
+                                    <p className="text-slate-600 mb-3">"Explains concepts very clearly. Highly recommended for anyone struggling with {teacher.subject}."</p>
+                                    <div className="text-sm text-slate-400">- Student Name</div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                </div>
+
+                {/* Right Column: Booking Card */}
+                <div className="lg:col-span-1">
+                    <div className="sticky top-24 bg-white rounded-3xl border border-slate-200 p-6 shadow-xl shadow-slate-200/50">
+                        <div className="flex justify-between items-end mb-6">
+                            <div>
+                                <div className="text-3xl font-bold text-slate-900">₹{teacher.hourlyRate}</div>
+                                <div className="text-slate-500 text-sm">per hour</div>
+                            </div>
+                            <div className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
+                                <Clock size={12} /> Available Now
+                            </div>
+                        </div>
+
+                        <div className="space-y-4 mb-6">
+                            <div className="flex items-center gap-3 text-slate-600 text-sm">
+                                <Video size={18} className="text-indigo-600" />
+                                <span>1-on-1 Online Class</span>
+                            </div>
+                            <div className="flex items-center gap-3 text-slate-600 text-sm">
+                                <Calendar size={18} className="text-indigo-600" />
+                                <span>Flexible Scheduling</span>
+                            </div>
+                            <div className="flex items-center gap-3 text-slate-600 text-sm">
+                                <ShieldCheck size={18} className="text-indigo-600" />
+                                <span>Satisfaction Guaranteed</span>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => setShowBookingModal(true)}
+                            className="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 active:scale-95 mb-4"
+                        >
+                            Book Class
+                        </button>
+
+                        <p className="text-center text-xs text-slate-400">
+                            Pay after your first class. No upfront payment required.
+                        </p>
+
+                        <AvailabilityMap availability={teacher.availability} />
+                    </div>
+                </div>
+            </div>
+
+            {showBookingModal && (
+                <BookingModal
+                    teacher={teacher}
+                    studentId={user?.uid || 'guest'}
+                    studentName={user?.displayName || 'Guest Student'}
+                    onClose={() => setShowBookingModal(false)}
+                    onSuccess={() => {
+                        alert('Booking request sent!');
+                        setShowBookingModal(false);
+                    }}
+                />
+            )}
+        </div>
+    );
+}
