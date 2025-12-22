@@ -26,6 +26,7 @@ export default function BookingModal({ teacher, studentId, studentName, onClose,
         topic: '',
         date: '',
         time: '',
+        description: '',
     });
     const [members, setMembers] = useState([{ name: '', phone: '' }]);
 
@@ -62,6 +63,7 @@ export default function BookingModal({ teacher, studentId, studentName, onClose,
                 studentId: studentId,
                 studentName: studentName,
                 topic: formData.topic,
+                description: formData.description,
                 scheduledAt: Timestamp.fromDate(scheduledAt),
                 status: 'pending',
                 isDemo: true, // First class is demo
@@ -128,7 +130,7 @@ export default function BookingModal({ teacher, studentId, studentName, onClose,
                                         className="w-full p-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition mb-4"
                                     />
 
-                                    <div className="grid grid-cols-3 gap-2">
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                         {['09:00', '11:00', '13:00', '15:00', '17:00', '19:00'].map(slot => (
                                             <button
                                                 key={slot}
@@ -147,24 +149,35 @@ export default function BookingModal({ teacher, studentId, studentName, onClose,
                             </div>
                         </div>
 
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Description (Optional)</label>
+                            <textarea
+                                placeholder="Any specific requirements or topics you want to focus on?"
+                                value={formData.description}
+                                onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition resize-none"
+                                rows={3}
+                            />
+                        </div>
+
                         <div className="space-y-3">
                             <label className="block text-sm font-medium text-slate-700">Add Members (Optional)</label>
                             {members.map((member, index) => (
                                 <div key={index} className="relative group p-3 bg-slate-50 rounded-xl border border-slate-200">
-                                    <div className="grid grid-cols-2 gap-2">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                         <input
                                             type="text"
                                             placeholder="Name"
                                             value={member.name}
                                             onChange={e => updateMember(index, 'name', e.target.value)}
-                                            className="w-full p-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition text-sm"
+                                            className="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition text-sm"
                                         />
                                         <input
                                             type="tel"
                                             placeholder="Phone"
                                             value={member.phone}
                                             onChange={e => updateMember(index, 'phone', e.target.value)}
-                                            className="w-full p-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition text-sm"
+                                            className="w-full p-2.5 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition text-sm"
                                         />
                                     </div>
                                     <button

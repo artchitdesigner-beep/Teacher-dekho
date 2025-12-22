@@ -11,6 +11,7 @@ import SearchTeachers from './pages/student/SearchTeachers';
 import TeacherProfilePublic from './pages/student/TeacherProfilePublic';
 import MyBookings from './pages/student/MyBookings';
 import MyRequests from './pages/student/MyRequests';
+import BookingDetail from './pages/student/BookingDetail';
 
 // Teacher Pages
 import TeacherDashboard from './pages/teacher/TeacherDashboard';
@@ -35,6 +36,7 @@ function App() {
           <Route path="search" element={<SearchTeachers />} />
           <Route path="teacher/:id" element={<TeacherProfilePublic />} />
           <Route path="bookings" element={<MyBookings />} />
+          <Route path="bookings/:id" element={<BookingDetail />} />
           <Route path="requests" element={<MyRequests />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>

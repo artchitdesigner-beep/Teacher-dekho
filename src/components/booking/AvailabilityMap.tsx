@@ -27,36 +27,38 @@ export default function AvailabilityMap({ availability }: AvailabilityMapProps) 
                 Weekly Availability
             </h3>
 
-            <div className="grid grid-cols-8 gap-1">
-                <div className="col-span-1"></div>
-                {days.map(day => (
-                    <div key={day} className="text-[10px] font-bold text-slate-400 text-center uppercase">
-                        {day}
-                    </div>
-                ))}
-
-                {timeSlots.map(slot => (
-                    <React.Fragment key={slot}>
-                        <div className="text-[10px] text-slate-400 flex items-center justify-end pr-2">
-                            {slot}
+            <div className="overflow-x-auto pb-2 -mx-2 px-2">
+                <div className="grid grid-cols-8 gap-1 min-w-[280px]">
+                    <div className="col-span-1"></div>
+                    {days.map(day => (
+                        <div key={day} className="text-[10px] font-bold text-slate-400 text-center uppercase">
+                            {day}
                         </div>
-                        {days.map(day => {
-                            const isAvailable = mockAvailability[day]?.includes(slot);
-                            return (
-                                <div
-                                    key={`${day}-${slot}`}
-                                    className={`aspect-square rounded-sm border transition-colors flex items-center justify-center ${isAvailable
+                    ))}
+
+                    {timeSlots.map(slot => (
+                        <React.Fragment key={slot}>
+                            <div className="text-[10px] text-slate-400 flex items-center justify-end pr-2">
+                                {slot}
+                            </div>
+                            {days.map(day => {
+                                const isAvailable = mockAvailability[day]?.includes(slot);
+                                return (
+                                    <div
+                                        key={`${day}-${slot}`}
+                                        className={`aspect-square rounded-sm border transition-colors flex items-center justify-center ${isAvailable
                                             ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
                                             : 'bg-slate-50 border-slate-100 text-transparent'
-                                        }`}
-                                    title={isAvailable ? `${day} at ${slot}` : 'Unavailable'}
-                                >
-                                    {isAvailable && <Check size={8} strokeWidth={3} />}
-                                </div>
-                            );
-                        })}
-                    </React.Fragment>
-                ))}
+                                            }`}
+                                        title={isAvailable ? `${day} at ${slot}` : 'Unavailable'}
+                                    >
+                                        {isAvailable && <Check size={8} strokeWidth={3} />}
+                                    </div>
+                                );
+                            })}
+                        </React.Fragment>
+                    ))}
+                </div>
             </div>
 
             <div className="mt-4 flex items-center justify-center gap-4 text-[10px] font-medium text-slate-500">

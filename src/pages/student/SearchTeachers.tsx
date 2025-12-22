@@ -13,6 +13,7 @@ export default function SearchTeachers() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('All');
     const [selectedTeacher, setSelectedTeacher] = useState<any | null>(null);
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
 
     useEffect(() => {
         fetchTeachers();
@@ -46,19 +47,19 @@ export default function SearchTeachers() {
     return (
         <div className="space-y-8">
             {/* Header / Search Bar */}
-            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+            <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm">
                 <div className="max-w-3xl">
-                    <h1 className="text-2xl font-serif font-bold text-slate-900 mb-2">Find your perfect mentor</h1>
-                    <p className="text-slate-500 mb-6">Search from over 2,000+ verified teachers.</p>
+                    <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-2">Find your perfect mentor</h1>
+                    <p className="text-sm md:text-base text-slate-500 mb-6">Search from over 2,000+ verified teachers.</p>
 
                     <div className="relative">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                         <input
                             type="text"
-                            placeholder="Search by subject (e.g. Physics) or teacher name..."
+                            placeholder="Search by subject or teacher name..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition text-lg"
+                            className="w-full pl-12 pr-4 py-3.5 md:py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition text-base md:text-lg"
                         />
                     </div>
                 </div>
@@ -66,15 +67,25 @@ export default function SearchTeachers() {
 
             <div className="flex flex-col lg:flex-row gap-8">
                 {/* Sidebar Filters */}
-                <div className="w-full lg:w-64 flex-shrink-0 space-y-6">
-                    <div className="bg-white p-6 rounded-2xl border border-slate-100 sticky top-4">
-                        <div className="flex items-center gap-2 font-bold text-slate-900 mb-6">
+                <div className="w-full lg:w-64 flex-shrink-0">
+                    <button
+                        onClick={() => setShowMobileFilters(!showMobileFilters)}
+                        className="lg:hidden w-full flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-100 mb-4 font-bold text-slate-900"
+                    >
+                        <div className="flex items-center gap-2">
+                            <SlidersHorizontal size={20} /> Filters
+                        </div>
+                        <span className="text-indigo-600 text-sm">{showMobileFilters ? 'Hide' : 'Show'}</span>
+                    </button>
+
+                    <div className={`${showMobileFilters ? 'block' : 'hidden'} lg:block bg-white p-6 rounded-2xl border border-slate-100 sticky top-4 animate-in fade-in slide-in-from-top-2 lg:animate-none`}>
+                        <div className="hidden lg:flex items-center gap-2 font-bold text-slate-900 mb-6">
                             <SlidersHorizontal size={20} /> Filters
                         </div>
 
                         {/* Subject Filter */}
                         <div className="mb-8">
-                            <h4 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider">Subject</h4>
+                            <h4 className="text-xs font-bold text-slate-900 mb-4 uppercase tracking-wider">Subject</h4>
                             <div className="space-y-2">
                                 {subjects.map(subject => (
                                     <label key={subject} className="flex items-center gap-3 cursor-pointer group">
@@ -86,7 +97,10 @@ export default function SearchTeachers() {
                                             name="subject"
                                             className="hidden"
                                             checked={selectedSubject === subject}
-                                            onChange={() => setSelectedSubject(subject)}
+                                            onChange={() => {
+                                                setSelectedSubject(subject);
+                                                if (window.innerWidth < 1024) setShowMobileFilters(false);
+                                            }}
                                         />
                                         <span className={`text-sm ${selectedSubject === subject ? 'text-indigo-600 font-medium' : 'text-slate-600'}`}>
                                             {subject}
@@ -98,12 +112,12 @@ export default function SearchTeachers() {
 
                         {/* Price Filter (Mock) */}
                         <div className="mb-8">
-                            <h4 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider">Hourly Rate</h4>
+                            <h4 className="text-xs font-bold text-slate-900 mb-4 uppercase tracking-wider">Hourly Rate</h4>
                             <div className="space-y-4">
                                 <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
                                     <div className="w-1/2 h-full bg-indigo-600 rounded-full"></div>
                                 </div>
-                                <div className="flex justify-between text-xs text-slate-500 font-medium">
+                                <div className="flex justify-between text-[10px] text-slate-500 font-medium">
                                     <span>₹100</span>
                                     <span>₹2000+</span>
                                 </div>
@@ -112,7 +126,7 @@ export default function SearchTeachers() {
 
                         {/* Other Filters (Mock) */}
                         <div>
-                            <h4 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider">Preferences</h4>
+                            <h4 className="text-xs font-bold text-slate-900 mb-4 uppercase tracking-wider">Preferences</h4>
                             <div className="space-y-3">
                                 <label className="flex items-center gap-3 cursor-pointer">
                                     <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />

@@ -52,8 +52,8 @@ export default function TeacherProfilePublic() {
                 <div className="lg:col-span-2 space-y-8">
 
                     {/* Profile Header */}
-                    <div className="flex gap-6 items-start">
-                        <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full ${teacher.avatarColor || 'bg-indigo-100'} flex-shrink-0 flex items-center justify-center text-4xl font-bold text-indigo-600 border-4 border-white shadow-lg`}>
+                    <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start text-center sm:text-left">
+                        <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full ${teacher.avatarColor || 'bg-indigo-100'} flex-shrink-0 flex items-center justify-center text-3xl md:text-4xl font-bold text-indigo-600 border-4 border-white shadow-lg`}>
                             {teacher.photoURL ? (
                                 <img src={teacher.photoURL} alt={teacher.name} className="w-full h-full rounded-full object-cover" />
                             ) : (
@@ -61,17 +61,17 @@ export default function TeacherProfilePublic() {
                             )}
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2">
+                            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 flex flex-wrap items-center justify-center sm:justify-start gap-2">
                                 {teacher.name}
-                                {teacher.kycStatus === 'verified' && <ShieldCheck className="text-emerald-500" fill="currentColor" stroke="white" />}
+                                {teacher.kycStatus === 'verified' && <ShieldCheck size={20} className="text-emerald-500" fill="currentColor" stroke="white" />}
                             </h1>
-                            <p className="text-lg text-slate-600 font-medium mb-2">{teacher.subject} Expert • {teacher.experience} Experience</p>
-                            <div className="flex items-center gap-4 text-sm text-slate-500">
+                            <p className="text-base md:text-lg text-slate-600 font-medium mb-2">{teacher.subject} Expert • {teacher.experience} Experience</p>
+                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-slate-500">
                                 <div className="flex items-center gap-1">
                                     <MapPin size={16} /> {teacher.college || 'Online'}
                                 </div>
                                 <div className="flex items-center gap-1 text-amber-500 font-bold">
-                                    <Star size={16} fill="currentColor" /> {teacher.rating || 'New'} ({teacher.reviewCount || 0} reviews)
+                                    <Star size={16} fill="currentColor" /> {teacher.rating || 'New'} ({teacher.reviewCount || 0})
                                 </div>
                             </div>
                         </div>
@@ -98,7 +98,7 @@ export default function TeacherProfilePublic() {
                     {/* About Section */}
                     <section>
                         <h2 className="text-xl font-bold text-slate-900 mb-4">About {teacher.name.split(' ')[0]}</h2>
-                        <p className="text-slate-600 leading-relaxed text-lg">
+                        <p className="text-slate-600 leading-relaxed text-base md:text-lg">
                             {teacher.bio}
                             <br /><br />
                             I believe in a conceptual approach to learning. My teaching methodology focuses on real-world examples and problem-solving techniques that help students not just memorize, but understand the core principles.
@@ -152,13 +152,13 @@ export default function TeacherProfilePublic() {
 
                 {/* Right Column: Booking Card */}
                 <div className="lg:col-span-1">
-                    <div className="sticky top-24 bg-white rounded-3xl border border-slate-200 p-6 shadow-xl shadow-slate-200/50">
+                    <div className="lg:sticky lg:top-24 bg-white rounded-3xl border border-slate-200 p-6 shadow-xl shadow-slate-200/50">
                         <div className="flex justify-between items-end mb-6">
                             <div>
-                                <div className="text-3xl font-bold text-slate-900">₹{teacher.hourlyRate}</div>
+                                <div className="text-2xl md:text-3xl font-bold text-slate-900">₹{teacher.hourlyRate}</div>
                                 <div className="text-slate-500 text-sm">per hour</div>
                             </div>
-                            <div className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
+                            <div className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold">
                                 <Clock size={12} /> Available Now
                             </div>
                         </div>
@@ -180,16 +180,18 @@ export default function TeacherProfilePublic() {
 
                         <button
                             onClick={() => setShowBookingModal(true)}
-                            className="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 active:scale-95 mb-4"
+                            className="w-full py-3.5 md:py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 active:scale-95 mb-4"
                         >
                             Book Class
                         </button>
 
-                        <p className="text-center text-xs text-slate-400">
+                        <p className="text-center text-[10px] md:text-xs text-slate-400">
                             Pay after your first class. No upfront payment required.
                         </p>
 
-                        <AvailabilityMap availability={teacher.availability} />
+                        <div className="mt-8">
+                            <AvailabilityMap availability={teacher.availability} />
+                        </div>
                     </div>
                 </div>
             </div>

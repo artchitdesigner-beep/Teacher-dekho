@@ -11,8 +11,8 @@ export default function TeacherCard({ teacher, onBook }: TeacherCardProps) {
     return (
         <div className="bg-white rounded-2xl border border-slate-100 p-6 hover:shadow-xl hover:shadow-indigo-100/50 transition-all duration-300 flex flex-col md:flex-row gap-6">
             {/* Left: Avatar */}
-            <div className="flex-shrink-0">
-                <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full ${teacher.avatarColor || 'bg-indigo-100'} flex items-center justify-center text-3xl font-bold text-indigo-600 border-4 border-white shadow-lg shadow-slate-100`}>
+            <div className="flex-shrink-0 flex justify-center md:block">
+                <div className={`w-20 h-20 md:w-32 md:h-32 rounded-full ${teacher.avatarColor || 'bg-indigo-100'} flex items-center justify-center text-2xl md:text-3xl font-bold text-indigo-600 border-4 border-white shadow-lg shadow-slate-100`}>
                     {teacher.photoURL ? (
                         <img src={teacher.photoURL} alt={teacher.name} className="w-full h-full rounded-full object-cover" />
                     ) : (
@@ -75,18 +75,18 @@ export default function TeacherCard({ teacher, onBook }: TeacherCardProps) {
                     <span className="text-slate-400 text-xs">({teacher.reviewCount || 0})</span>
                 </div>
 
-                <div className="flex flex-col gap-2 w-full">
+                <div className="flex flex-row md:flex-col gap-2 w-full">
                     <button
                         onClick={() => onBook(teacher.uid)}
-                        className="w-full px-4 py-2.5 bg-indigo-600 text-white font-medium text-sm rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 active:scale-95"
+                        className="flex-1 md:w-full px-4 py-2.5 bg-indigo-600 text-white font-medium text-xs md:text-sm rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 active:scale-95"
                     >
                         Book Class
                     </button>
                     <Link
                         to={`/student/teacher/${teacher.id}`}
-                        className="w-full px-4 py-2.5 bg-white text-indigo-600 font-medium text-sm rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-all text-center"
+                        className="flex-1 md:w-full px-4 py-2.5 bg-white text-indigo-600 font-medium text-xs md:text-sm rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-all text-center"
                     >
-                        View Profile
+                        Profile
                     </Link>
                 </div>
             </div>

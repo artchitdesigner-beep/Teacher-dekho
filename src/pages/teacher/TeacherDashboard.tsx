@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, orderBy, Timestamp, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, Timestamp, doc, updateDoc } from 'firebase/firestore';
 import { Calendar, Clock, User, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Booking {
     id: string;
-    studentName: string; // We might need to fetch this separately or store it in booking
+    studentName: string;
     topic: string;
     scheduledAt: Timestamp;
     status: 'pending' | 'confirmed' | 'rejected' | 'completed';
     isDemo: boolean;
+    createdAt: Timestamp;
 }
 
 export default function TeacherDashboard() {
@@ -28,23 +29,24 @@ export default function TeacherDashboard() {
                 const now = Timestamp.now();
                 const bookingsRef = collection(db, 'bookings');
 
-                // Fetch all bookings for this teacher
+                // Fetch all bookings for this teacher (no orderBy to avoid composite index)
                 const allBookingsQuery = query(
                     bookingsRef,
-                    where('teacherId', '==', user.uid),
-                    orderBy('createdAt', 'desc')
+                    where('teacherId', '==', user.uid)
                 );
 
                 const querySnap = await getDocs(allBookingsQuery);
                 const allBookings = querySnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Booking));
 
-                // Filter in memory to avoid composite index requirement
+                // Sort and filter in memory
+                const sortedAll = [...allBookings].sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+
                 const upcoming = allBookings
                     .filter(b => b.status === 'confirmed' && b.scheduledAt.toMillis() > now.toMillis())
                     .sort((a, b) => a.scheduledAt.toMillis() - b.scheduledAt.toMillis())
                     .slice(0, 3);
 
-                const pending = allBookings
+                const pending = sortedAll
                     .filter(b => b.status === 'pending')
                     .slice(0, 3);
 
@@ -95,7 +97,7 @@ export default function TeacherDashboard() {
                 <p className="text-slate-500">Welcome back, {user?.displayName}</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {/* Stats Cards */}
                 <div className="bg-indigo-600 text-white p-6 rounded-3xl shadow-lg shadow-indigo-200">
                     <div className="text-indigo-200 text-sm font-medium mb-1">Total Earnings</div>
@@ -108,7 +110,7 @@ export default function TeacherDashboard() {
                     <div className="text-slate-500 text-sm font-medium mb-1">Active Students</div>
                     <div className="text-3xl font-bold text-slate-900">0</div>
                 </div>
-                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm sm:col-span-2 lg:col-span-1">
                     <div className="text-slate-500 text-sm font-medium mb-1">Hours Taught</div>
                     <div className="text-3xl font-bold text-slate-900">0h</div>
                 </div>
@@ -145,23 +147,27 @@ export default function TeacherDashboard() {
                         <div className="space-y-3">
                             {upcomingClasses.map(booking => (
                                 <div key={booking.id} className="bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex flex-col items-center justify-center text-xs font-bold">
+                                    <div className="flex items-center gap-3 md:gap-4">
+                                        <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-50 text-indigo-600 rounded-xl flex flex-col items-center justify-center text-[10px] md:text-xs font-bold shrink-0">
                                             <span>{booking.scheduledAt.toDate().getDate()}</span>
-                                            <span className="uppercase text-[10px]">{booking.scheduledAt.toDate().toLocaleString('default', { month: 'short' })}</span>
+                                            <span className="uppercase text-[8px] md:text-[10px]">{booking.scheduledAt.toDate().toLocaleString('default', { month: 'short' })}</span>
                                         </div>
-                                        <div>
-                                            <div className="font-bold text-slate-900">{booking.topic}</div>
-                                            <div className="text-sm text-slate-500 flex items-center gap-2">
-                                                <Clock size={14} />
-                                                {booking.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                <span>•</span>
-                                                <User size={14} />
-                                                {booking.studentName}
+                                        <div className="min-w-0">
+                                            <div className="font-bold text-slate-900 truncate">{booking.topic}</div>
+                                            <div className="text-xs md:text-sm text-slate-500 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                                <div className="flex items-center gap-1">
+                                                    <Clock size={12} />
+                                                    {booking.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </div>
+                                                <span className="hidden sm:inline">•</span>
+                                                <div className="flex items-center gap-1">
+                                                    <User size={12} />
+                                                    {booking.studentName}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <button className="px-4 py-2 bg-indigo-50 text-indigo-600 text-sm font-bold rounded-xl hover:bg-indigo-100 transition-colors">
+                                    <button className="px-3 py-1.5 md:px-4 md:py-2 bg-indigo-50 text-indigo-600 text-xs md:text-sm font-bold rounded-xl hover:bg-indigo-100 transition-colors">
                                         Join
                                     </button>
                                 </div>

@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import { Calendar, Clock, Video, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import BookingDetailModal from '@/components/booking/BookingDetailModal';
 
 interface Booking {
     id: string;
@@ -16,13 +15,13 @@ interface Booking {
     members?: { name: string; phone: string }[];
     teacherRemarks?: string;
     paymentStatus?: string;
+    createdAt: Timestamp;
 }
 
 export default function StudentDashboard() {
     const { user } = useAuth();
     const [upcomingClasses, setUpcomingClasses] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
     useEffect(() => {
         async function fetchDashboardData() {
@@ -32,21 +31,23 @@ export default function StudentDashboard() {
                 const now = Timestamp.now();
                 const bookingsRef = collection(db, 'bookings');
 
-                // Fetch all bookings for this student
+                // Fetch all bookings for this student (no orderBy to avoid composite index)
                 const upcomingQuery = query(
                     bookingsRef,
-                    where('studentId', '==', user.uid),
-                    orderBy('scheduledAt', 'asc')
+                    where('studentId', '==', user.uid)
                 );
 
                 const upcomingSnap = await getDocs(upcomingQuery);
                 const allBookings = upcomingSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Booking));
 
-                // Filter in memory to avoid composite index requirement
-                const filtered = allBookings.filter(b =>
-                    (b.status === 'confirmed' || b.status === 'pending') &&
-                    b.scheduledAt.toMillis() > now.toMillis()
-                ).slice(0, 5);
+                // Sort and filter in memory
+                const filtered = allBookings
+                    .filter(b =>
+                        (b.status === 'confirmed' || b.status === 'pending') &&
+                        b.scheduledAt.toMillis() > now.toMillis()
+                    )
+                    .sort((a, b) => a.scheduledAt.toMillis() - b.scheduledAt.toMillis())
+                    .slice(0, 5);
 
                 setUpcomingClasses(filtered);
 
@@ -69,15 +70,15 @@ export default function StudentDashboard() {
 
     return (
         <div className="space-y-8">
-            <div className="bg-indigo-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-200 relative overflow-hidden">
+            <div className="bg-indigo-600 rounded-3xl p-6 md:p-8 text-white shadow-xl shadow-indigo-200 relative overflow-hidden">
                 <div className="relative z-10">
-                    <h1 className="text-3xl font-serif font-bold mb-2">Welcome back, {user?.displayName?.split(' ')[0]}!</h1>
-                    <p className="text-indigo-100 mb-6 max-w-lg">Ready to learn something new today? Find the perfect mentor to help you master your subjects.</p>
+                    <h1 className="text-2xl md:text-3xl font-serif font-bold mb-2">Welcome back, {user?.displayName?.split(' ')[0]}!</h1>
+                    <p className="text-indigo-100 mb-6 max-w-lg text-sm md:text-base">Ready to learn something new today? Find the perfect mentor to help you master your subjects.</p>
                     <Link
                         to="/student/search"
-                        className="inline-flex items-center gap-2 bg-white text-indigo-600 px-6 py-3 rounded-xl font-bold hover:bg-indigo-50 transition-colors"
+                        className="inline-flex items-center gap-2 bg-white text-indigo-600 px-5 py-2.5 md:px-6 md:py-3 rounded-xl font-bold hover:bg-indigo-50 transition-colors text-sm md:text-base"
                     >
-                        <Search size={20} />
+                        <Search size={18} />
                         Find a Teacher
                     </Link>
                 </div>
@@ -117,34 +118,34 @@ export default function StudentDashboard() {
                         <div className="space-y-3">
                             {upcomingClasses.map(booking => (
                                 <div key={booking.id} className="bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between group">
-                                    <div className="flex items-center gap-4">
-                                        <div className={`w-12 h-12 ${booking.status === 'confirmed' ? 'bg-indigo-50 text-indigo-600' : 'bg-amber-50 text-amber-600'} rounded-xl flex flex-col items-center justify-center text-xs font-bold`}>
+                                    <div className="flex items-center gap-2 md:gap-4">
+                                        <div className={`w-10 h-10 md:w-12 md:h-12 ${booking.status === 'confirmed' ? 'bg-indigo-50 text-indigo-600' : 'bg-amber-50 text-amber-600'} rounded-xl flex flex-col items-center justify-center text-[10px] md:text-xs font-bold shrink-0`}>
                                             <span>{booking.scheduledAt.toDate().getDate()}</span>
-                                            <span className="uppercase text-[10px]">{booking.scheduledAt.toDate().toLocaleString('default', { month: 'short' })}</span>
+                                            <span className="uppercase text-[8px] md:text-[10px]">{booking.scheduledAt.toDate().toLocaleString('default', { month: 'short' })}</span>
                                         </div>
-                                        <div>
-                                            <div className="font-bold text-slate-900 flex items-center gap-2">
-                                                {booking.topic}
+                                        <div className="min-w-0">
+                                            <div className="font-bold text-slate-900 flex items-center gap-2 truncate">
+                                                <span className="truncate">{booking.topic}</span>
                                                 {booking.status === 'pending' && (
-                                                    <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded uppercase tracking-wider">Pending</span>
+                                                    <span className="text-[8px] md:text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0">Pending</span>
                                                 )}
                                             </div>
-                                            <div className="text-sm text-slate-500 flex items-center gap-2">
-                                                <Clock size={14} />
+                                            <div className="text-xs md:text-sm text-slate-500 flex items-center gap-2">
+                                                <Clock size={12} className="md:w-3.5 md:h-3.5" />
                                                 {booking.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => setSelectedBooking(booking)}
-                                            className="px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                    <div className="flex items-center gap-1 md:gap-2">
+                                        <Link
+                                            to={`/student/bookings/${booking.id}`}
+                                            className="px-2 py-1 md:px-3 md:py-1.5 text-[10px] md:text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors lg:opacity-0 lg:group-hover:opacity-100"
                                         >
-                                            View Detail
-                                        </button>
+                                            View
+                                        </Link>
                                         {booking.status === 'confirmed' && (
-                                            <button className="p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors">
-                                                <Video size={20} />
+                                            <button className="p-1.5 md:p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors">
+                                                <Video size={18} className="md:w-5 md:h-5" />
                                             </button>
                                         )}
                                     </div>
@@ -176,12 +177,6 @@ export default function StudentDashboard() {
                 </div>
             </div>
 
-            {selectedBooking && (
-                <BookingDetailModal
-                    booking={selectedBooking}
-                    onClose={() => setSelectedBooking(null)}
-                />
-            )}
         </div>
     );
 }
