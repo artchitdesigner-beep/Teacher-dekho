@@ -18,6 +18,8 @@ import TeacherDashboard from './pages/teacher/TeacherDashboard';
 import TeacherRequests from './pages/teacher/TeacherRequests';
 import TeacherSchedule from './pages/teacher/TeacherSchedule';
 import TeacherProfile from './pages/teacher/TeacherProfile';
+import TeacherBookingDetail from './pages/teacher/TeacherBookingDetail';
+import Notifications from './pages/Notifications';
 
 function App() {
   return (
@@ -38,6 +40,7 @@ function App() {
           <Route path="bookings" element={<MyBookings />} />
           <Route path="bookings/:id" element={<BookingDetail />} />
           <Route path="requests" element={<MyRequests />} />
+          <Route path="notifications" element={<Notifications />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 
@@ -47,6 +50,8 @@ function App() {
           <Route path="requests" element={<TeacherRequests />} />
           <Route path="schedule" element={<TeacherSchedule />} />
           <Route path="profile" element={<TeacherProfile />} />
+          <Route path="bookings/:id" element={<TeacherBookingDetail />} />
+          <Route path="notifications" element={<Notifications />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 

@@ -16,16 +16,26 @@ interface BookingModalProps {
     studentName: string;
     onClose: () => void;
     onSuccess: () => void;
+    initialDate?: string;
+    initialTime?: string;
 }
 
-export default function BookingModal({ teacher, studentId, studentName, onClose, onSuccess }: BookingModalProps) {
+export default function BookingModal({
+    teacher,
+    studentId,
+    studentName,
+    onClose,
+    onSuccess,
+    initialDate = '',
+    initialTime = ''
+}: BookingModalProps) {
     const [loading, setLoading] = useState(false);
     // Removed unused step state
 
     const [formData, setFormData] = useState({
         topic: '',
-        date: '',
-        time: '',
+        date: initialDate,
+        time: initialTime,
         description: '',
     });
     const [members, setMembers] = useState([{ name: '', phone: '' }]);

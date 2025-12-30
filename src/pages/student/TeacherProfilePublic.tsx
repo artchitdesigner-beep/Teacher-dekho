@@ -12,6 +12,8 @@ export default function TeacherProfilePublic() {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [showBookingModal, setShowBookingModal] = useState(false);
+    const [selectedDate, setSelectedDate] = useState<string>('');
+    const [selectedTime, setSelectedTime] = useState<string>('');
     const [teacher, setTeacher] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -32,6 +34,24 @@ export default function TeacherProfilePublic() {
         }
         fetchTeacher();
     }, [id]);
+
+    const handleSlotClick = (day: string, slot: string) => {
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const targetDayIndex = days.indexOf(day);
+        const today = new Date();
+        const currentDayIndex = today.getDay();
+
+        let diff = targetDayIndex - currentDayIndex;
+        if (diff < 0) diff += 7; // Next week
+
+        const targetDate = new Date(today);
+        targetDate.setDate(today.getDate() + diff);
+
+        const dateString = targetDate.toISOString().split('T')[0];
+        setSelectedDate(dateString);
+        setSelectedTime(slot);
+        setShowBookingModal(true);
+    };
 
     if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin text-indigo-600" /></div>;
     if (!teacher) return <div className="flex items-center justify-center min-h-screen">Teacher not found</div>;
@@ -190,7 +210,10 @@ export default function TeacherProfilePublic() {
                         </p>
 
                         <div className="mt-8">
-                            <AvailabilityMap availability={teacher.availability} />
+                            <AvailabilityMap
+                                availability={teacher.availability}
+                                onSlotClick={handleSlotClick}
+                            />
                         </div>
                     </div>
                 </div>
@@ -201,7 +224,13 @@ export default function TeacherProfilePublic() {
                     teacher={teacher}
                     studentId={user?.uid || 'guest'}
                     studentName={user?.displayName || 'Guest Student'}
-                    onClose={() => setShowBookingModal(false)}
+                    initialDate={selectedDate}
+                    initialTime={selectedTime}
+                    onClose={() => {
+                        setShowBookingModal(false);
+                        setSelectedDate('');
+                        setSelectedTime('');
+                    }}
                     onSuccess={() => {
                         alert('Booking request sent!');
                         setShowBookingModal(false);

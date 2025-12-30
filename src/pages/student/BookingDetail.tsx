@@ -4,29 +4,32 @@ import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import {
-    Calendar, Clock, Video, CreditCard,
-    Users, AlertCircle, ChevronLeft, Trash2,
-    Plus, X, ExternalLink
+    Clock, AlertCircle,
+    Video, Info, User,
+    ExternalLink, ChevronLeft, Trash2, CreditCard
 } from 'lucide-react';
 
-interface Member {
-    name: string;
-    phone: string;
+interface Session {
+    id: string;
+    scheduledAt: Timestamp;
+    status: 'pending' | 'confirmed' | 'rejected' | 'completed';
+    isDemo: boolean;
 }
 
 interface Booking {
     id: string;
     teacherId: string;
+    teacherName: string;
     studentId: string;
     studentName: string;
     topic: string;
     description?: string;
-    scheduledAt: Timestamp;
-    status: 'pending' | 'confirmed' | 'rejected' | 'completed';
-    isDemo: boolean;
-    members?: Member[];
+    totalSessions: number;
+    sessions: Session[];
+    status: 'active' | 'pending' | 'completed' | 'rejected';
+    paymentStatus: 'pending' | 'paid' | 'required';
     teacherRemarks?: string;
-    paymentStatus?: 'pending' | 'paid' | 'failed';
+    members?: { name: string; phone: string }[];
     createdAt: Timestamp;
 }
 
@@ -37,8 +40,6 @@ export default function BookingDetail() {
     const [booking, setBooking] = useState<Booking | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [newMember, setNewMember] = useState({ name: '', phone: '' });
-    const [isAddingMember, setIsAddingMember] = useState(false);
 
     useEffect(() => {
         async function fetchBooking() {
@@ -69,39 +70,6 @@ export default function BookingDetail() {
         fetchBooking();
     }, [bookingId, user]);
 
-    const handleAddMember = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!booking || !newMember.name || !newMember.phone) return;
-
-        try {
-            const updatedMembers = [...(booking.members || []), newMember];
-            const docRef = doc(db, 'bookings', booking.id);
-            await updateDoc(docRef, { members: updatedMembers });
-
-            setBooking({ ...booking, members: updatedMembers });
-            setNewMember({ name: '', phone: '' });
-            setIsAddingMember(false);
-        } catch (err) {
-            console.error("Error adding member:", err);
-            alert("Failed to add member.");
-        }
-    };
-
-    const handleRemoveMember = async (index: number) => {
-        if (!booking || !booking.members) return;
-
-        try {
-            const updatedMembers = booking.members.filter((_, i) => i !== index);
-            const docRef = doc(db, 'bookings', booking.id);
-            await updateDoc(docRef, { members: updatedMembers });
-
-            setBooking({ ...booking, members: updatedMembers });
-        } catch (err) {
-            console.error("Error removing member:", err);
-            alert("Failed to remove member.");
-        }
-    };
-
     const handleCancelBooking = async () => {
         if (!booking) return;
         if (!confirm("Are you sure you want to cancel this booking? This action cannot be undone.")) return;
@@ -131,6 +99,17 @@ export default function BookingDetail() {
         }
     };
 
+    const getNextSession = () => {
+        if (!booking?.sessions) return null;
+        const now = Date.now();
+        return booking.sessions
+            .filter(s => s.status === 'confirmed' && s.scheduledAt.toMillis() > now)
+            .sort((a, b) => a.scheduledAt.toMillis() - b.scheduledAt.toMillis())[0];
+    };
+
+    const nextSession = getNextSession();
+    const firstSessionCompleted = booking?.sessions?.some(s => s.isDemo && s.status === 'completed');
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
@@ -155,8 +134,7 @@ export default function BookingDetail() {
         );
     }
 
-    const isUpcoming = booking.scheduledAt.toMillis() > Date.now();
-    const canJoin = booking.status === 'confirmed' && isUpcoming;
+    const canJoin = nextSession && booking.status === 'active';
 
     return (
         <div className="max-w-5xl mx-auto space-y-8 pb-12">
@@ -169,7 +147,7 @@ export default function BookingDetail() {
                     <ChevronLeft size={20} />
                     Back to Dashboard
                 </button>
-                <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${booking.status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
+                <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${booking.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
                     booking.status === 'pending' ? 'bg-amber-100 text-amber-700' :
                         'bg-slate-100 text-slate-600'
                     }`}>
@@ -183,12 +161,11 @@ export default function BookingDetail() {
                     <div className="space-y-4">
                         <div className="flex flex-wrap items-center gap-3">
                             <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold uppercase rounded-lg">
-                                {booking.isDemo ? 'Demo Class' : 'Regular Class'}
+                                {booking.totalSessions} Sessions Course
                             </span>
                             <span className="hidden md:inline text-slate-300">|</span>
                             <span className="text-slate-500 text-xs md:text-sm flex items-center gap-1">
-                                <Calendar size={14} />
-                                Booked on {booking.createdAt.toDate().toLocaleDateString()}
+                                <User size={14} /> {booking.teacherName}
                             </span>
                         </div>
                         <h1 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 leading-tight">
@@ -236,113 +213,82 @@ export default function BookingDetail() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left Column: Details */}
                 <div className="lg:col-span-2 space-y-8">
-                    {/* Schedule Card */}
+                    {/* Sessions List Card */}
                     <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
                         <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
                             <Clock className="text-indigo-600" size={20} />
-                            Class Schedule
+                            Course Sessions
                         </h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-                            <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl">
-                                <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl flex items-center justify-center text-indigo-600 shadow-sm shrink-0">
-                                    <Calendar size={20} className="md:w-6 md:h-6" />
+                        <div className="space-y-4">
+                            {booking.sessions?.map((session, idx) => (
+                                <div key={session.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${session.id === nextSession?.id ? 'bg-indigo-50 border-indigo-100 ring-1 ring-indigo-50' : 'bg-slate-50 border-slate-100'}`}>
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center font-bold shrink-0 ${session.id === nextSession?.id ? 'bg-white text-indigo-600 shadow-sm' : 'bg-white text-slate-400'}`}>
+                                            <span className="text-sm">{session.scheduledAt.toDate().getDate()}</span>
+                                            <span className="text-[8px] uppercase">{session.scheduledAt.toDate().toLocaleString('default', { month: 'short' })}</span>
+                                        </div>
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-0.5">
+                                                <span className="text-sm font-bold text-slate-900">Session {idx + 1}</span>
+                                                {session.isDemo && <span className="text-[8px] font-bold bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded uppercase">Demo</span>}
+                                            </div>
+                                            <div className="text-xs text-slate-500 flex items-center gap-2">
+                                                <Clock size={12} /> {session.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${session.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                                            session.status === 'confirmed' ? 'bg-blue-100 text-blue-700' :
+                                                'bg-amber-100 text-amber-700'
+                                            }`}>
+                                            {session.status}
+                                        </span>
+                                        {session.id === nextSession?.id && (
+                                            <button className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100">
+                                                <Video size={16} />
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
-                                <div>
-                                    <div className="text-[10px] md:text-xs text-slate-400 font-medium uppercase">Date</div>
-                                    <div className="text-sm md:text-base font-bold text-slate-900">{booking.scheduledAt.toDate().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl">
-                                <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl flex items-center justify-center text-indigo-600 shadow-sm shrink-0">
-                                    <Clock size={20} className="md:w-6 md:h-6" />
-                                </div>
-                                <div>
-                                    <div className="text-[10px] md:text-xs text-slate-400 font-medium uppercase">Time</div>
-                                    <div className="text-sm md:text-base font-bold text-slate-900">{booking.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
 
-                    {/* Members Card */}
-                    <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                <Users className="text-indigo-600" size={20} />
+                    {/* Group Members */}
+                    {booking.members && booking.members.length > 0 && (
+                        <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
+                            <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                                <User className="text-indigo-600" size={20} />
                                 Group Members
                             </h3>
-                            <button
-                                onClick={() => setIsAddingMember(!isAddingMember)}
-                                className="text-sm text-indigo-600 font-bold hover:underline flex items-center gap-1"
-                            >
-                                <Plus size={16} />
-                                Add
-                            </button>
-                        </div>
-
-                        {isAddingMember && (
-                            <form onSubmit={handleAddMember} className="mb-6 p-4 bg-indigo-50 rounded-2xl border border-indigo-100 animate-in fade-in slide-in-from-top-2">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                                    <input
-                                        required
-                                        placeholder="Name"
-                                        value={newMember.name}
-                                        onChange={e => setNewMember({ ...newMember, name: e.target.value })}
-                                        className="p-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-                                    />
-                                    <input
-                                        required
-                                        placeholder="Phone Number"
-                                        value={newMember.phone}
-                                        onChange={e => setNewMember({ ...newMember, phone: e.target.value })}
-                                        className="p-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-                                    />
-                                </div>
-                                <div className="flex justify-end gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsAddingMember(false)}
-                                        className="px-4 py-2 text-slate-500 text-sm font-bold"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="px-4 py-2 bg-indigo-600 text-white text-sm font-bold rounded-lg"
-                                    >
-                                        Save
-                                    </button>
-                                </div>
-                            </form>
-                        )}
-
-                        {!booking.members || booking.members.length === 0 ? (
-                            <div className="text-center py-8 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                                <p className="text-slate-400 text-sm">No additional members added.</p>
-                            </div>
-                        ) : (
-                            <div className="space-y-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {booking.members.map((member, idx) => (
-                                    <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl group">
-                                        <div className="flex items-center gap-3 md:gap-4">
-                                            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-400 font-bold border border-slate-100 shrink-0">
-                                                {member.name[0]}
-                                            </div>
-                                            <div className="min-w-0">
-                                                <div className="font-bold text-slate-900 truncate">{member.name}</div>
-                                                <div className="text-xs text-slate-500">{member.phone}</div>
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={() => handleRemoveMember(idx)}
-                                            className="p-2 text-slate-300 hover:text-red-500 transition-colors lg:opacity-0 lg:group-hover:opacity-100"
-                                        >
-                                            <X size={18} />
-                                        </button>
+                                    <div key={idx} className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <div className="font-bold text-slate-900">{member.name}</div>
+                                        <div className="text-xs text-slate-500">{member.phone}</div>
                                     </div>
                                 ))}
                             </div>
-                        )}
+                        </div>
+                    )}
+
+                    {/* Course Info Card */}
+                    <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
+                        <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                            <Info className="text-indigo-600" size={20} />
+                            Course Information
+                        </h3>
+                        <div className="space-y-4 text-sm text-slate-600 leading-relaxed">
+                            <p>This course covers <strong>{booking.topic}</strong> with <strong>{booking.teacherName}</strong>.</p>
+                            <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 text-amber-800 text-xs">
+                                <div className="flex items-center gap-2 font-bold mb-1">
+                                    <AlertCircle size={14} />
+                                    Payment Policy
+                                </div>
+                                The first session is a Demo. Payment for the entire course is required after the demo session is completed to continue with the rest of the classes.
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -357,29 +303,30 @@ export default function BookingDetail() {
                         <div className="space-y-6">
                             <div className="flex items-center justify-between">
                                 <span className="text-slate-500 text-sm">Status</span>
-                                <span className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase ${booking.paymentStatus === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                                <span className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase ${booking.paymentStatus === 'paid' ? 'bg-emerald-100 text-emerald-700' :
+                                    booking.paymentStatus === 'required' ? 'bg-red-100 text-red-700 animate-pulse' : 'bg-amber-100 text-amber-700'
                                     }`}>
                                     {booking.paymentStatus || 'pending'}
                                 </span>
                             </div>
                             <div className="flex items-center justify-between">
-                                <span className="text-slate-500 text-sm">Amount</span>
-                                <span className="font-bold text-slate-900">₹{booking.isDemo ? '0 (Demo)' : '500'}</span>
+                                <span className="text-slate-500 text-sm">Course Fee</span>
+                                <span className="font-bold text-slate-900">₹{booking.totalSessions * 500}</span>
                             </div>
 
-                            {booking.paymentStatus !== 'paid' && !booking.isDemo && (
+                            {booking.paymentStatus === 'required' && (
                                 <button
                                     onClick={handlePayment}
                                     className="w-full py-3.5 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
                                 >
-                                    Pay Now
+                                    Pay Course Fee
                                 </button>
                             )}
 
-                            {booking.isDemo && (
+                            {booking.paymentStatus === 'pending' && !firstSessionCompleted && (
                                 <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
                                     <p className="text-[11px] md:text-xs text-indigo-700 leading-relaxed">
-                                        <strong>Note:</strong> This is a demo class. Payment is only required if you choose to continue with regular classes.
+                                        <strong>Note:</strong> The first session is a demo. Payment is required after the demo to continue the course.
                                     </p>
                                 </div>
                             )}
@@ -390,7 +337,7 @@ export default function BookingDetail() {
                     {booking.teacherRemarks && (
                         <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
                             <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                <MessageSquare className="text-indigo-600" size={20} />
+                                <MessageSquare size={20} className="text-indigo-600" />
                                 Teacher's Remarks
                             </h3>
                             <div className="p-4 bg-slate-50 rounded-2xl italic text-slate-600 text-sm">

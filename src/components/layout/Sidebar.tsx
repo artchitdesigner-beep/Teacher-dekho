@@ -1,6 +1,9 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, Calendar, MessageSquare, Settings, LogOut, User, X } from 'lucide-react';
-import { auth } from '@/lib/firebase';
+import { LayoutDashboard, BookOpen, Calendar, MessageSquare, Settings, LogOut, User, X, Bell } from 'lucide-react';
+import { auth, db } from '@/lib/firebase';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/lib/auth-context';
 
 interface SidebarProps {
     role: 'student' | 'teacher';
@@ -9,6 +12,22 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ role, isOpen, onClose }: SidebarProps) {
+    const { user } = useAuth();
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        if (!user) return;
+        const q = query(
+            collection(db, 'notifications'),
+            where('userId', '==', user.uid),
+            where('read', '==', false)
+        );
+        const unsubscribe = onSnapshot(q, (snap) => {
+            setUnreadCount(snap.size);
+        });
+        return () => unsubscribe();
+    }, [user]);
+
     const handleLogout = () => {
         auth.signOut();
         window.location.href = '/';
@@ -20,12 +39,14 @@ export default function Sidebar({ role, isOpen, onClose }: SidebarProps) {
             { to: '/student/search', icon: BookOpen, label: 'Find Teachers' },
             { to: '/student/bookings', icon: Calendar, label: 'My Bookings' },
             { to: '/student/requests', icon: MessageSquare, label: 'My Requests' },
+            { to: '/notifications', icon: Bell, label: 'Notifications', badge: true },
         ]
         : [
             { to: '/teacher/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
             { to: '/teacher/requests', icon: MessageSquare, label: 'Requests' },
             { to: '/teacher/schedule', icon: Calendar, label: 'Schedule' },
             { to: '/teacher/profile', icon: User, label: 'Profile' },
+            { to: '/notifications', icon: Bell, label: 'Notifications', badge: true },
         ];
 
     const isTeacher = role === 'teacher';
@@ -74,14 +95,21 @@ export default function Sidebar({ role, isOpen, onClose }: SidebarProps) {
                             to={link.to}
                             onClick={onClose}
                             className={({ isActive }) =>
-                                `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive
+                                `flex items-center justify-between px-4 py-3 rounded-xl transition-all ${isActive
                                     ? activeClass
                                     : `text-slate-500 ${hoverClass}`
                                 }`
                             }
                         >
-                            <link.icon size={20} />
-                            {link.label}
+                            <div className="flex items-center gap-3">
+                                <link.icon size={20} />
+                                {link.label}
+                            </div>
+                            {link.badge && unreadCount > 0 && (
+                                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                                    {unreadCount}
+                                </span>
+                            )}
                         </NavLink>
                     ))}
                 </nav>

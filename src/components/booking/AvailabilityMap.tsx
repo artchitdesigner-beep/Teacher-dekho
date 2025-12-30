@@ -3,9 +3,10 @@ import { Clock, Check } from 'lucide-react';
 
 interface AvailabilityMapProps {
     availability?: any; // Mocking for now
+    onSlotClick?: (day: string, slot: string) => void;
 }
 
-export default function AvailabilityMap({ availability }: AvailabilityMapProps) {
+export default function AvailabilityMap({ availability, onSlotClick }: AvailabilityMapProps) {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const timeSlots = ['09:00', '11:00', '13:00', '15:00', '17:00', '19:00'];
 
@@ -44,16 +45,18 @@ export default function AvailabilityMap({ availability }: AvailabilityMapProps) 
                             {days.map(day => {
                                 const isAvailable = mockAvailability[day]?.includes(slot);
                                 return (
-                                    <div
+                                    <button
                                         key={`${day}-${slot}`}
-                                        className={`aspect-square rounded-sm border transition-colors flex items-center justify-center ${isAvailable
-                                            ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
-                                            : 'bg-slate-50 border-slate-100 text-transparent'
+                                        onClick={() => isAvailable && onSlotClick?.(day, slot)}
+                                        disabled={!isAvailable}
+                                        className={`aspect-square rounded-sm border transition-all flex items-center justify-center ${isAvailable
+                                            ? 'bg-emerald-50 border-emerald-100 text-emerald-600 hover:bg-emerald-100 hover:scale-110 cursor-pointer'
+                                            : 'bg-slate-50 border-slate-100 text-transparent cursor-not-allowed'
                                             }`}
-                                        title={isAvailable ? `${day} at ${slot}` : 'Unavailable'}
+                                        title={isAvailable ? `${day} at ${slot} - Click to Book` : 'Unavailable'}
                                     >
                                         {isAvailable && <Check size={8} strokeWidth={3} />}
-                                    </div>
+                                    </button>
                                 );
                             })}
                         </React.Fragment>

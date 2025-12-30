@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, query, where, getDocs, Timestamp } from 'firebase/firestore';
-import { Plus, MessageSquare, Loader2, CheckCircle, Clock } from 'lucide-react';
+import { collection, addDoc, query, where, getDocs, Timestamp, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import { Plus, MessageSquare, Loader2, CheckCircle, Clock, Edit2, Trash2, AlertTriangle, X } from 'lucide-react';
 
 interface Request {
     id: string;
@@ -22,6 +22,7 @@ export default function MyRequests() {
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
 
     const [formData, setFormData] = useState({
         topic: '',
@@ -60,7 +61,7 @@ export default function MyRequests() {
         setSubmitting(true);
 
         try {
-            await addDoc(collection(db, 'open_requests'), {
+            const data = {
                 studentId: user.uid,
                 studentName: user.displayName || 'Student',
                 topic: formData.topic,
@@ -70,16 +71,50 @@ export default function MyRequests() {
                 course: formData.course,
                 timeSlot: formData.timeSlot,
                 status: 'open',
-                createdAt: Timestamp.now()
-            });
+                updatedAt: Timestamp.now()
+            };
+
+            if (editingId) {
+                await updateDoc(doc(db, 'open_requests', editingId), data);
+            } else {
+                await addDoc(collection(db, 'open_requests'), {
+                    ...data,
+                    createdAt: Timestamp.now()
+                });
+            }
 
             setFormData({ topic: '', description: '', budget: '500', subject: '', course: '', timeSlot: '' });
             setShowForm(false);
+            setEditingId(null);
             fetchRequests(); // Refresh list
         } catch (error) {
-            console.error('Error creating request:', error);
+            console.error('Error saving request:', error);
         } finally {
             setSubmitting(false);
+        }
+    };
+
+    const handleEdit = (req: Request) => {
+        setFormData({
+            topic: req.topic,
+            description: req.description,
+            budget: req.budget,
+            subject: req.subject,
+            course: req.course,
+            timeSlot: req.timeSlot
+        });
+        setEditingId(req.id);
+        setShowForm(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this request?')) return;
+        try {
+            await deleteDoc(doc(db, 'open_requests', id));
+            setRequests(requests.filter(r => r.id !== id));
+        } catch (error) {
+            console.error('Error deleting request:', error);
         }
     };
 
@@ -93,17 +128,26 @@ export default function MyRequests() {
                     <p className="text-sm md:text-base text-slate-500">Post a requirement and let teachers contact you.</p>
                 </div>
                 <button
-                    onClick={() => setShowForm(!showForm)}
+                    onClick={() => {
+                        if (showForm && editingId) {
+                            setEditingId(null);
+                            setFormData({ topic: '', description: '', budget: '500', subject: '', course: '', timeSlot: '' });
+                        } else {
+                            setShowForm(!showForm);
+                        }
+                    }}
                     className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
                 >
-                    <Plus size={20} />
-                    New Request
+                    {showForm && editingId ? <X size={20} /> : <Plus size={20} />}
+                    {showForm && editingId ? 'Cancel Edit' : 'New Request'}
                 </button>
             </div>
 
             {showForm && (
                 <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl animate-in slide-in-from-top-4">
-                    <h3 className="text-xl font-bold text-slate-900 mb-6">Create New Request</h3>
+                    <h3 className="text-xl font-bold text-slate-900 mb-6">
+                        {editingId ? 'Edit Request' : 'Create New Request'}
+                    </h3>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                             <div>
@@ -213,7 +257,7 @@ export default function MyRequests() {
                                 disabled={submitting}
                                 className="w-full sm:w-auto px-8 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50 shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 text-sm"
                             >
-                                {submitting ? <Loader2 className="animate-spin" size={20} /> : 'Post Request'}
+                                {submitting ? <Loader2 className="animate-spin" size={20} /> : (editingId ? 'Update Request' : 'Post Request')}
                             </button>
                         </div>
                     </form>
@@ -249,6 +293,24 @@ export default function MyRequests() {
                                     {req.budget && <span className="font-bold text-slate-600">Budget: ₹{req.budget}/hr</span>}
                                 </div>
                             </div>
+                            {req.status === 'open' && (
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handleEdit(req)}
+                                        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                                        title="Edit Request"
+                                    >
+                                        <Edit2 size={18} />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(req.id)}
+                                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                        title="Delete Request"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
+                            )}
                             {req.status === 'accepted' && (
                                 <div className="flex sm:justify-end">
                                     <span className="px-4 py-2 bg-emerald-50 text-emerald-600 text-sm font-bold rounded-xl flex items-center gap-2">

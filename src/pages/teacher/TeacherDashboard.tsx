@@ -2,16 +2,24 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, Timestamp, doc, updateDoc } from 'firebase/firestore';
-import { Calendar, Clock, User, AlertCircle } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+interface Session {
+    id: string;
+    scheduledAt: Timestamp;
+    status: 'pending' | 'confirmed' | 'rejected' | 'completed';
+    isDemo: boolean;
+}
 
 interface Booking {
     id: string;
     studentName: string;
     topic: string;
-    scheduledAt: Timestamp;
-    status: 'pending' | 'confirmed' | 'rejected' | 'completed';
-    isDemo: boolean;
+    totalSessions: number;
+    sessions: Session[];
+    status: 'active' | 'pending' | 'completed' | 'rejected';
+    paymentStatus: 'pending' | 'paid' | 'required';
     createdAt: Timestamp;
 }
 
@@ -26,10 +34,9 @@ export default function TeacherDashboard() {
             if (!user) return;
 
             try {
-                const now = Timestamp.now();
                 const bookingsRef = collection(db, 'bookings');
 
-                // Fetch all bookings for this teacher (no orderBy to avoid composite index)
+                // Fetch all bookings for this teacher
                 const allBookingsQuery = query(
                     bookingsRef,
                     where('teacherId', '==', user.uid)
@@ -42,9 +49,9 @@ export default function TeacherDashboard() {
                 const sortedAll = [...allBookings].sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
 
                 const upcoming = allBookings
-                    .filter(b => b.status === 'confirmed' && b.scheduledAt.toMillis() > now.toMillis())
-                    .sort((a, b) => a.scheduledAt.toMillis() - b.scheduledAt.toMillis())
-                    .slice(0, 3);
+                    .filter(b => b.status === 'active' || b.status === 'pending')
+                    .sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis())
+                    .slice(0, 6);
 
                 const pending = sortedAll
                     .filter(b => b.status === 'pending')
@@ -63,14 +70,11 @@ export default function TeacherDashboard() {
         fetchDashboardData();
     }, [user]);
 
-    const [remarks, setRemarks] = useState<{ [key: string]: string }>({});
-
-    const handleStatusUpdate = async (bookingId: string, newStatus: 'confirmed' | 'rejected') => {
+    const handleStatusUpdate = async (bookingId: string, newStatus: 'active' | 'rejected') => {
         try {
             const bookingRef = doc(db, 'bookings', bookingId);
             await updateDoc(bookingRef, {
                 status: newStatus,
-                teacherRemarks: remarks[bookingId] || '',
                 updatedAt: Timestamp.now()
             });
 
@@ -117,123 +121,109 @@ export default function TeacherDashboard() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Upcoming Classes */}
-                <div className="space-y-4">
+                {/* Active Courses */}
+                <div className="space-y-6">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-slate-900">Upcoming Classes</h2>
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={async () => {
-                                    if (!user) return;
-                                    setLoading(true);
-                                    const { seedBookings } = await import('@/lib/seed');
-                                    await seedBookings(user.uid, user.displayName || 'Teacher');
-                                    window.location.reload();
-                                }}
-                                className="text-xs text-indigo-600 font-medium hover:underline"
-                            >
-                                Seed Demo
-                            </button>
-                            <Link to="/teacher/schedule" className="text-sm text-indigo-600 font-medium hover:underline">View all</Link>
-                        </div>
+                        <h2 className="text-xl font-bold text-slate-900">Active Courses</h2>
+                        <Link to="/teacher/schedule" className="text-indigo-600 text-sm font-bold hover:underline">View All</Link>
                     </div>
 
-                    {upcomingClasses.length === 0 ? (
-                        <div className="bg-white p-8 rounded-3xl border border-slate-100 text-center text-slate-500">
-                            <Calendar className="mx-auto mb-3 text-slate-300" size={32} />
-                            <p>No upcoming classes scheduled.</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-3">
-                            {upcomingClasses.map(booking => (
-                                <div key={booking.id} className="bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-3 md:gap-4">
-                                        <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-50 text-indigo-600 rounded-xl flex flex-col items-center justify-center text-[10px] md:text-xs font-bold shrink-0">
-                                            <span>{booking.scheduledAt.toDate().getDate()}</span>
-                                            <span className="uppercase text-[8px] md:text-[10px]">{booking.scheduledAt.toDate().toLocaleString('default', { month: 'short' })}</span>
-                                        </div>
-                                        <div className="min-w-0">
-                                            <div className="font-bold text-slate-900 truncate">{booking.topic}</div>
-                                            <div className="text-xs md:text-sm text-slate-500 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                                <div className="flex items-center gap-1">
-                                                    <Clock size={12} />
-                                                    {booking.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                </div>
-                                                <span className="hidden sm:inline">•</span>
-                                                <div className="flex items-center gap-1">
-                                                    <User size={12} />
-                                                    {booking.studentName}
-                                                </div>
+                    <div className="space-y-4">
+                        {upcomingClasses.length === 0 ? (
+                            <div className="p-8 bg-white rounded-3xl border border-dashed border-slate-200 text-center">
+                                <p className="text-slate-400">No active courses found.</p>
+                            </div>
+                        ) : (
+                            upcomingClasses.map(booking => {
+                                const completedSessions = booking.sessions?.filter(s => s.status === 'completed').length || 0;
+                                const nextSession = booking.sessions?.find(s => s.status === 'confirmed' && s.scheduledAt.toMillis() > Date.now());
+
+                                return (
+                                    <Link
+                                        key={booking.id}
+                                        to={`/teacher/bookings/${booking.id}`}
+                                        className="block p-5 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group"
+                                    >
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div>
+                                                <h3 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{booking.topic}</h3>
+                                                <p className="text-xs text-slate-500">Student: {booking.studentName}</p>
                                             </div>
+                                            <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase ${booking.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                                                }`}>
+                                                {booking.status}
+                                            </span>
                                         </div>
-                                    </div>
-                                    <button className="px-3 py-1.5 md:px-4 md:py-2 bg-indigo-50 text-indigo-600 text-xs md:text-sm font-bold rounded-xl hover:bg-indigo-100 transition-colors">
-                                        Join
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
+                                                <span>Progress</span>
+                                                <span>{completedSessions}/{booking.totalSessions} Sessions</span>
+                                            </div>
+                                            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                                <div
+                                                    className="h-full bg-indigo-600 rounded-full transition-all duration-500"
+                                                    style={{ width: `${(completedSessions / booking.totalSessions) * 100}%` }}
+                                                ></div>
+                                            </div>
+                                            {nextSession && (
+                                                <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 p-2 rounded-lg">
+                                                    <Clock size={14} className="text-indigo-500" />
+                                                    Next: {nextSession.scheduledAt.toDate().toLocaleDateString()} at {nextSession.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </Link>
+                                );
+                            })
+                        )}
+                    </div>
                 </div>
 
-                {/* Pending Requests */}
-                <div className="space-y-4">
+                {/* Pending Approvals */}
+                <div className="space-y-6">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-slate-900">Pending Requests</h2>
-                        <Link to="/teacher/requests" className="text-sm text-indigo-600 font-medium hover:underline">View all</Link>
+                        <h2 className="text-xl font-bold text-slate-900">New Requests</h2>
+                        <Link to="/teacher/requests" className="text-indigo-600 text-sm font-bold hover:underline">View All</Link>
                     </div>
 
-                    {pendingRequests.length === 0 ? (
-                        <div className="bg-white p-8 rounded-3xl border border-slate-100 text-center text-slate-500">
-                            <AlertCircle className="mx-auto mb-3 text-slate-300" size={32} />
-                            <p>No pending requests.</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-3">
-                            {pendingRequests.map(booking => (
-                                <div key={booking.id} className="bg-white p-4 rounded-2xl border border-slate-100">
-                                    <div className="flex items-center justify-between mb-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold">
-                                                {booking.studentName[0]}
-                                            </div>
-                                            <div>
-                                                <div className="font-bold text-slate-900">{booking.studentName}</div>
-                                                <div className="text-xs text-slate-500">{booking.isDemo ? 'Demo Class' : 'Regular Class'}</div>
-                                            </div>
+                    <div className="space-y-4">
+                        {pendingRequests.length === 0 ? (
+                            <div className="p-8 bg-white rounded-3xl border border-dashed border-slate-200 text-center">
+                                <p className="text-slate-400">No pending requests.</p>
+                            </div>
+                        ) : (
+                            pendingRequests.map(booking => (
+                                <div key={booking.id} className="p-5 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h3 className="font-bold text-slate-900">{booking.topic}</h3>
+                                            <p className="text-xs text-slate-500">From: {booking.studentName}</p>
                                         </div>
-                                        <div className="text-xs font-medium text-slate-400">
-                                            {booking.scheduledAt.toDate().toLocaleDateString()}
+                                        <div className="text-right">
+                                            <div className="text-[10px] font-bold text-slate-400 uppercase mb-1">Requested On</div>
+                                            <div className="text-xs font-bold text-slate-900">{booking.createdAt.toDate().toLocaleDateString()}</div>
                                         </div>
                                     </div>
-                                    <div className="mb-4">
-                                        <div className="text-sm text-slate-900 font-medium mb-2">Topic: {booking.topic}</div>
-                                        <textarea
-                                            placeholder="Add a remark (optional)..."
-                                            value={remarks[booking.id] || ''}
-                                            onChange={e => setRemarks({ ...remarks, [booking.id]: e.target.value })}
-                                            className="w-full p-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition resize-none"
-                                            rows={2}
-                                        />
-                                    </div>
+
                                     <div className="flex gap-2">
                                         <button
-                                            onClick={() => handleStatusUpdate(booking.id, 'confirmed')}
-                                            className="flex-1 py-2 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 transition-colors"
+                                            onClick={() => handleStatusUpdate(booking.id, 'active')}
+                                            className="flex-1 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700 transition-all"
                                         >
-                                            Accept
+                                            Approve
                                         </button>
                                         <button
                                             onClick={() => handleStatusUpdate(booking.id, 'rejected')}
-                                            className="flex-1 py-2 bg-slate-100 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-200 transition-colors"
+                                            className="flex-1 py-2 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all"
                                         >
                                             Decline
                                         </button>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    )}
+                            ))
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
