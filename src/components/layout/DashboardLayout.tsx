@@ -3,6 +3,7 @@ import Sidebar from './Sidebar';
 import { useAuth } from '@/lib/auth-context';
 import { Loader2, Menu } from 'lucide-react';
 import { useState } from 'react';
+import ProfileDropdown from './ProfileDropdown';
 
 interface DashboardLayoutProps {
     role: 'student' | 'teacher';
@@ -30,24 +31,25 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
         return <Navigate to={`/${userRole}/dashboard`} replace />;
     }
 
-    const isTeacher = role === 'teacher';
+
 
     return (
         <div className="min-h-screen bg-[#FDFCF8]">
-            {/* Mobile Header */}
-            <header className="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
-                <div className="flex items-center gap-2 font-bold text-lg font-serif text-slate-900">
-                    <div className={`${isTeacher ? 'bg-emerald-600' : 'bg-indigo-600'} text-white p-1 rounded`}>
-                        <Menu size={16} />
-                    </div>
-                    TeacherDekho
+            {/* Dashboard Header */}
+            <header className="fixed top-0 right-0 left-0 lg:left-64 h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 z-30 px-6 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => setIsSidebarOpen(true)}
+                        className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                    >
+                        <Menu size={24} />
+                    </button>
+                    <h1 className="text-lg font-semibold text-slate-900 lg:hidden">TeacherDekho</h1>
                 </div>
-                <button
-                    onClick={() => setIsSidebarOpen(true)}
-                    className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-                >
-                    <Menu size={24} />
-                </button>
+
+                <div className="flex items-center gap-4">
+                    <ProfileDropdown />
+                </div>
             </header>
 
             {/* Sidebar with mobile overlay */}
@@ -58,7 +60,7 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
             />
 
             {/* Main Content */}
-            <main className="lg:pl-64 min-h-screen transition-all duration-300">
+            <main className="lg:pl-64 min-h-screen transition-all duration-300 pt-20">
                 <div className="max-w-7xl mx-auto p-4 md:p-8">
                     <Outlet />
                 </div>

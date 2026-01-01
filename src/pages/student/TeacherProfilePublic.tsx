@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Star, MapPin, Clock, Award, ShieldCheck, Play, Video, Calendar, CheckCircle2, Loader2 } from 'lucide-react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Star, MapPin, Clock, Award, ShieldCheck, Play, Video, Calendar, CheckCircle2, Loader2, Heart, Share2 } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import BookingModal from '@/components/booking/BookingModal';
@@ -10,12 +10,22 @@ import { useAuth } from '@/lib/auth-context';
 export default function TeacherProfilePublic() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const location = useLocation();
+    const { user, userRole } = useAuth();
+
+    useEffect(() => {
+        if (user && userRole === 'student' && location.pathname.startsWith('/teacher/')) {
+            const teacherId = location.pathname.split('/')[2];
+            navigate(`/student/teacher/${teacherId}`, { replace: true });
+        }
+    }, [user, userRole, location.pathname, navigate]);
     const [showBookingModal, setShowBookingModal] = useState(false);
     const [selectedDate, setSelectedDate] = useState<string>('');
     const [selectedTime, setSelectedTime] = useState<string>('');
     const [teacher, setTeacher] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [isSaved, setIsSaved] = useState(false);
+    const [showShareToast, setShowShareToast] = useState(false);
 
     useEffect(() => {
         async function fetchTeacher() {
@@ -36,6 +46,10 @@ export default function TeacherProfilePublic() {
     }, [id]);
 
     const handleSlotClick = (day: string, slot: string) => {
+        if (!user) {
+            navigate('/login', { state: { from: `/teacher/${id}` } });
+            return;
+        }
         const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         const targetDayIndex = days.indexOf(day);
         const today = new Date();
@@ -53,21 +67,31 @@ export default function TeacherProfilePublic() {
         setShowBookingModal(true);
     };
 
+    const handleBookClick = () => {
+        if (!user) {
+            navigate('/login', { state: { from: `/teacher/${id}` } });
+            return;
+        }
+        setShowBookingModal(true);
+    };
+
     if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin text-indigo-600" /></div>;
     if (!teacher) return <div className="flex items-center justify-center min-h-screen">Teacher not found</div>;
+
+    const isDashboard = location.pathname.startsWith('/student');
 
     return (
         <div className="min-h-screen bg-[#FDFCF8] pb-20">
             {/* Header / Breadcrumb */}
             <div className="bg-white border-b border-slate-100">
-                <div className="max-w-6xl mx-auto px-6 py-4">
+                <div className={`${isDashboard ? '' : 'max-w-7xl mx-auto px-4 md:px-8'} py-4`}>
                     <button onClick={() => navigate(-1)} className="text-sm text-slate-500 hover:text-indigo-600">
                         &larr; Back to Search
                     </button>
                 </div>
             </div>
 
-            <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className={`${isDashboard ? '' : 'max-w-7xl mx-auto px-4 md:px-8'} py-8 grid grid-cols-1 lg:grid-cols-3 gap-8`}>
                 {/* Left Column: Main Content */}
                 <div className="lg:col-span-2 space-y-8">
 
@@ -94,8 +118,36 @@ export default function TeacherProfilePublic() {
                                     <Star size={16} fill="currentColor" /> {teacher.rating || 'New'} ({teacher.reviewCount || 0})
                                 </div>
                             </div>
+
+                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-6">
+                                <button
+                                    onClick={() => setIsSaved(!isSaved)}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all border ${isSaved ? 'bg-rose-50 border-rose-100 text-rose-600' : 'bg-white border-slate-200 text-slate-600 hover:border-rose-200 hover:text-rose-600'}`}
+                                >
+                                    <Heart size={18} fill={isSaved ? "currentColor" : "none"} />
+                                    {isSaved ? 'Saved' : 'Save'}
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(window.location.href);
+                                        setShowShareToast(true);
+                                        setTimeout(() => setShowShareToast(false), 2000);
+                                    }}
+                                    className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:border-indigo-200 hover:text-indigo-600 transition-all"
+                                >
+                                    <Share2 size={18} />
+                                    Share
+                                </button>
+                            </div>
                         </div>
                     </div>
+
+                    {showShareToast && (
+                        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-4 duration-300 flex items-center gap-2">
+                            <CheckCircle2 size={18} className="text-emerald-400" />
+                            Link copied to clipboard!
+                        </div>
+                    )}
 
                     {/* Video Intro */}
                     <div className="bg-slate-900 rounded-2xl overflow-hidden aspect-video relative group cursor-pointer shadow-xl">
@@ -199,7 +251,7 @@ export default function TeacherProfilePublic() {
                         </div>
 
                         <button
-                            onClick={() => setShowBookingModal(true)}
+                            onClick={handleBookClick}
                             className="w-full py-3.5 md:py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 active:scale-95 mb-4"
                         >
                             Book Class
@@ -219,11 +271,11 @@ export default function TeacherProfilePublic() {
                 </div>
             </div>
 
-            {showBookingModal && (
+            {showBookingModal && user && (
                 <BookingModal
                     teacher={teacher}
-                    studentId={user?.uid || 'guest'}
-                    studentName={user?.displayName || 'Guest Student'}
+                    studentId={user.uid}
+                    studentName={user.displayName || 'Student'}
                     initialDate={selectedDate}
                     initialTime={selectedTime}
                     onClose={() => {

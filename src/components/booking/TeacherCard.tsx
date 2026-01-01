@@ -1,5 +1,6 @@
 import { Star, Clock, MapPin, ShieldCheck, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/lib/auth-context';
 // User type not actually used in component props, removing import
 
 interface TeacherCardProps {
@@ -8,6 +9,9 @@ interface TeacherCardProps {
 }
 
 export default function TeacherCard({ teacher, onBook }: TeacherCardProps) {
+    const { userRole } = useAuth();
+    const profilePath = userRole === 'student' ? `/student/teacher/${teacher.id}` : `/teacher/${teacher.id}`;
+
     return (
         <div className="bg-white rounded-2xl border border-slate-100 p-6 hover:shadow-xl hover:shadow-indigo-100/50 transition-all duration-300 flex flex-col md:flex-row gap-6">
             {/* Left: Avatar */}
@@ -59,6 +63,16 @@ export default function TeacherCard({ teacher, onBook }: TeacherCardProps) {
                     <span className="px-3 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-full border border-green-100 flex items-center gap-1">
                         <Clock size={10} /> Available
                     </span>
+                    {teacher.class && (
+                        <span className="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-medium rounded-full border border-indigo-100">
+                            {Array.isArray(teacher.class) ? teacher.class.join(', ') : teacher.class}
+                        </span>
+                    )}
+                    {teacher.language && (
+                        <span className="px-3 py-1 bg-slate-50 text-slate-600 text-xs font-medium rounded-full border border-slate-100">
+                            {Array.isArray(teacher.language) ? teacher.language.join(', ') : teacher.language}
+                        </span>
+                    )}
                 </div>
             </div>
 
@@ -83,7 +97,7 @@ export default function TeacherCard({ teacher, onBook }: TeacherCardProps) {
                         Book Class
                     </button>
                     <Link
-                        to={`/student/teacher/${teacher.id}`}
+                        to={profilePath}
                         className="flex-1 md:w-full px-4 py-2.5 bg-white text-indigo-600 font-medium text-xs md:text-sm rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-all text-center"
                     >
                         Profile

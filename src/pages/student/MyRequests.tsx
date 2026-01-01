@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, query, where, getDocs, Timestamp, updateDoc, doc, deleteDoc } from 'firebase/firestore';
-import { Plus, MessageSquare, Loader2, CheckCircle, Clock, Edit2, Trash2, AlertTriangle, X } from 'lucide-react';
+import { Plus, MessageSquare, Loader2, CheckCircle, Clock, Edit2, Trash2, AlertTriangle, X, Search, SlidersHorizontal } from 'lucide-react';
 
 interface Request {
     id: string;
@@ -23,6 +23,8 @@ export default function MyRequests() {
     const [showForm, setShowForm] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('All');
 
     const [formData, setFormData] = useState({
         topic: '',
@@ -118,6 +120,13 @@ export default function MyRequests() {
         }
     };
 
+    const filteredRequests = requests.filter(req => {
+        const matchesSearch = req.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            req.description.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesStatus = statusFilter === 'All' || req.status === statusFilter.toLowerCase();
+        return matchesSearch && matchesStatus;
+    });
+
     if (loading) return <div className="p-8"><Loader2 className="animate-spin" /></div>;
 
     return (
@@ -141,6 +150,33 @@ export default function MyRequests() {
                     {showForm && editingId ? <X size={20} /> : <Plus size={20} />}
                     {showForm && editingId ? 'Cancel Edit' : 'New Request'}
                 </button>
+            </div>
+
+            {/* Filters */}
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="relative flex-grow">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                    <input
+                        type="text"
+                        placeholder="Search your requests..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                    />
+                </div>
+                <div className="flex items-center gap-2">
+                    <SlidersHorizontal size={20} className="text-slate-400" />
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="px-4 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500"
+                    >
+                        <option value="All">All Status</option>
+                        <option value="Open">Open</option>
+                        <option value="Accepted">Accepted</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                </div>
             </div>
 
             {showForm && (
@@ -265,13 +301,13 @@ export default function MyRequests() {
             )}
 
             <div className="grid grid-cols-1 gap-4">
-                {requests.length === 0 ? (
+                {filteredRequests.length === 0 ? (
                     <div className="text-center py-12 bg-white rounded-3xl border border-slate-100">
                         <MessageSquare className="mx-auto text-slate-300 mb-3" size={32} />
-                        <p className="text-slate-500">You haven't posted any requests yet.</p>
+                        <p className="text-slate-500">No requests found matching your criteria.</p>
                     </div>
                 ) : (
-                    requests.map(req => (
+                    filteredRequests.map(req => (
                         <div key={req.id} className="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div className="min-w-0">
                                 <div className="flex flex-wrap items-center gap-2 mb-1">

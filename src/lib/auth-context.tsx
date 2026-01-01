@@ -7,12 +7,14 @@ interface AuthContextType {
     user: User | null;
     userRole: 'student' | 'teacher' | null;
     loading: boolean;
+    logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
     user: null,
     userRole: null,
     loading: true,
+    logout: async () => { },
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -43,8 +45,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return () => unsubscribe();
     }, []);
 
+    const logout = async () => {
+        try {
+            await auth.signOut();
+        } catch (error) {
+            console.error('Error signing out:', error);
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, userRole, loading }}>
+        <AuthContext.Provider value={{ user, userRole, loading, logout }}>
             {children}
         </AuthContext.Provider>
     );

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, updateDoc, doc, Timestamp, orderBy } from 'firebase/firestore';
-import { Loader2, User, CheckCircle } from 'lucide-react';
+import { Loader2, User, CheckCircle, Search, SlidersHorizontal } from 'lucide-react';
 
 interface Request {
     id: string;
@@ -18,6 +18,8 @@ export default function TeacherRequests() {
     const [requests, setRequests] = useState<Request[]>([]);
     const [loading, setLoading] = useState(true);
     const [processing, setProcessing] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedSubject, setSelectedSubject] = useState('All');
 
     useEffect(() => {
         fetchRequests();
@@ -59,6 +61,15 @@ export default function TeacherRequests() {
         }
     };
 
+    const subjects = ['All', 'Physics', 'Mathematics', 'Chemistry', 'Biology', 'English', 'Computer Science'];
+
+    const filteredRequests = requests.filter(req => {
+        const matchesSearch = req.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            req.description.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSubject = selectedSubject === 'All' || req.topic.toLowerCase().includes(selectedSubject.toLowerCase());
+        return matchesSearch && matchesSubject;
+    });
+
     if (loading) return <div className="p-8"><Loader2 className="animate-spin" /></div>;
 
     return (
@@ -68,14 +79,38 @@ export default function TeacherRequests() {
                 <p className="text-slate-500">Find students looking for help in your subject.</p>
             </div>
 
+            {/* Filters */}
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="relative flex-grow">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                    <input
+                        type="text"
+                        placeholder="Search requests..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                    />
+                </div>
+                <div className="flex items-center gap-2">
+                    <SlidersHorizontal size={20} className="text-slate-400" />
+                    <select
+                        value={selectedSubject}
+                        onChange={(e) => setSelectedSubject(e.target.value)}
+                        className="px-4 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500"
+                    >
+                        {subjects.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {requests.length === 0 ? (
+                {filteredRequests.length === 0 ? (
                     <div className="col-span-full text-center py-12 bg-white rounded-3xl border border-slate-100">
                         <CheckCircle className="mx-auto text-slate-300 mb-3" size={32} />
                         <p className="text-slate-500">No open requests at the moment.</p>
                     </div>
                 ) : (
-                    requests.map(req => (
+                    filteredRequests.map(req => (
                         <div key={req.id} className="bg-white p-6 rounded-3xl border border-slate-100 hover:shadow-lg transition-all">
                             <div className="flex items-start justify-between mb-4">
                                 <div className="flex items-center gap-3">

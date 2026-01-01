@@ -78,7 +78,7 @@ export default function MyBookings() {
         <div className="space-y-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900">My Bookings</h1>
+                    <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900">My Courses</h1>
                     <p className="text-sm md:text-base text-slate-500">Manage your ongoing courses and sessions.</p>
                 </div>
             </div>
@@ -103,8 +103,8 @@ export default function MyBookings() {
                 {filteredBookings.length === 0 ? (
                     <div className="text-center py-20 bg-white rounded-3xl border border-slate-100">
                         <Calendar className="mx-auto text-slate-300 mb-4" size={48} />
-                        <h3 className="text-lg font-bold text-slate-900 mb-1">No {activeTab} bookings</h3>
-                        <p className="text-slate-500">You don't have any bookings in this category.</p>
+                        <h3 className="text-lg font-bold text-slate-900 mb-1">No {activeTab} courses</h3>
+                        <p className="text-slate-500">You don't have any courses in this category.</p>
                     </div>
                 ) : (
                     filteredBookings.map(booking => {

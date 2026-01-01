@@ -41,6 +41,8 @@ export default function BookingDetail() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const [batch, setBatch] = useState<any>(null);
+
     useEffect(() => {
         async function fetchBooking() {
             if (!bookingId || !user) return;
@@ -50,18 +52,26 @@ export default function BookingDetail() {
 
                 if (docSnap.exists()) {
                     const data = docSnap.data() as Booking;
-                    // Security check: ensure the user is either the student or the teacher
                     if (data.studentId !== user.uid && data.teacherId !== user.uid) {
-                        setError("You don't have permission to view this booking.");
+                        setError("You don't have permission to view this course.");
                     } else {
                         setBooking({ ...data, id: docSnap.id });
+
+                        // Fetch batch details if batchId exists
+                        if ((data as any).batchId) {
+                            const batchRef = doc(db, 'batches', (data as any).batchId);
+                            const batchSnap = await getDoc(batchRef);
+                            if (batchSnap.exists()) {
+                                setBatch(batchSnap.data());
+                            }
+                        }
                     }
                 } else {
-                    setError("Booking not found.");
+                    setError("Course not found.");
                 }
             } catch (err) {
-                console.error("Error fetching booking:", err);
-                setError("Failed to load booking details.");
+                console.error("Error fetching course:", err);
+                setError("Failed to load course details.");
             } finally {
                 setLoading(false);
             }
@@ -145,7 +155,7 @@ export default function BookingDetail() {
                     className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 font-medium transition-colors"
                 >
                     <ChevronLeft size={20} />
-                    Back to Dashboard
+                    Back to Courses
                 </button>
                 <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${booking.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
                     booking.status === 'pending' ? 'bg-amber-100 text-amber-700' :
@@ -281,7 +291,43 @@ export default function BookingDetail() {
                         </h3>
                         <div className="space-y-4 text-sm text-slate-600 leading-relaxed">
                             <p>This course covers <strong>{booking.topic}</strong> with <strong>{booking.teacherName}</strong>.</p>
-                            <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 text-amber-800 text-xs">
+
+                            {batch && (
+                                <>
+                                    <div className="mt-8">
+                                        <h4 className="font-bold text-slate-900 mb-4">Curriculum</h4>
+                                        <div className="space-y-3">
+                                            {batch.syllabus?.map((module: any, i: number) => (
+                                                <div key={i} className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                                    <div className="font-bold text-slate-800 text-xs mb-2">{module.title}</div>
+                                                    <div className="space-y-1">
+                                                        {module.lessons.map((lesson: string, li: number) => (
+                                                            <div key={li} className="text-[10px] flex items-center gap-2">
+                                                                <div className="w-1 h-1 bg-indigo-400 rounded-full" />
+                                                                {lesson}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-8">
+                                        <h4 className="font-bold text-slate-900 mb-4">Weekly Schedule</h4>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {batch.schedule?.map((item: any, i: number) => (
+                                                <div key={i} className="p-3 bg-indigo-50 rounded-xl border border-indigo-100 text-[10px]">
+                                                    <div className="font-bold text-indigo-700">{item.day}</div>
+                                                    <div className="text-indigo-600">{item.time}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
+                            <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 text-amber-800 text-xs mt-6">
                                 <div className="flex items-center gap-2 font-bold mb-1">
                                     <AlertCircle size={14} />
                                     Payment Policy

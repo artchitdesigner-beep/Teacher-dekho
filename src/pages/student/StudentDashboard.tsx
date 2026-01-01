@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
-import { Calendar, Clock, Video, Search } from 'lucide-react';
+import { Calendar, Clock, Video, Search, MessageSquare, Plus, Bell, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Booking {
@@ -18,9 +18,14 @@ interface Booking {
     createdAt: Timestamp;
 }
 
+import BatchCard from '@/components/batches/BatchCard';
+
 export default function StudentDashboard() {
     const { user } = useAuth();
     const [upcomingClasses, setUpcomingClasses] = useState<Booking[]>([]);
+    const [batches, setBatches] = useState<any[]>([]);
+    const [requests, setRequests] = useState<any[]>([]);
+    const [notifications, setNotifications] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -29,27 +34,36 @@ export default function StudentDashboard() {
 
             try {
                 const now = Timestamp.now();
+
+                // 1. Fetch Bookings
                 const bookingsRef = collection(db, 'bookings');
-
-                // Fetch all bookings for this student (no orderBy to avoid composite index)
-                const upcomingQuery = query(
-                    bookingsRef,
-                    where('studentId', '==', user.uid)
-                );
-
+                const upcomingQuery = query(bookingsRef, where('studentId', '==', user.uid));
                 const upcomingSnap = await getDocs(upcomingQuery);
                 const allBookings = upcomingSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Booking));
 
-                // Sort and filter in memory
-                const filtered = allBookings
-                    .filter(b =>
-                        (b.status === 'confirmed' || b.status === 'pending') &&
-                        b.scheduledAt.toMillis() > now.toMillis()
-                    )
+                const filteredBookings = allBookings
+                    .filter(b => (b.status === 'confirmed' || b.status === 'pending') && b.scheduledAt.toMillis() > now.toMillis())
                     .sort((a, b) => a.scheduledAt.toMillis() - b.scheduledAt.toMillis())
                     .slice(0, 5);
+                setUpcomingClasses(filteredBookings);
 
-                setUpcomingClasses(filtered);
+                // 2. Fetch Batches
+                const batchesSnap = await getDocs(collection(db, 'batches'));
+                setBatches(batchesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+
+                // 3. Fetch Open Requests
+                const requestsQuery = query(collection(db, 'open_requests'), where('studentId', '==', user.uid));
+                const requestsSnap = await getDocs(requestsQuery);
+                const allRequests = requestsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                // Sort by createdAt desc
+                setRequests(allRequests.sort((a: any, b: any) => b.createdAt.toMillis() - a.createdAt.toMillis()).slice(0, 3));
+
+                // 4. Fetch Notifications
+                const notifQuery = query(collection(db, 'notifications'), where('userId', '==', user.uid));
+                const notifSnap = await getDocs(notifQuery);
+                const allNotifs = notifSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                // Sort by createdAt desc
+                setNotifications(allNotifs.sort((a: any, b: any) => b.createdAt.toMillis() - a.createdAt.toMillis()).slice(0, 3));
 
             } catch (error) {
                 console.error('Error fetching dashboard data:', error);
@@ -79,7 +93,7 @@ export default function StudentDashboard() {
                         className="inline-flex items-center gap-2 bg-white text-indigo-600 px-5 py-2.5 md:px-6 md:py-3 rounded-xl font-bold hover:bg-indigo-50 transition-colors text-sm md:text-base"
                     >
                         <Search size={18} />
-                        Find a Teacher
+                        Explore Teachers & Batches
                     </Link>
                 </div>
                 {/* Decorative circles */}
@@ -88,7 +102,7 @@ export default function StudentDashboard() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Upcoming Classes */}
+                {/* Left Column: Upcoming Classes */}
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <h2 className="text-xl font-bold text-slate-900">Upcoming Classes</h2>
@@ -155,28 +169,94 @@ export default function StudentDashboard() {
                     )}
                 </div>
 
-                {/* Quick Actions */}
-                <div className="space-y-4">
-                    <h2 className="text-xl font-bold text-slate-900">Quick Actions</h2>
-                    <div className="grid grid-cols-2 gap-4">
-                        <Link to="/student/requests" className="bg-white p-6 rounded-2xl border border-slate-100 hover:border-indigo-200 hover:shadow-lg transition-all group">
-                            <div className="w-10 h-10 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                <Search size={20} />
+                {/* Right Column: Requests & Notifications */}
+                <div className="space-y-8">
+                    {/* Open Requests */}
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-xl font-bold text-slate-900">Your Requests</h2>
+                            <Link to="/student/requests" className="text-sm text-indigo-600 font-medium hover:underline flex items-center gap-1">
+                                <Plus size={16} /> New Request
+                            </Link>
+                        </div>
+
+                        {requests.length === 0 ? (
+                            <div className="bg-white p-6 rounded-3xl border border-slate-100 text-center text-slate-500">
+                                <MessageSquare className="mx-auto mb-3 text-slate-300" size={24} />
+                                <p className="text-sm mb-3">No active requests.</p>
+                                <Link to="/student/requests" className="text-xs font-bold text-indigo-600 hover:underline">Post a requirement</Link>
                             </div>
-                            <div className="font-bold text-slate-900">Post Request</div>
-                            <div className="text-xs text-slate-500 mt-1">Ask for help</div>
-                        </Link>
-                        <Link to="/student/bookings" className="bg-white p-6 rounded-2xl border border-slate-100 hover:border-indigo-200 hover:shadow-lg transition-all group">
-                            <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                <Calendar size={20} />
+                        ) : (
+                            <div className="space-y-3">
+                                {requests.map(req => (
+                                    <Link key={req.id} to="/student/requests" className="block bg-white p-4 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-colors group">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${req.status === 'open' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                                                {req.status}
+                                            </span>
+                                            <span className="text-[10px] text-slate-400">{req.createdAt?.toDate().toLocaleDateString()}</span>
+                                        </div>
+                                        <h3 className="font-bold text-slate-900 text-sm truncate mb-1 group-hover:text-indigo-600 transition-colors">{req.topic}</h3>
+                                        <p className="text-xs text-slate-500 line-clamp-1">{req.description}</p>
+                                    </Link>
+                                ))}
                             </div>
-                            <div className="font-bold text-slate-900">Schedule</div>
-                            <div className="text-xs text-slate-500 mt-1">View calendar</div>
-                        </Link>
+                        )}
+                    </div>
+
+                    {/* Recent Notifications */}
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-xl font-bold text-slate-900">Notifications</h2>
+                            <Link to="/notifications" className="text-sm text-indigo-600 font-medium hover:underline">View all</Link>
+                        </div>
+
+                        {notifications.length === 0 ? (
+                            <div className="bg-white p-6 rounded-3xl border border-slate-100 text-center text-slate-500">
+                                <Bell className="mx-auto mb-3 text-slate-300" size={24} />
+                                <p className="text-sm">No new notifications.</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {notifications.map(notif => (
+                                    <div key={notif.id} className={`bg-white p-4 rounded-2xl border ${notif.read ? 'border-slate-100 opacity-75' : 'border-indigo-100 shadow-sm'} flex gap-3`}>
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${notif.read ? 'bg-slate-50 text-slate-400' : 'bg-indigo-50 text-indigo-600'}`}>
+                                            <Bell size={14} />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-bold text-slate-900 line-clamp-1">{notif.title}</p>
+                                            <p className="text-xs text-slate-500 line-clamp-1">{notif.message}</p>
+                                            <p className="text-[10px] text-slate-400 mt-1">{notif.createdAt?.toDate().toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
 
+            {/* Featured Batches Carousel */}
+            <div className="lg:col-span-2">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold text-slate-900">Featured Batches</h2>
+                    <Link to="/student/search?tab=batches" className="text-sm text-indigo-600 font-medium hover:underline">View all</Link>
+                </div>
+
+                {batches.length === 0 ? (
+                    <div className="bg-white p-8 rounded-3xl border border-slate-100 text-center text-slate-500">
+                        <p>No featured batches available at the moment.</p>
+                    </div>
+                ) : (
+                    <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
+                        {batches.map(batch => (
+                            <div key={batch.id} className="min-w-[280px] md:min-w-[320px] snap-start">
+                                <BatchCard batch={batch} />
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

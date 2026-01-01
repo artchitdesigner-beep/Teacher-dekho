@@ -4,6 +4,7 @@ import { auth, db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import logoIndigo from '@/assets/Logo Indigo.svg';
 
 interface SidebarProps {
     role: 'student' | 'teacher';
@@ -36,8 +37,8 @@ export default function Sidebar({ role, isOpen, onClose }: SidebarProps) {
     const links = role === 'student'
         ? [
             { to: '/student/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-            { to: '/student/search', icon: BookOpen, label: 'Find Teachers' },
-            { to: '/student/bookings', icon: Calendar, label: 'My Bookings' },
+            { to: '/student/search', icon: BookOpen, label: 'Explore' },
+            { to: '/student/bookings', icon: Calendar, label: 'My Courses' },
             { to: '/student/requests', icon: MessageSquare, label: 'My Requests' },
             { to: '/notifications', icon: Bell, label: 'Notifications', badge: true },
         ]
@@ -72,12 +73,10 @@ export default function Sidebar({ role, isOpen, onClose }: SidebarProps) {
                 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             `}>
                 <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                    <div className="flex items-center gap-2 font-bold text-xl font-serif text-slate-900">
-                        <div className={`${isTeacher ? 'bg-emerald-600' : 'bg-indigo-600'} text-white p-1 rounded`}>
-                            <LayoutDashboard size={16} fill="currentColor" />
-                        </div>
-                        TeacherDekho
-                    </div>
+                    <NavLink to="/" className="flex items-center gap-2">
+                        <img src={logoIndigo} alt="TeacherDekho" className="h-8 w-auto" />
+                        <span className="font-bold text-xl font-serif text-slate-900">TeacherDekho</span>
+                    </NavLink>
                     {onClose && (
                         <button
                             onClick={onClose}

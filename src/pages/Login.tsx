@@ -3,6 +3,7 @@ import { ChevronLeft, LogIn, Loader2, ArrowRight } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
+import logoIndigo from '@/assets/Logo Indigo.svg';
 
 export default function Login() {
     const navigate = useNavigate();
@@ -42,8 +43,8 @@ export default function Login() {
 
                 <div className="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
                     <div className="mb-8">
-                        <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mb-4">
-                            <LogIn size={24} />
+                        <div className="mb-4">
+                            <img src={logoIndigo} alt="TeacherDekho" className="h-12 w-auto" />
                         </div>
                         <h2 className="text-2xl font-serif font-bold text-slate-900">Welcome back</h2>
                         <p className="text-slate-500 text-sm">Please enter your details to sign in.</p>
