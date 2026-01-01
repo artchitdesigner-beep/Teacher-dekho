@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Star, MapPin, Clock, Award, ShieldCheck, Play, Video, Calendar, CheckCircle2, Loader2, Heart, Share2 } from 'lucide-react';
+import { Star, MapPin, Clock, Award, ShieldCheck, Play, Video, Calendar, CheckCircle2, Loader2, Heart, Share2, Linkedin, Youtube, Twitter, Globe, FileText, PlayCircle } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import BookingModal from '@/components/booking/BookingModal';
@@ -110,16 +110,48 @@ export default function TeacherProfilePublic() {
                                 {teacher.kycStatus === 'verified' && <ShieldCheck size={20} className="text-emerald-500" fill="currentColor" stroke="white" />}
                             </h1>
                             <p className="text-base md:text-lg text-slate-600 font-medium mb-2">{teacher.subject} Expert • {teacher.experience} Experience</p>
-                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-slate-500">
+
+                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-slate-500 mb-4">
                                 <div className="flex items-center gap-1">
                                     <MapPin size={16} /> {teacher.college || 'Online'}
                                 </div>
                                 <div className="flex items-center gap-1 text-amber-500 font-bold">
                                     <Star size={16} fill="currentColor" /> {teacher.rating || 'New'} ({teacher.reviewCount || 0})
                                 </div>
+                                {teacher.joiningDate && (
+                                    <div className="flex items-center gap-1 text-slate-400">
+                                        <Calendar size={16} /> Joined {teacher.joiningDate.toDate().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
+                                    </div>
+                                )}
                             </div>
 
-                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-6">
+                            {/* Social Links */}
+                            {teacher.socialLinks && (
+                                <div className="flex items-center justify-center sm:justify-start gap-3 mb-6">
+                                    {teacher.socialLinks.linkedin && (
+                                        <a href={teacher.socialLinks.linkedin} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 text-slate-500 hover:text-[#0077b5] hover:bg-[#0077b5]/10 rounded-full transition-colors">
+                                            <Linkedin size={18} />
+                                        </a>
+                                    )}
+                                    {teacher.socialLinks.twitter && (
+                                        <a href={teacher.socialLinks.twitter} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 text-slate-500 hover:text-[#1DA1F2] hover:bg-[#1DA1F2]/10 rounded-full transition-colors">
+                                            <Twitter size={18} />
+                                        </a>
+                                    )}
+                                    {teacher.socialLinks.youtube && (
+                                        <a href={teacher.socialLinks.youtube} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 text-slate-500 hover:text-[#FF0000] hover:bg-[#FF0000]/10 rounded-full transition-colors">
+                                            <Youtube size={18} />
+                                        </a>
+                                    )}
+                                    {teacher.socialLinks.website && (
+                                        <a href={teacher.socialLinks.website} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
+                                            <Globe size={18} />
+                                        </a>
+                                    )}
+                                </div>
+                            )}
+
+                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
                                 <button
                                     onClick={() => setIsSaved(!isSaved)}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all border ${isSaved ? 'bg-rose-50 border-rose-100 text-rose-600' : 'bg-white border-slate-200 text-slate-600 hover:border-rose-200 hover:text-rose-600'}`}
@@ -202,9 +234,89 @@ export default function TeacherProfilePublic() {
                         </div>
                     </section>
 
+                    {/* Certificates Gallery */}
+                    {teacher.certificates && teacher.certificates.length > 0 && (
+                        <section>
+                            <h2 className="text-xl font-bold text-slate-900 mb-4">Certificates</h2>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {teacher.certificates.map((cert: string, index: number) => (
+                                    <div key={index} className="aspect-[4/3] bg-slate-100 rounded-xl overflow-hidden border border-slate-200 cursor-pointer hover:shadow-md transition-shadow">
+                                        <img src={cert} alt={`Certificate ${index + 1}`} className="w-full h-full object-cover" />
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* Public Resources */}
+                    {teacher.resources && teacher.resources.length > 0 && (
+                        <section>
+                            <h2 className="text-xl font-bold text-slate-900 mb-4">Free Resources</h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {teacher.resources.map((resource: any, index: number) => (
+                                    <a
+                                        key={index}
+                                        href={resource.url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="flex gap-4 p-4 bg-white border border-slate-200 rounded-2xl hover:border-indigo-200 hover:shadow-md transition-all group"
+                                    >
+                                        <div className="w-16 h-16 bg-slate-100 rounded-xl overflow-hidden shrink-0 relative">
+                                            <img src={resource.thumbnail} alt={resource.title} className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
+                                                {resource.type === 'video' ? <PlayCircle size={24} className="text-white drop-shadow-md" /> : <FileText size={24} className="text-white drop-shadow-md" />}
+                                            </div>
+                                        </div>
+                                        <div className="min-w-0">
+                                            <h3 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{resource.title}</h3>
+                                            <p className="text-xs text-slate-500 capitalize mb-2">{resource.type}</p>
+                                            <span className="text-xs font-bold text-indigo-600">View Resource &rarr;</span>
+                                        </div>
+                                    </a>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
                     {/* Reviews Preview */}
                     <section>
                         <h2 className="text-xl font-bold text-slate-900 mb-4">Student Reviews</h2>
+
+                        {/* Rating Breakdown */}
+                        {teacher.ratingBreakdown && (
+                            <div className="bg-slate-50 p-6 rounded-2xl mb-6">
+                                <div className="flex items-center gap-4 mb-6">
+                                    <div className="text-center">
+                                        <div className="text-4xl font-bold text-slate-900">{teacher.rating}</div>
+                                        <div className="flex text-amber-400 justify-center my-1">
+                                            <Star size={16} fill="currentColor" />
+                                            <Star size={16} fill="currentColor" />
+                                            <Star size={16} fill="currentColor" />
+                                            <Star size={16} fill="currentColor" />
+                                            <Star size={16} fill="currentColor" className="text-slate-300" />
+                                        </div>
+                                        <div className="text-xs text-slate-500">{teacher.reviewCount} Reviews</div>
+                                    </div>
+                                    <div className="flex-1 space-y-2">
+                                        {[5, 4, 3, 2, 1].map((star) => {
+                                            const count = teacher.ratingBreakdown[star] || 0;
+                                            const total = Object.values(teacher.ratingBreakdown).reduce((a: any, b: any) => a + b, 0) as number;
+                                            const percentage = total > 0 ? (count / total) * 100 : 0;
+                                            return (
+                                                <div key={star} className="flex items-center gap-3 text-xs">
+                                                    <div className="w-8 font-bold text-slate-600 flex items-center gap-1">{star} <Star size={10} fill="currentColor" className="text-slate-400" /></div>
+                                                    <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+                                                        <div className="h-full bg-amber-400 rounded-full" style={{ width: `${percentage}%` }}></div>
+                                                    </div>
+                                                    <div className="w-8 text-right text-slate-400">{count}</div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="grid gap-4">
                             {[1, 2].map((i) => (
                                 <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100">

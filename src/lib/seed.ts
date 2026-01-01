@@ -9,8 +9,8 @@ export const DUMMY_BATCHES = [
         class: "12th",
         startDate: "Jan 15, 2024",
         price: 4999,
-        studentCount: 18,
-        maxStudents: 25,
+        studentCount: 8,
+        maxStudents: 10,
         rating: 4.9,
         image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
         description: "Master the entire Class 12th Physics syllabus with Dr. Priya Patel. This comprehensive course covers everything from Electrostatics to Modern Physics, designed specifically for Board Exams and Competitive Entrance Tests.",
@@ -26,7 +26,8 @@ export const DUMMY_BATCHES = [
             { day: "Friday", time: "6:00 PM - 7:30 PM" }
         ],
         teacherBio: "PhD in Physics with 10+ years of teaching experience. Helped over 5000+ students achieve their dream scores in Board exams.",
-        teacherImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+        teacherImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
+        introVideoUrl: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
     },
     {
         title: "Mathematics Foundation - Class 11th",
@@ -52,7 +53,8 @@ export const DUMMY_BATCHES = [
             { day: "Saturday", time: "10:00 AM - 11:30 AM" }
         ],
         teacherBio: "Mathematics enthusiast and former Olympiad trainer. Known for making math fun and engaging.",
-        teacherImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+        teacherImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
+        introVideoUrl: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
     },
     {
         title: "Biology Crash Course - NEET Special",
@@ -80,7 +82,8 @@ export const DUMMY_BATCHES = [
             { day: "Friday", time: "4:00 PM - 6:00 PM" }
         ],
         teacherBio: "Medical professional with a passion for teaching. Expert in Human Physiology and Genetics.",
-        teacherImage: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+        teacherImage: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
+        introVideoUrl: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
     }
 ];
 
@@ -99,7 +102,23 @@ export const DUMMY_TEACHERS = [
         kycStatus: "verified",
         avatarColor: "bg-blue-100",
         class: ["11th", "12th"],
-        language: ["English", "Hindi"]
+        language: ["English", "Hindi"],
+        joiningDate: Timestamp.fromDate(new Date('2023-01-15')),
+        certificates: [
+            "https://images.unsplash.com/photo-1589330694653-4a8b74c644db?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
+            "https://images.unsplash.com/photo-1544531586-fde5298cdd40?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+        ],
+        socialLinks: {
+            linkedin: "https://linkedin.com",
+            youtube: "https://youtube.com",
+            twitter: "https://twitter.com",
+            website: "https://example.com"
+        },
+        resources: [
+            { title: "Physics Formula Sheet", type: "pdf", url: "#", thumbnail: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" },
+            { title: "Thermodynamics Basics", type: "video", url: "#", thumbnail: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" }
+        ],
+        ratingBreakdown: { 5: 90, 4: 24, 3: 8, 2: 2, 1: 0 }
     },
     {
         name: "Prof. Rajesh Verma",
@@ -115,7 +134,19 @@ export const DUMMY_TEACHERS = [
         kycStatus: "verified",
         avatarColor: "bg-green-100",
         class: ["12th"],
-        language: ["English", "Hinglish"]
+        language: ["English", "Hinglish"],
+        joiningDate: Timestamp.fromDate(new Date('2022-06-10')),
+        certificates: [
+            "https://images.unsplash.com/photo-1589330694653-4a8b74c644db?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+        ],
+        socialLinks: {
+            linkedin: "https://linkedin.com",
+            youtube: "https://youtube.com"
+        },
+        resources: [
+            { title: "Calculus Cheat Sheet", type: "pdf", url: "#", thumbnail: "https://images.unsplash.com/photo-1596495578065-6e0763fa1178?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" }
+        ],
+        ratingBreakdown: { 5: 180, 4: 30, 3: 5, 2: 0, 1: 0 }
     },
     {
         name: "Anita Roy",
@@ -131,7 +162,14 @@ export const DUMMY_TEACHERS = [
         kycStatus: "verified",
         avatarColor: "bg-purple-100",
         class: ["11th"],
-        language: ["Hindi", "Hinglish"]
+        language: ["Hindi", "Hinglish"],
+        joiningDate: Timestamp.fromDate(new Date('2023-08-20')),
+        certificates: [],
+        socialLinks: {
+            linkedin: "https://linkedin.com"
+        },
+        resources: [],
+        ratingBreakdown: { 5: 50, 4: 30, 3: 9, 2: 0, 1: 0 }
     },
     {
         name: "Vikram Singh",
@@ -147,7 +185,20 @@ export const DUMMY_TEACHERS = [
         kycStatus: "verified",
         avatarColor: "bg-orange-100",
         class: ["11th", "12th"],
-        language: ["English"]
+        language: ["English"],
+        joiningDate: Timestamp.fromDate(new Date('2021-03-05')),
+        certificates: [
+            "https://images.unsplash.com/photo-1589330694653-4a8b74c644db?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
+            "https://images.unsplash.com/photo-1544531586-fde5298cdd40?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+        ],
+        socialLinks: {
+            linkedin: "https://linkedin.com",
+            website: "https://example.com"
+        },
+        resources: [
+            { title: "IELTS Speaking Guide", type: "pdf", url: "#", thumbnail: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" }
+        ],
+        ratingBreakdown: { 5: 250, 4: 50, 3: 12, 2: 0, 1: 0 }
     },
     {
         name: "Dr. Priya Patel",
@@ -163,7 +214,19 @@ export const DUMMY_TEACHERS = [
         kycStatus: "verified",
         avatarColor: "bg-pink-100",
         class: ["12th"],
-        language: ["English", "Marathi"]
+        language: ["English", "Marathi"],
+        joiningDate: Timestamp.fromDate(new Date('2023-05-12')),
+        certificates: [
+            "https://images.unsplash.com/photo-1589330694653-4a8b74c644db?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+        ],
+        socialLinks: {
+            linkedin: "https://linkedin.com",
+            youtube: "https://youtube.com"
+        },
+        resources: [
+            { title: "Human Anatomy Chart", type: "pdf", url: "#", thumbnail: "https://images.unsplash.com/photo-1530210124550-912dc1381cb8?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" }
+        ],
+        ratingBreakdown: { 5: 130, 4: 20, 3: 6, 2: 0, 1: 0 }
     },
     {
         name: "Arjun Mehta",
@@ -179,7 +242,17 @@ export const DUMMY_TEACHERS = [
         kycStatus: "verified",
         avatarColor: "bg-indigo-100",
         class: ["11th", "12th"],
-        language: ["English", "Hinglish"]
+        language: ["English", "Hinglish"],
+        joiningDate: Timestamp.fromDate(new Date('2023-11-01')),
+        certificates: [],
+        socialLinks: {
+            linkedin: "https://linkedin.com",
+            website: "https://github.com"
+        },
+        resources: [
+            { title: "Python Basics", type: "video", url: "#", thumbnail: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" }
+        ],
+        ratingBreakdown: { 5: 30, 4: 10, 3: 5, 2: 0, 1: 0 }
     }
 ];
 

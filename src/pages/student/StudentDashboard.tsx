@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
-import { Calendar, Clock, Video, Search, MessageSquare, Plus, Bell, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, Video, Search, MessageSquare, Plus, Bell } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Booking {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, query, where, getDocs, Timestamp, updateDoc, doc, deleteDoc } from 'firebase/firestore';
-import { Plus, MessageSquare, Loader2, CheckCircle, Clock, Edit2, Trash2, AlertTriangle, X, Search, SlidersHorizontal } from 'lucide-react';
+import { Plus, MessageSquare, Loader2, CheckCircle, Clock, Edit2, Trash2, X, Search, SlidersHorizontal } from 'lucide-react';
 
 interface Request {
     id: string;

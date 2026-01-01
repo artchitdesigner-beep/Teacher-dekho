@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronLeft, LogIn, Loader2, ArrowRight } from 'lucide-react';
+import { ChevronLeft, Loader2, ArrowRight } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';

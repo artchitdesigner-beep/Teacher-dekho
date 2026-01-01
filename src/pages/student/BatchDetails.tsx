@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Star, Clock, Calendar, Users, CheckCircle2, Loader2, ArrowRight, BookOpen, GraduationCap, ChevronDown, ChevronUp } from 'lucide-react';
+import { Star, Clock, Calendar, Users, CheckCircle2, Loader2, ArrowRight, BookOpen, GraduationCap, ChevronDown, ChevronUp, Play } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, addDoc, Timestamp } from 'firebase/firestore';
 import { useAuth } from '@/lib/auth-context';
@@ -36,6 +36,11 @@ export default function BatchDetails() {
     const handleEnroll = async () => {
         if (!user) {
             navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+
+        if (batch.studentCount >= batch.maxStudents) {
+            alert("Sorry, this batch is full.");
             return;
         }
 
@@ -78,6 +83,7 @@ export default function BatchDetails() {
 
     const isDashboard = location.pathname.startsWith('/student');
     const progress = (batch.studentCount / batch.maxStudents) * 100;
+    const isSmallGroup = batch.maxStudents <= 10;
 
     return (
         <div className="min-h-screen bg-[#FDFCF8] pb-20">
@@ -103,6 +109,11 @@ export default function BatchDetails() {
                             <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-full uppercase tracking-wider">
                                 Class {batch.class}
                             </span>
+                            {isSmallGroup && (
+                                <span className="px-3 py-1 bg-rose-100 text-rose-600 text-xs font-bold rounded-full uppercase tracking-wider flex items-center gap-1">
+                                    <Users size={12} /> Small Group Cohort
+                                </span>
+                            )}
                         </div>
                         <h1 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
                             {batch.title}
@@ -130,6 +141,26 @@ export default function BatchDetails() {
                             className="w-full h-full object-cover"
                         />
                     </div>
+
+                    {/* Intro Video */}
+                    {batch.introVideoUrl && (
+                        <div className="bg-slate-900 rounded-3xl overflow-hidden aspect-video relative group cursor-pointer shadow-xl">
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Play size={40} className="text-white ml-1" fill="currentColor" />
+                                </div>
+                            </div>
+                            <img
+                                src={batch.introVideoUrl}
+                                alt="Intro Video Thumbnail"
+                                className="w-full h-full object-cover opacity-60"
+                            />
+                            <div className="absolute bottom-6 left-6 text-white">
+                                <div className="font-bold text-xl mb-1">Watch Course Intro</div>
+                                <div className="text-sm opacity-80">Hear from {batch.teacherName} about what you'll learn</div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Description */}
                     <section className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
@@ -230,12 +261,12 @@ export default function BatchDetails() {
                                 </div>
                                 <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                                     <div
-                                        className="h-full bg-indigo-600 rounded-full transition-all duration-1000"
+                                        className={`h-full rounded-full transition-all duration-1000 ${batch.studentCount >= batch.maxStudents ? 'bg-rose-500' : 'bg-indigo-600'}`}
                                         style={{ width: `${progress}%` }}
                                     />
                                 </div>
-                                <p className="text-[10px] text-center text-rose-500 font-bold animate-pulse">
-                                    Only {batch.maxStudents - batch.studentCount} seats left!
+                                <p className={`text-[10px] text-center font-bold animate-pulse ${batch.studentCount >= batch.maxStudents ? 'text-rose-600' : 'text-rose-500'}`}>
+                                    {batch.studentCount >= batch.maxStudents ? 'Batch Full!' : `Only ${batch.maxStudents - batch.studentCount} seats left!`}
                                 </p>
                             </div>
 
@@ -251,11 +282,13 @@ export default function BatchDetails() {
 
                             <button
                                 onClick={handleEnroll}
-                                disabled={enrolling}
-                                className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20 active:scale-95 mb-4 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={enrolling || batch.studentCount >= batch.maxStudents}
+                                className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20 active:scale-95 mb-4 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-400 disabled:shadow-none"
                             >
                                 {enrolling ? (
                                     <Loader2 className="animate-spin" size={20} />
+                                ) : batch.studentCount >= batch.maxStudents ? (
+                                    <>Batch Full <Users size={20} /></>
                                 ) : (
                                     <>Enroll in Batch <ArrowRight size={20} /></>
                                 )}
