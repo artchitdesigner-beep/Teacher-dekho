@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, Timestamp, doc, updateDoc } from 'firebase/firestore';
-import { Clock } from 'lucide-react';
+import { Clock, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Session {
@@ -23,11 +23,14 @@ interface Booking {
     createdAt: Timestamp;
 }
 
+import ReferralModal from '@/components/common/ReferralModal';
+
 export default function TeacherDashboard() {
     const { user } = useAuth();
     const [upcomingClasses, setUpcomingClasses] = useState<Booking[]>([]);
     const [pendingRequests, setPendingRequests] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showReferralModal, setShowReferralModal] = useState(false);
 
     useEffect(() => {
         async function fetchDashboardData() {
@@ -225,7 +228,30 @@ export default function TeacherDashboard() {
                         )}
                     </div>
                 </div>
+
+                {/* Refer & Earn Card */}
+                <div className="bg-gradient-to-br from-violet-600 to-indigo-700 rounded-3xl p-6 text-white relative overflow-hidden group cursor-pointer" onClick={() => setShowReferralModal(true)}>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-white/20 transition-all"></div>
+                    <div className="relative z-10">
+                        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-4 backdrop-blur-sm">
+                            <Gift size={20} className="text-white" />
+                        </div>
+                        <h4 className="font-bold text-lg mb-1">Refer & Earn Bonus</h4>
+                        <p className="text-indigo-100 text-sm mb-4">Invite other teachers to Teacher Dekho and earn a joining bonus.</p>
+                        <button className="px-4 py-2 bg-white text-indigo-600 font-bold rounded-lg text-xs hover:bg-indigo-50 transition-colors">
+                            Invite Teachers
+                        </button>
+                    </div>
+                </div>
             </div>
+
+            {/* Referral Modal */}
+            <ReferralModal
+                isOpen={showReferralModal}
+                onClose={() => setShowReferralModal(false)}
+                userRole="teacher"
+                userName={user?.displayName || "Teacher"}
+            />
         </div>
     );
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
-import { Calendar, Clock, Video, Search, MessageSquare, Plus, Bell } from 'lucide-react';
+import { Calendar, Clock, Video, Search, MessageSquare, Plus, Bell, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Booking {
@@ -19,6 +19,7 @@ interface Booking {
 }
 
 import BatchCard from '@/components/batches/BatchCard';
+import ReferralModal from '@/components/common/ReferralModal';
 
 export default function StudentDashboard() {
     const { user } = useAuth();
@@ -27,6 +28,7 @@ export default function StudentDashboard() {
     const [requests, setRequests] = useState<any[]>([]);
     const [notifications, setNotifications] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showReferralModal, setShowReferralModal] = useState(false);
 
     useEffect(() => {
         async function fetchDashboardData() {
@@ -233,30 +235,53 @@ export default function StudentDashboard() {
                             </div>
                         )}
                     </div>
-                </div>
-            </div>
 
-            {/* Featured Batches Carousel */}
-            <div className="lg:col-span-2">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-slate-900">Featured Batches</h2>
-                    <Link to="/student/search?tab=batches" className="text-sm text-indigo-600 font-medium hover:underline">View all</Link>
-                </div>
-
-                {batches.length === 0 ? (
-                    <div className="bg-white p-8 rounded-3xl border border-slate-100 text-center text-slate-500">
-                        <p>No featured batches available at the moment.</p>
-                    </div>
-                ) : (
-                    <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
-                        {batches.map(batch => (
-                            <div key={batch.id} className="min-w-[280px] md:min-w-[320px] snap-start">
-                                <BatchCard batch={batch} />
+                    {/* Refer & Earn Card */}
+                    <div className="bg-gradient-to-br from-violet-600 to-indigo-700 rounded-3xl p-6 text-white relative overflow-hidden group cursor-pointer" onClick={() => setShowReferralModal(true)}>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-white/20 transition-all"></div>
+                        <div className="relative z-10">
+                            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-4 backdrop-blur-sm">
+                                <Gift size={20} className="text-white" />
                             </div>
-                        ))}
+                            <h4 className="font-bold text-lg mb-1">Refer & Earn ₹500</h4>
+                            <p className="text-indigo-100 text-sm mb-4">Invite friends to Teacher Dekho and earn rewards.</p>
+                            <button className="px-4 py-2 bg-white text-indigo-600 font-bold rounded-lg text-xs hover:bg-indigo-50 transition-colors">
+                                Invite Now
+                            </button>
+                        </div>
                     </div>
-                )}
+                </div>
+
+                {/* Featured Batches Carousel */}
+                <div className="lg:col-span-2">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-bold text-slate-900">Featured Batches</h2>
+                        <Link to="/student/search?tab=batches" className="text-sm text-indigo-600 font-medium hover:underline">View all</Link>
+                    </div>
+
+                    {batches.length === 0 ? (
+                        <div className="bg-white p-8 rounded-3xl border border-slate-100 text-center text-slate-500">
+                            <p>No featured batches available at the moment.</p>
+                        </div>
+                    ) : (
+                        <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
+                            {batches.map(batch => (
+                                <div key={batch.id} className="min-w-[280px] md:min-w-[320px] snap-start">
+                                    <BatchCard batch={batch} />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
+
+            {/* Referral Modal */}
+            <ReferralModal
+                isOpen={showReferralModal}
+                onClose={() => setShowReferralModal(false)}
+                userRole="student"
+                userName={user?.displayName || "Student"}
+            />
         </div>
     );
 }
