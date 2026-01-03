@@ -46,7 +46,7 @@ export default function BatchDetails() {
 
         setEnrolling(true);
         try {
-            const bookingData = {
+            const bookingData: any = {
                 studentId: user.uid,
                 studentName: user.displayName || 'Student',
                 teacherId: batch.teacherId || 'dummy_teacher_1', // Use actual teacherId if available
@@ -58,18 +58,66 @@ export default function BatchDetails() {
                 status: 'active',
                 paymentStatus: 'pending',
                 createdAt: Timestamp.now(),
-                sessions: [
-                    {
+                sessions: []
+            };
+
+            // Calculate first session based on schedule
+            if (batch.schedule && batch.schedule.length > 0) {
+                const daysMap: { [key: string]: number } = { 'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6 };
+                const today = new Date();
+                let nextSessionDate = new Date();
+                let found = false;
+
+                // Sort schedule by day index
+                const sortedSchedule = [...batch.schedule].sort((a: any, b: any) => daysMap[a.day] - daysMap[b.day]);
+
+                // Find next available slot
+                for (let i = 0; i < 14; i++) { // Look ahead 2 weeks
+                    nextSessionDate.setDate(today.getDate() + i + 1); // Start from tomorrow
+                    const dayName = nextSessionDate.toLocaleDateString('en-US', { weekday: 'long' });
+                    const slot = sortedSchedule.find((s: any) => s.day === dayName);
+
+                    if (slot) {
+                        // Parse time (e.g., "10:00 AM")
+                        const [time, period] = slot.time.split(' ');
+                        const [hours, minutes] = time.split(':');
+                        let h = parseInt(hours);
+                        if (period === 'PM' && h !== 12) h += 12;
+                        if (period === 'AM' && h === 12) h = 0;
+
+                        nextSessionDate.setHours(h, parseInt(minutes), 0, 0);
+
+                        bookingData.sessions = [{
+                            id: 's1',
+                            scheduledAt: Timestamp.fromDate(nextSessionDate),
+                            status: 'confirmed',
+                            isDemo: true
+                        }];
+                        found = true;
+                        break;
+                    }
+                }
+
+                // Fallback if no schedule match found
+                if (!found) {
+                    bookingData.sessions = [{
                         id: 's1',
                         scheduledAt: Timestamp.fromDate(new Date(Date.now() + 86400000)), // Tomorrow
                         status: 'confirmed',
                         isDemo: true
-                    }
-                ]
-            };
+                    }];
+                }
+            } else {
+                bookingData.sessions = [{
+                    id: 's1',
+                    scheduledAt: Timestamp.fromDate(new Date(Date.now() + 86400000)), // Tomorrow
+                    status: 'confirmed',
+                    isDemo: true
+                }];
+            }
 
             const docRef = await addDoc(collection(db, 'bookings'), bookingData);
-            navigate(`/student/bookings/${docRef.id}`);
+            navigate(`/student/courses/${docRef.id}`);
         } catch (error) {
             console.error("Error enrolling in batch:", error);
             alert("Failed to enroll. Please try again.");

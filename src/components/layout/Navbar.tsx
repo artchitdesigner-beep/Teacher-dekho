@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, Heart, Wallet } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import ProfileDropdown from './ProfileDropdown';
 import logoIndigo from '@/assets/Logo Indigo.svg';
@@ -47,7 +47,27 @@ export default function Navbar() {
                 {/* Auth Buttons / Profile Dropdown */}
                 <div className="hidden lg:flex items-center gap-4">
                     {user ? (
-                        <ProfileDropdown />
+                        <div className="flex items-center gap-4">
+                            {userRole === 'student' && (
+                                <>
+                                    <Link
+                                        to="/student/wallet"
+                                        className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                                        title="My Wallet"
+                                    >
+                                        <Wallet size={20} />
+                                    </Link>
+                                    <Link
+                                        to="/student/saved"
+                                        className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                                        title="Saved Teachers"
+                                    >
+                                        <Heart size={20} />
+                                    </Link>
+                                </>
+                            )}
+                            <ProfileDropdown />
+                        </div>
                     ) : (
                         <>
                             <Link to="/login" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">
@@ -89,6 +109,31 @@ export default function Navbar() {
                         </NavLink>
                     ))}
                     <div className="pt-4 flex flex-col gap-3">
+                        {user && userRole === 'student' && (
+                            <>
+                                <Link
+                                    to="/student/wallet"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="flex items-center gap-2 py-2 text-base font-medium text-slate-600"
+                                >
+                                    <span className="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center">
+                                        <Wallet size={16} />
+                                    </span>
+                                    My Wallet (₹1,250)
+                                </Link>
+                                <Link
+                                    to="/student/saved"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="flex items-center gap-2 py-2 text-base font-medium text-slate-600"
+                                >
+                                    <span className="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center">
+                                        <Heart size={16} />
+                                    </span>
+                                    Saved Teachers
+                                </Link>
+                                <div className="h-px bg-slate-50 my-2" />
+                            </>
+                        )}
                         {user ? (
                             <Link
                                 to={userRole === 'teacher' ? '/teacher/dashboard' : '/student/dashboard'}

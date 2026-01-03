@@ -12,11 +12,13 @@ import PublicLayout from './components/layout/PublicLayout';
 import StudentDashboard from './pages/student/StudentDashboard';
 import SearchTeachers from './pages/student/SearchTeachers';
 import TeacherProfilePublic from './pages/student/TeacherProfilePublic';
-import MyBookings from './pages/student/MyBookings';
+import MyCourses from './pages/student/MyCourses';
 import MyRequests from './pages/student/MyRequests';
 import BookingDetail from './pages/student/BookingDetail';
 import SavedTeachers from './pages/student/SavedTeachers';
 import BatchDetails from './pages/student/BatchDetails';
+import Wallet from './pages/student/Wallet';
+import StudentProfile from './pages/student/StudentProfile';
 
 // Teacher Pages
 import TeacherDashboard from './pages/teacher/TeacherDashboard';
@@ -49,10 +51,12 @@ function App() {
         {/* Student Routes */}
         <Route path="/student" element={<DashboardLayout role="student" />}>
           <Route path="dashboard" element={<StudentDashboard />} />
-          <Route path="bookings" element={<MyBookings />} />
-          <Route path="bookings/:id" element={<BookingDetail />} />
+          <Route path="courses" element={<MyCourses />} />
+          <Route path="courses/:id" element={<BookingDetail />} />
           <Route path="requests" element={<MyRequests />} />
           <Route path="saved" element={<SavedTeachers />} />
+          <Route path="wallet" element={<Wallet />} />
+          <Route path="profile" element={<StudentProfile />} />
           <Route path="batch/:id" element={<BatchDetails />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="search" element={<SearchTeachers />} />

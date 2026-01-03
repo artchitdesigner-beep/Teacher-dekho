@@ -38,7 +38,7 @@ export default function Sidebar({ role, isOpen, onClose }: SidebarProps) {
         ? [
             { to: '/student/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
             { to: '/student/search', icon: BookOpen, label: 'Explore' },
-            { to: '/student/bookings', icon: Calendar, label: 'My Courses' },
+            { to: '/student/courses', icon: Calendar, label: 'My Courses' },
             { to: '/student/requests', icon: MessageSquare, label: 'My Requests' },
             { to: '/notifications', icon: Bell, label: 'Notifications', badge: true },
         ]

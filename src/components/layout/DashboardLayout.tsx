@@ -1,7 +1,7 @@
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, Link } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { useAuth } from '@/lib/auth-context';
-import { Loader2, Menu } from 'lucide-react';
+import { Loader2, Menu, Heart, Wallet } from 'lucide-react';
 import { useState } from 'react';
 import ProfileDropdown from './ProfileDropdown';
 
@@ -48,6 +48,24 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
                 </div>
 
                 <div className="flex items-center gap-4">
+                    {role === 'student' && (
+                        <div className="hidden md:flex items-center gap-2">
+                            <Link
+                                to="/student/wallet"
+                                className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                                title="My Wallet"
+                            >
+                                <Wallet size={20} />
+                            </Link>
+                            <Link
+                                to="/student/saved"
+                                className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                                title="Saved Teachers"
+                            >
+                                <Heart size={20} />
+                            </Link>
+                        </div>
+                    )}
                     <ProfileDropdown />
                 </div>
             </header>

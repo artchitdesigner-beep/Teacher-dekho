@@ -5,15 +5,15 @@ const GridBackground = () => {
 
     // Configuration: Adjust these values to match your website's theme
     const config = {
-        gridSize: 40,               // Spacing between lines
+        gridSize: 30,               // Spacing between lines
         lineColor: [199, 210, 254], // RGB value for Indigo-200
         // lineColor: [255, 255, 255], // Use this for Dark mode
-        maxOpacity: 0.2,            // Grid line opacity
-        maskRadius: 450,            // Size of the spotlight effect
-        maxDotRadius: 3,            // Max size of the dots
-        dotOpacity: 0.3,            // Opacity of the dots
+        maxOpacity: 0.6,            // Grid line opacity
+        maskRadius: 800,            // Size of the spotlight effect
+        maxDotRadius: 1,            // Max size of the dots
+        dotOpacity: 0.8,            // Opacity of the dots
         lerpFactor: 0.07,           // How fast the spotlight follows the mouse (0-1)
-        wanderSpeed: 2.0            // INCREASED: Cruising speed for idle animation
+        wanderSpeed: 5.0            // INCREASED: Cruising speed for idle animation
     };
 
     useEffect(() => {

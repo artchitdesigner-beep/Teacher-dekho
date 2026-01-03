@@ -6,7 +6,8 @@ import { doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import {
     Clock, AlertCircle,
     Video, Info, User,
-    ExternalLink, ChevronLeft, Trash2, CreditCard
+    ExternalLink, ChevronLeft, Trash2, CreditCard,
+    Crown, Zap, Star
 } from 'lucide-react';
 
 interface Session {
@@ -135,7 +136,7 @@ export default function BookingDetail() {
                 <h2 className="text-2xl font-bold text-slate-900 mb-2">Oops!</h2>
                 <p className="text-slate-500 mb-6">{error || "Something went wrong."}</p>
                 <button
-                    onClick={() => navigate(-1)}
+                    onClick={() => navigate('/student/courses')}
                     className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all"
                 >
                     Go Back
@@ -151,7 +152,7 @@ export default function BookingDetail() {
             {/* Navigation & Status */}
             <div className="flex items-center justify-between">
                 <button
-                    onClick={() => navigate(-1)}
+                    onClick={() => navigate('/student/courses')}
                     className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 font-medium transition-colors"
                 >
                     <ChevronLeft size={20} />
@@ -173,6 +174,18 @@ export default function BookingDetail() {
                             <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold uppercase rounded-lg">
                                 {booking.totalSessions} Sessions Course
                             </span>
+                            {/* Plan Badge */}
+                            {(booking as any).planType && (
+                                <span className={`px-3 py-1 text-[10px] font-bold uppercase rounded-lg flex items-center gap-1
+                                    ${(booking as any).planType === 'platinum' ? 'bg-indigo-100 text-indigo-700' :
+                                        (booking as any).planType === 'gold' ? 'bg-amber-100 text-amber-700' :
+                                            'bg-slate-100 text-slate-600'}`}>
+                                    {(booking as any).planType === 'platinum' && <Crown size={12} />}
+                                    {(booking as any).planType === 'gold' && <Zap size={12} />}
+                                    {(booking as any).planType === 'silver' && <Star size={12} />}
+                                    {(booking as any).planType} Plan
+                                </span>
+                            )}
                             <span className="hidden md:inline text-slate-300">|</span>
                             <span className="text-slate-500 text-xs md:text-sm flex items-center gap-1">
                                 <User size={14} /> {booking.teacherName}
@@ -200,10 +213,10 @@ export default function BookingDetail() {
                         )}
                         <div className="flex gap-3">
                             <button
-                                onClick={() => alert("Rescheduling coming soon!")}
+                                onClick={() => alert("Change Plan feature coming soon!")}
                                 className="flex-1 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-2xl hover:border-indigo-200 hover:text-indigo-600 transition-all text-sm"
                             >
-                                Reschedule
+                                Change Plan
                             </button>
                             {booking.status !== 'rejected' && (
                                 <button

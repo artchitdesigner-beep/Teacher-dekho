@@ -25,7 +25,7 @@ interface Booking {
     createdAt: Timestamp;
 }
 
-export default function MyBookings() {
+export default function MyCourses() {
     const { user } = useAuth();
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(true);
@@ -181,7 +181,7 @@ export default function MyBookings() {
 
                                         <div className="flex gap-2">
                                             <Link
-                                                to={`/student/bookings/${booking.id}`}
+                                                to={`/student/courses/${booking.id}`}
                                                 className="flex-1 px-6 py-3 bg-white border border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:border-indigo-200 hover:text-indigo-600 transition-all text-center"
                                             >
                                                 View Course

@@ -366,3 +366,20 @@ export const seedBatches = async () => {
         return false;
     }
 };
+
+export async function clearAllData() {
+    try {
+        const collections = ['users', 'batches', 'bookings', 'notifications'];
+        for (const colName of collections) {
+            const colRef = collection(db, colName);
+            const snapshot = await getDocs(colRef);
+            const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+            await Promise.all(deletePromises);
+            console.log(`Cleared collection: ${colName}`);
+        }
+        return true;
+    } catch (error) {
+        console.error("Error clearing data:", error);
+        return false;
+    }
+}
