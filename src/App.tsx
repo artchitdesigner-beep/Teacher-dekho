@@ -60,6 +60,7 @@ function App() {
           <Route path="batch/:id" element={<BatchDetails />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="search" element={<SearchTeachers />} />
+          <Route path="batches" element={<SearchTeachers />} />
           <Route path="teacher/:id" element={<TeacherProfilePublic />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>

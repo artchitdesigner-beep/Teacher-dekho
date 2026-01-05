@@ -78,20 +78,20 @@ export default function MyCourses() {
         <div className="space-y-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900">My Courses</h1>
-                    <p className="text-sm md:text-base text-slate-500">Manage your ongoing courses and sessions.</p>
+                    <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">My Courses</h1>
+                    <p className="text-sm md:text-base text-slate-500 dark:text-slate-400">Manage your ongoing courses and sessions.</p>
                 </div>
             </div>
 
             {/* Tabs */}
-            <div className="flex p-1 bg-slate-100 rounded-2xl w-fit">
+            <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl w-fit">
                 {(['active', 'pending', 'completed'] as const).map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
                         className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all capitalize ${activeTab === tab
-                            ? 'bg-white text-indigo-600 shadow-sm'
-                            : 'text-slate-500 hover:text-slate-700'
+                            ? 'bg-white dark:bg-slate-950 text-indigo-600 shadow-sm'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                             }`}
                     >
                         {tab}
@@ -101,10 +101,10 @@ export default function MyCourses() {
 
             <div className="grid grid-cols-1 gap-6">
                 {filteredBookings.length === 0 ? (
-                    <div className="text-center py-20 bg-white rounded-3xl border border-slate-100">
-                        <Calendar className="mx-auto text-slate-300 mb-4" size={48} />
-                        <h3 className="text-lg font-bold text-slate-900 mb-1">No {activeTab} courses</h3>
-                        <p className="text-slate-500">You don't have any courses in this category.</p>
+                    <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800">
+                        <Calendar className="mx-auto text-slate-300 dark:text-slate-600 mb-4" size={48} />
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">No {activeTab} courses</h3>
+                        <p className="text-slate-500 dark:text-slate-400">You don't have any courses in this category.</p>
                     </div>
                 ) : (
                     filteredBookings.map(booking => {
@@ -112,7 +112,7 @@ export default function MyCourses() {
                         const progress = getProgress(booking);
 
                         return (
-                            <div key={booking.id} className="bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-all overflow-hidden group">
+                            <div key={booking.id} className="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all overflow-hidden group">
                                 <div className="p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
                                     <div className="space-y-4 flex-grow">
                                         <div className="flex flex-wrap items-center gap-3">
@@ -121,17 +121,17 @@ export default function MyCourses() {
                                                 }`}>
                                                 {booking.paymentStatus === 'required' ? 'Payment Required' : `Payment: ${booking.paymentStatus}`}
                                             </span>
-                                            <span className="text-slate-300">|</span>
-                                            <span className="text-slate-500 text-xs font-medium flex items-center gap-1">
+                                            <span className="text-slate-300 dark:text-slate-600">|</span>
+                                            <span className="text-slate-500 dark:text-slate-400 text-xs font-medium flex items-center gap-1">
                                                 <User size={14} /> {booking.teacherName}
                                             </span>
                                         </div>
 
                                         <div>
-                                            <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-1 group-hover:text-indigo-600 transition-colors">
+                                            <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1 group-hover:text-indigo-600 transition-colors">
                                                 {booking.topic}
                                             </h3>
-                                            <div className="flex items-center gap-4 text-sm text-slate-500">
+                                            <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
                                                 <div className="flex items-center gap-1.5">
                                                     <BookOpen size={16} className="text-indigo-500" />
                                                     {progress.completed}/{progress.total} Classes Completed
@@ -141,11 +141,11 @@ export default function MyCourses() {
 
                                         {/* Progress Bar */}
                                         <div className="w-full max-w-md">
-                                            <div className="flex justify-between text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">
+                                            <div className="flex justify-between text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-1 uppercase tracking-wider">
                                                 <span>Course Progress</span>
                                                 <span>{Math.round(progress.percent)}%</span>
                                             </div>
-                                            <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                            <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                                 <div
                                                     className="h-full bg-indigo-600 rounded-full transition-all duration-500"
                                                     style={{ width: `${progress.percent}%` }}
@@ -156,25 +156,25 @@ export default function MyCourses() {
 
                                     <div className="flex flex-col sm:flex-row lg:flex-col gap-4 shrink-0 lg:min-w-[240px]">
                                         {nextSession ? (
-                                            <div className="flex-grow p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
-                                                <div className="text-[10px] font-bold text-indigo-600 uppercase mb-2">Next Class</div>
+                                            <div className="flex-grow p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl border border-indigo-100 dark:border-indigo-900/30">
+                                                <div className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase mb-2">Next Class</div>
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 bg-white rounded-xl flex flex-col items-center justify-center font-bold text-indigo-600 shadow-sm">
                                                         <span className="text-sm">{nextSession.scheduledAt.toDate().getDate()}</span>
                                                         <span className="text-[8px] uppercase">{nextSession.scheduledAt.toDate().toLocaleString('default', { month: 'short' })}</span>
                                                     </div>
                                                     <div>
-                                                        <div className="text-sm font-bold text-slate-900">
+                                                        <div className="text-sm font-bold text-slate-900 dark:text-slate-100">
                                                             {nextSession.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                         </div>
-                                                        <div className="text-[10px] text-slate-500">
+                                                        <div className="text-[10px] text-slate-500 dark:text-slate-400">
                                                             {nextSession.scheduledAt.toDate().toLocaleDateString('en-US', { weekday: 'short' })}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="flex-grow p-4 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+                                            <div className="flex-grow p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 text-center">
                                                 <p className="text-xs text-slate-400 font-medium">No upcoming classes scheduled</p>
                                             </div>
                                         )}
@@ -182,7 +182,7 @@ export default function MyCourses() {
                                         <div className="flex gap-2">
                                             <Link
                                                 to={`/student/courses/${booking.id}`}
-                                                className="flex-1 px-6 py-3 bg-white border border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:border-indigo-200 hover:text-indigo-600 transition-all text-center"
+                                                className="flex-1 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-xl hover:border-indigo-200 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all text-center"
                                             >
                                                 View Course
                                             </Link>

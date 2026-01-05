@@ -36,15 +36,15 @@ export default function SavedTeachers() {
         <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-2">Saved Teachers</h1>
-                    <p className="text-slate-500">Teachers you've bookmarked for later.</p>
+                    <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 dark:text-slate-100 mb-2">Saved Teachers</h1>
+                    <p className="text-slate-500 dark:text-slate-400">Teachers you've bookmarked for later.</p>
                 </div>
             </div>
 
             {loading ? (
                 <div className="space-y-4">
                     {[1, 2].map(i => (
-                        <div key={i} className="h-48 bg-white rounded-2xl animate-pulse border border-slate-100" />
+                        <div key={i} className="h-48 bg-white dark:bg-slate-900 rounded-2xl animate-pulse border border-slate-100 dark:border-slate-800" />
                     ))}
                 </div>
             ) : (
@@ -58,12 +58,12 @@ export default function SavedTeachers() {
                     ))}
 
                     {savedTeachers.length === 0 && (
-                        <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 border-dashed">
-                            <div className="w-16 h-16 bg-slate-50 text-rose-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 border-dashed">
+                            <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 text-rose-400 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <Heart size={24} />
                             </div>
-                            <h3 className="text-lg font-bold text-slate-900 mb-1">No saved teachers yet</h3>
-                            <p className="text-slate-500 mb-6">Start exploring and bookmark teachers you like!</p>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">No saved teachers yet</h3>
+                            <p className="text-slate-500 dark:text-slate-400 mb-6">Start exploring and bookmark teachers you like!</p>
                             <button className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-2 mx-auto">
                                 Find Teachers <ArrowRight size={18} />
                             </button>

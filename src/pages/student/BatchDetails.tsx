@@ -134,11 +134,11 @@ export default function BatchDetails() {
     const isSmallGroup = batch.maxStudents <= 10;
 
     return (
-        <div className="min-h-screen bg-[#FDFCF8] pb-20">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
             {/* Header / Breadcrumb */}
-            <div className="bg-white border-b border-slate-100">
+            <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
                 <div className={`${isDashboard ? '' : 'max-w-7xl mx-auto px-4 md:px-8'} py-4`}>
-                    <button onClick={() => navigate(-1)} className="text-sm text-slate-500 hover:text-indigo-600 flex items-center gap-2">
+                    <button onClick={() => navigate(-1)} className="text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-2">
                         <ArrowRight size={16} className="rotate-180" /> Back to Batches
                     </button>
                 </div>
@@ -163,19 +163,19 @@ export default function BatchDetails() {
                                 </span>
                             )}
                         </div>
-                        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
+                        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 leading-tight">
                             {batch.title}
                         </h1>
-                        <div className="flex flex-wrap items-center gap-6 text-sm text-slate-500">
+                        <div className="flex flex-wrap items-center gap-6 text-sm text-slate-500 dark:text-slate-400">
                             <div className="flex items-center gap-1 text-amber-500 font-bold">
                                 <Star size={18} fill="currentColor" /> {batch.rating}
                             </div>
                             <div className="flex items-center gap-2">
-                                <Users size={18} className="text-indigo-600" />
+                                <Users size={18} className="text-indigo-600 dark:text-indigo-400" />
                                 <span className="font-medium">{batch.studentCount} Students Enrolled</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Calendar size={18} className="text-indigo-600" />
+                                <Calendar size={18} className="text-indigo-600 dark:text-indigo-400" />
                                 <span className="font-medium">Starts {batch.startDate}</span>
                             </div>
                         </div>
@@ -211,15 +211,15 @@ export default function BatchDetails() {
                     )}
 
                     {/* Description */}
-                    <section className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-                        <h2 className="text-2xl font-bold text-slate-900 mb-4">Course Overview</h2>
-                        <p className="text-slate-600 leading-relaxed text-lg">
+                    <section className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">Course Overview</h2>
+                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-lg">
                             {batch.description}
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
                             {batch.features?.map((feature: string, i: number) => (
-                                <div key={i} className="flex items-center gap-3 text-slate-700">
-                                    <div className="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                <div key={i} className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
+                                    <div className="w-6 h-6 bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center flex-shrink-0">
                                         <CheckCircle2 size={14} />
                                     </div>
                                     <span className="font-medium">{feature}</span>
@@ -230,28 +230,28 @@ export default function BatchDetails() {
 
                     {/* Syllabus */}
                     <section>
-                        <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-                            <BookOpen className="text-indigo-600" /> Curriculum
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-3">
+                            <BookOpen className="text-indigo-600 dark:text-indigo-400" /> Curriculum
                         </h2>
                         <div className="space-y-4">
                             {batch.syllabus?.map((module: any, index: number) => (
-                                <div key={index} className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+                                <div key={index} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
                                     <button
                                         onClick={() => setExpandedModule(expandedModule === index ? null : index)}
-                                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
+                                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center font-bold text-sm">
+                                            <div className="w-8 h-8 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">
                                                 {index + 1}
                                             </div>
-                                            <span className="font-bold text-slate-900">{module.title}</span>
+                                            <span className="font-bold text-slate-900 dark:text-slate-100">{module.title}</span>
                                         </div>
                                         {expandedModule === index ? <ChevronUp size={20} className="text-slate-400" /> : <ChevronDown size={20} className="text-slate-400" />}
                                     </button>
                                     {expandedModule === index && (
                                         <div className="px-6 pb-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
                                             {module.lessons.map((lesson: string, lIndex: number) => (
-                                                <div key={lIndex} className="flex items-center gap-3 text-slate-600 pl-12">
+                                                <div key={lIndex} className="flex items-center gap-3 text-slate-600 dark:text-slate-300 pl-12">
                                                     <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full" />
                                                     <span className="text-sm">{lesson}</span>
                                                 </div>
@@ -290,12 +290,12 @@ export default function BatchDetails() {
                 {/* Right Column: Enrollment Card */}
                 <div className="lg:col-span-1">
                     <div className="lg:sticky lg:top-24 space-y-6">
-                        <div className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-2xl shadow-slate-200/50">
+                        <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 p-8 shadow-2xl shadow-slate-200/50 dark:shadow-none">
                             <div className="mb-8">
-                                <div className="text-slate-500 text-sm font-bold uppercase tracking-wider mb-1">Course Fee</div>
+                                <div className="text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">Course Fee</div>
                                 <div className="flex items-baseline gap-2">
-                                    <span className="text-4xl font-bold text-slate-900">₹{batch.price}</span>
-                                    <span className="text-slate-400 line-through text-lg">₹{Math.round(batch.price * 1.5)}</span>
+                                    <span className="text-4xl font-bold text-slate-900 dark:text-slate-100">₹{batch.price}</span>
+                                    <span className="text-slate-400 dark:text-slate-500 line-through text-lg">₹{Math.round(batch.price * 1.5)}</span>
                                 </div>
                                 <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold">
                                     Save 33% Today
@@ -307,7 +307,7 @@ export default function BatchDetails() {
                                     <span>Batch Capacity</span>
                                     <span>{batch.studentCount}/{batch.maxStudents} Seats</span>
                                 </div>
-                                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                     <div
                                         className={`h-full rounded-full transition-all duration-1000 ${batch.studentCount >= batch.maxStudents ? 'bg-rose-500' : 'bg-indigo-600'}`}
                                         style={{ width: `${progress}%` }}
@@ -319,11 +319,11 @@ export default function BatchDetails() {
                             </div>
 
                             <div className="space-y-4 mb-8">
-                                <h4 className="text-sm font-bold text-slate-900 mb-3">Weekly Schedule</h4>
+                                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">Weekly Schedule</h4>
                                 {batch.schedule?.map((item: any, i: number) => (
                                     <div key={i} className="flex items-center justify-between text-sm">
-                                        <span className="text-slate-500">{item.day}</span>
-                                        <span className="font-bold text-slate-700">{item.time}</span>
+                                        <span className="text-slate-500 dark:text-slate-400">{item.day}</span>
+                                        <span className="font-bold text-slate-700 dark:text-slate-300">{item.time}</span>
                                     </div>
                                 ))}
                             </div>
@@ -343,12 +343,12 @@ export default function BatchDetails() {
                             </button>
 
                             <div className="space-y-3">
-                                <div className="flex items-center gap-3 text-slate-500 text-xs">
-                                    <Clock size={14} className="text-indigo-600" />
+                                <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400 text-xs">
+                                    <Clock size={14} className="text-indigo-600 dark:text-indigo-400" />
                                     <span>Lifetime access to recordings</span>
                                 </div>
-                                <div className="flex items-center gap-3 text-slate-500 text-xs">
-                                    <CheckCircle2 size={14} className="text-indigo-600" />
+                                <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400 text-xs">
+                                    <CheckCircle2 size={14} className="text-indigo-600 dark:text-indigo-400" />
                                     <span>Money-back guarantee</span>
                                 </div>
                             </div>

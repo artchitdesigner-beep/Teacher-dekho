@@ -131,10 +131,10 @@ export default function BookingDetail() {
 
     if (error || !booking) {
         return (
-            <div className="max-w-2xl mx-auto mt-12 p-8 bg-white rounded-3xl border border-slate-100 text-center">
+            <div className="max-w-2xl mx-auto mt-12 p-8 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 text-center">
                 <AlertCircle className="mx-auto text-red-500 mb-4" size={48} />
-                <h2 className="text-2xl font-bold text-slate-900 mb-2">Oops!</h2>
-                <p className="text-slate-500 mb-6">{error || "Something went wrong."}</p>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Oops!</h2>
+                <p className="text-slate-500 dark:text-slate-400 mb-6">{error || "Something went wrong."}</p>
                 <button
                     onClick={() => navigate('/student/courses')}
                     className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all"
@@ -153,7 +153,7 @@ export default function BookingDetail() {
             <div className="flex items-center justify-between">
                 <button
                     onClick={() => navigate('/student/courses')}
-                    className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 font-medium transition-colors"
+                    className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors"
                 >
                     <ChevronLeft size={20} />
                     Back to Courses
@@ -167,11 +167,11 @@ export default function BookingDetail() {
             </div>
 
             {/* Main Header Card */}
-            <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 border border-slate-100 shadow-sm relative overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
                 <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
                     <div className="space-y-4">
                         <div className="flex flex-wrap items-center gap-3">
-                            <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold uppercase rounded-lg">
+                            <span className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase rounded-lg">
                                 {booking.totalSessions} Sessions Course
                             </span>
                             {/* Plan Badge */}
@@ -191,11 +191,11 @@ export default function BookingDetail() {
                                 <User size={14} /> {booking.teacherName}
                             </span>
                         </div>
-                        <h1 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 leading-tight">
+                        <h1 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 dark:text-slate-100 leading-tight">
                             {booking.topic}
                         </h1>
                         {booking.description && (
-                            <p className="text-slate-500 text-base md:text-lg max-w-2xl">{booking.description}</p>
+                            <p className="text-slate-500 dark:text-slate-400 text-base md:text-lg max-w-2xl">{booking.description}</p>
                         )}
                     </div>
 
@@ -206,7 +206,7 @@ export default function BookingDetail() {
                                 Join Class Now
                             </button>
                         ) : (
-                            <button disabled className="w-full py-3.5 md:py-4 bg-slate-100 text-slate-400 font-bold rounded-2xl cursor-not-allowed flex items-center justify-center gap-2">
+                            <button disabled className="w-full py-3.5 md:py-4 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-bold rounded-2xl cursor-not-allowed flex items-center justify-center gap-2">
                                 <Video size={20} />
                                 Join Class
                             </button>
@@ -214,7 +214,7 @@ export default function BookingDetail() {
                         <div className="flex gap-3">
                             <button
                                 onClick={() => alert("Change Plan feature coming soon!")}
-                                className="flex-1 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-2xl hover:border-indigo-200 hover:text-indigo-600 transition-all text-sm"
+                                className="flex-1 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-2xl hover:border-indigo-200 dark:hover:border-indigo-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all text-sm"
                             >
                                 Change Plan
                             </button>
@@ -237,25 +237,25 @@ export default function BookingDetail() {
                 {/* Left Column: Details */}
                 <div className="lg:col-span-2 space-y-8">
                     {/* Sessions List Card */}
-                    <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
-                        <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                            <Clock className="text-indigo-600" size={20} />
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+                            <Clock className="text-indigo-600 dark:text-indigo-400" size={20} />
                             Course Sessions
                         </h3>
                         <div className="space-y-4">
                             {booking.sessions?.map((session, idx) => (
-                                <div key={session.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${session.id === nextSession?.id ? 'bg-indigo-50 border-indigo-100 ring-1 ring-indigo-50' : 'bg-slate-50 border-slate-100'}`}>
+                                <div key={session.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${session.id === nextSession?.id ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-100 dark:border-indigo-900/30 ring-1 ring-indigo-50 dark:ring-indigo-900/20' : 'bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-700'}`}>
                                     <div className="flex items-center gap-4">
-                                        <div className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center font-bold shrink-0 ${session.id === nextSession?.id ? 'bg-white text-indigo-600 shadow-sm' : 'bg-white text-slate-400'}`}>
+                                        <div className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center font-bold shrink-0 ${session.id === nextSession?.id ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500'}`}>
                                             <span className="text-sm">{session.scheduledAt.toDate().getDate()}</span>
                                             <span className="text-[8px] uppercase">{session.scheduledAt.toDate().toLocaleString('default', { month: 'short' })}</span>
                                         </div>
                                         <div>
                                             <div className="flex items-center gap-2 mb-0.5">
-                                                <span className="text-sm font-bold text-slate-900">Session {idx + 1}</span>
-                                                {session.isDemo && <span className="text-[8px] font-bold bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded uppercase">Demo</span>}
+                                                <span className="text-sm font-bold text-slate-900 dark:text-slate-100">Session {idx + 1}</span>
+                                                {session.isDemo && <span className="text-[8px] font-bold bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded uppercase">Demo</span>}
                                             </div>
-                                            <div className="text-xs text-slate-500 flex items-center gap-2">
+                                            <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
                                                 <Clock size={12} /> {session.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </div>
                                         </div>
@@ -280,16 +280,16 @@ export default function BookingDetail() {
 
                     {/* Group Members */}
                     {booking.members && booking.members.length > 0 && (
-                        <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
-                            <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                                <User className="text-indigo-600" size={20} />
+                        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+                                <User className="text-indigo-600 dark:text-indigo-400" size={20} />
                                 Group Members
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {booking.members.map((member, idx) => (
-                                    <div key={idx} className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                        <div className="font-bold text-slate-900">{member.name}</div>
-                                        <div className="text-xs text-slate-500">{member.phone}</div>
+                                    <div key={idx} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                        <div className="font-bold text-slate-900 dark:text-slate-100">{member.name}</div>
+                                        <div className="text-xs text-slate-500 dark:text-slate-400">{member.phone}</div>
                                     </div>
                                 ))}
                             </div>
@@ -297,22 +297,22 @@ export default function BookingDetail() {
                     )}
 
                     {/* Course Info Card */}
-                    <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
-                        <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                            <Info className="text-indigo-600" size={20} />
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+                            <Info className="text-indigo-600 dark:text-indigo-400" size={20} />
                             Course Information
                         </h3>
-                        <div className="space-y-4 text-sm text-slate-600 leading-relaxed">
+                        <div className="space-y-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                             <p>This course covers <strong>{booking.topic}</strong> with <strong>{booking.teacherName}</strong>.</p>
 
                             {batch && (
                                 <>
                                     <div className="mt-8">
-                                        <h4 className="font-bold text-slate-900 mb-4">Curriculum</h4>
+                                        <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-4">Curriculum</h4>
                                         <div className="space-y-3">
                                             {batch.syllabus?.map((module: any, i: number) => (
-                                                <div key={i} className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                                    <div className="font-bold text-slate-800 text-xs mb-2">{module.title}</div>
+                                                <div key={i} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                                    <div className="font-bold text-slate-800 dark:text-slate-200 text-xs mb-2">{module.title}</div>
                                                     <div className="space-y-1">
                                                         {module.lessons.map((lesson: string, li: number) => (
                                                             <div key={li} className="text-[10px] flex items-center gap-2">
@@ -327,12 +327,12 @@ export default function BookingDetail() {
                                     </div>
 
                                     <div className="mt-8">
-                                        <h4 className="font-bold text-slate-900 mb-4">Weekly Schedule</h4>
+                                        <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-4">Weekly Schedule</h4>
                                         <div className="grid grid-cols-2 gap-3">
                                             {batch.schedule?.map((item: any, i: number) => (
-                                                <div key={i} className="p-3 bg-indigo-50 rounded-xl border border-indigo-100 text-[10px]">
-                                                    <div className="font-bold text-indigo-700">{item.day}</div>
-                                                    <div className="text-indigo-600">{item.time}</div>
+                                                <div key={i} className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-900/30 text-[10px]">
+                                                    <div className="font-bold text-indigo-700 dark:text-indigo-400">{item.day}</div>
+                                                    <div className="text-indigo-600 dark:text-indigo-300">{item.time}</div>
                                                 </div>
                                             ))}
                                         </div>
@@ -340,7 +340,7 @@ export default function BookingDetail() {
                                 </>
                             )}
 
-                            <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 text-amber-800 text-xs mt-6">
+                            <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-2xl border border-amber-100 dark:border-amber-900/30 text-amber-800 dark:text-amber-400 text-xs mt-6">
                                 <div className="flex items-center gap-2 font-bold mb-1">
                                     <AlertCircle size={14} />
                                     Payment Policy
@@ -354,14 +354,14 @@ export default function BookingDetail() {
                 {/* Right Column: Payment & Teacher */}
                 <div className="space-y-8">
                     {/* Payment Card */}
-                    <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
-                        <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                            <CreditCard className="text-indigo-600" size={20} />
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+                            <CreditCard className="text-indigo-600 dark:text-indigo-400" size={20} />
                             Payment Details
                         </h3>
                         <div className="space-y-6">
                             <div className="flex items-center justify-between">
-                                <span className="text-slate-500 text-sm">Status</span>
+                                <span className="text-slate-500 dark:text-slate-400 text-sm">Status</span>
                                 <span className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase ${booking.paymentStatus === 'paid' ? 'bg-emerald-100 text-emerald-700' :
                                     booking.paymentStatus === 'required' ? 'bg-red-100 text-red-700 animate-pulse' : 'bg-amber-100 text-amber-700'
                                     }`}>
@@ -369,8 +369,8 @@ export default function BookingDetail() {
                                 </span>
                             </div>
                             <div className="flex items-center justify-between">
-                                <span className="text-slate-500 text-sm">Course Fee</span>
-                                <span className="font-bold text-slate-900">₹{booking.totalSessions * 500}</span>
+                                <span className="text-slate-500 dark:text-slate-400 text-sm">Course Fee</span>
+                                <span className="font-bold text-slate-900 dark:text-slate-100">₹{booking.totalSessions * 500}</span>
                             </div>
 
                             {booking.paymentStatus === 'required' && (
@@ -383,8 +383,8 @@ export default function BookingDetail() {
                             )}
 
                             {booking.paymentStatus === 'pending' && !firstSessionCompleted && (
-                                <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
-                                    <p className="text-[11px] md:text-xs text-indigo-700 leading-relaxed">
+                                <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl border border-indigo-100 dark:border-indigo-900/30">
+                                    <p className="text-[11px] md:text-xs text-indigo-700 dark:text-indigo-300 leading-relaxed">
                                         <strong>Note:</strong> The first session is a demo. Payment is required after the demo to continue the course.
                                     </p>
                                 </div>
@@ -394,12 +394,12 @@ export default function BookingDetail() {
 
                     {/* Teacher Remarks Card */}
                     {booking.teacherRemarks && (
-                        <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
-                            <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                <MessageSquare size={20} className="text-indigo-600" />
+                        <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+                                <MessageSquare size={20} className="text-indigo-600 dark:text-indigo-400" />
                                 Teacher's Remarks
                             </h3>
-                            <div className="p-4 bg-slate-50 rounded-2xl italic text-slate-600 text-sm">
+                            <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl italic text-slate-600 dark:text-slate-300 text-sm">
                                 "{booking.teacherRemarks}"
                             </div>
                         </div>

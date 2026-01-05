@@ -6,16 +6,18 @@ import { useAuth } from '@/lib/auth-context';
 interface TeacherCardProps {
     teacher: any; // Using any for now, ideally should be a Teacher type
     onBook: (teacherId: string) => void;
+    layout?: 'horizontal' | 'vertical';
 }
 
-export default function TeacherCard({ teacher, onBook }: TeacherCardProps) {
+export default function TeacherCard({ teacher, onBook, layout = 'horizontal' }: TeacherCardProps) {
     const { userRole } = useAuth();
     const profilePath = userRole === 'student' ? `/student/teacher/${teacher.id}` : `/teacher/${teacher.id}`;
+    const isVertical = layout === 'vertical';
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 p-6 hover:shadow-xl hover:shadow-indigo-100/50 transition-all duration-300 flex flex-col md:flex-row gap-6">
+        <div className={`bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 hover:shadow-xl hover:shadow-indigo-100/50 dark:hover:shadow-none transition-all duration-300 flex flex-col ${isVertical ? '' : 'md:flex-row'} gap-6`}>
             {/* Left: Avatar */}
-            <div className="flex-shrink-0 flex justify-center md:block">
+            <div className={`flex-shrink-0 flex justify-center ${isVertical ? '' : 'md:block'}`}>
                 <div className={`w-20 h-20 md:w-32 md:h-32 rounded-full ${teacher.avatarColor || 'bg-indigo-100'} flex items-center justify-center text-2xl md:text-3xl font-bold text-indigo-600 border-4 border-white shadow-lg shadow-slate-100`}>
                     {teacher.photoURL ? (
                         <img src={teacher.photoURL} alt={teacher.name} className="w-full h-full rounded-full object-cover" />
@@ -29,7 +31,7 @@ export default function TeacherCard({ teacher, onBook }: TeacherCardProps) {
             <div className="flex-grow space-y-3">
                 <div className="flex items-start justify-between">
                     <div>
-                        <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                             {teacher.name}
                             {teacher.kycStatus === 'verified' && (
                                 <ShieldCheck size={18} className="text-emerald-500" fill="currentColor" stroke="white" />
@@ -41,35 +43,35 @@ export default function TeacherCard({ teacher, onBook }: TeacherCardProps) {
                             {teacher.experience && <span className="text-slate-400">• {teacher.experience} Exp.</span>}
                         </p>
                     </div>
-                    <div className="md:hidden text-right">
-                        <div className="text-2xl font-bold text-slate-900">₹{teacher.hourlyRate}</div>
+                    <div className={`${isVertical ? '' : 'md:hidden'} text-right`}>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">₹{teacher.hourlyRate}</div>
                         <div className="text-xs text-slate-500">/hour</div>
                     </div>
                 </div>
 
-                <p className="text-slate-500 text-sm leading-relaxed line-clamp-2">
+                <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed line-clamp-2">
                     {teacher.bio || `Experienced ${teacher.subject} tutor passionate about helping students achieve their academic goals.`}
                 </p>
 
                 <div className="flex flex-wrap gap-2 pt-2">
-                    <span className="px-3 py-1 bg-slate-50 text-slate-600 text-xs font-medium rounded-full border border-slate-100">
+                    <span className="px-3 py-1 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium rounded-full border border-slate-100 dark:border-slate-700">
                         {teacher.subject}
                     </span>
                     {teacher.college && (
-                        <span className="px-3 py-1 bg-slate-50 text-slate-600 text-xs font-medium rounded-full border border-slate-100 flex items-center gap-1">
+                        <span className="px-3 py-1 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium rounded-full border border-slate-100 dark:border-slate-700 flex items-center gap-1">
                             <MapPin size={10} /> {teacher.college}
                         </span>
                     )}
-                    <span className="px-3 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-full border border-green-100 flex items-center gap-1">
+                    <span className="px-3 py-1 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-xs font-medium rounded-full border border-green-100 dark:border-green-900/30 flex items-center gap-1">
                         <Clock size={10} /> Available
                     </span>
                     {teacher.class && (
-                        <span className="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-medium rounded-full border border-indigo-100">
+                        <span className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 text-xs font-medium rounded-full border border-indigo-100 dark:border-indigo-900/30">
                             {Array.isArray(teacher.class) ? teacher.class.join(', ') : teacher.class}
                         </span>
                     )}
                     {teacher.language && (
-                        <span className="px-3 py-1 bg-slate-50 text-slate-600 text-xs font-medium rounded-full border border-slate-100">
+                        <span className="px-3 py-1 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium rounded-full border border-slate-100 dark:border-slate-700">
                             {Array.isArray(teacher.language) ? teacher.language.join(', ') : teacher.language}
                         </span>
                     )}
@@ -77,19 +79,19 @@ export default function TeacherCard({ teacher, onBook }: TeacherCardProps) {
             </div>
 
             {/* Right: Action */}
-            <div className="flex-shrink-0 flex flex-col items-end justify-between min-w-[140px] border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6 mt-4 md:mt-0">
-                <div className="hidden md:block text-right mb-4">
-                    <div className="text-2xl font-bold text-slate-900">₹{teacher.hourlyRate}</div>
+            <div className={`flex-shrink-0 flex flex-col items-end justify-between min-w-[140px] border-t border-slate-100 dark:border-slate-800 pt-4 mt-4 ${isVertical ? '' : 'md:border-t-0 md:border-l md:pt-0 md:pl-6 md:mt-0'}`}>
+                <div className={`${isVertical ? 'hidden' : 'hidden md:block'} text-right mb-4`}>
+                    <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">₹{teacher.hourlyRate}</div>
                     <div className="text-xs text-slate-500">per hour</div>
                 </div>
 
-                <div className="flex items-center gap-1 mb-4 bg-amber-50 px-2 py-1 rounded-lg border border-amber-100">
+                <div className="flex items-center gap-1 mb-4 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-lg border border-amber-100 dark:border-amber-900/30">
                     <Star size={14} className="text-amber-500" fill="currentColor" />
-                    <span className="font-bold text-slate-900 text-sm">{teacher.rating || 'New'}</span>
+                    <span className="font-bold text-slate-900 dark:text-slate-100 text-sm">{teacher.rating || 'New'}</span>
                     <span className="text-slate-400 text-xs">({teacher.reviewCount || 0})</span>
                 </div>
 
-                <div className="flex flex-row md:flex-col gap-2 w-full">
+                <div className={`flex gap-2 w-full ${isVertical ? 'flex-row' : 'flex-row md:flex-col'}`}>
                     <button
                         onClick={() => onBook(teacher.uid)}
                         className="flex-1 md:w-full px-4 py-2.5 bg-indigo-600 text-white font-medium text-xs md:text-sm rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 active:scale-95"
@@ -98,7 +100,7 @@ export default function TeacherCard({ teacher, onBook }: TeacherCardProps) {
                     </button>
                     <Link
                         to={profilePath}
-                        className="flex-1 md:w-full px-4 py-2.5 bg-white text-indigo-600 font-medium text-xs md:text-sm rounded-xl border border-indigo-100 hover:bg-indigo-50 transition-all text-center"
+                        className="flex-1 md:w-full px-4 py-2.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 font-medium text-xs md:text-sm rounded-xl border border-indigo-100 dark:border-indigo-900 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all text-center"
                     >
                         Profile
                     </Link>

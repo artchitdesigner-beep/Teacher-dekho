@@ -50,18 +50,18 @@ export default function StudentProfile() {
     return (
         <div className="max-w-4xl mx-auto space-y-8">
             <div>
-                <h1 className="text-3xl font-serif font-bold text-slate-900">My Profile</h1>
-                <p className="text-slate-500">Manage your account and data settings</p>
+                <h1 className="text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">My Profile</h1>
+                <p className="text-slate-500 dark:text-slate-400">Manage your account and data settings</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Profile Card */}
-                <div className="md:col-span-2 bg-white rounded-3xl border border-slate-100 overflow-hidden">
+                <div className="md:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden">
                     <div className="h-32 bg-gradient-to-r from-indigo-500 to-violet-600"></div>
                     <div className="px-8 pb-8">
                         <div className="relative -mt-12 mb-6">
-                            <div className="w-24 h-24 bg-white rounded-2xl p-1 shadow-lg inline-block">
-                                <div className="w-full h-full bg-indigo-100 rounded-xl flex items-center justify-center text-3xl font-bold text-indigo-600">
+                            <div className="w-24 h-24 bg-white dark:bg-slate-900 rounded-2xl p-1 shadow-lg inline-block">
+                                <div className="w-full h-full bg-indigo-100 dark:bg-indigo-900/20 rounded-xl flex items-center justify-center text-3xl font-bold text-indigo-600 dark:text-indigo-400">
                                     {user?.displayName?.[0] || 'U'}
                                 </div>
                             </div>
@@ -69,31 +69,31 @@ export default function StudentProfile() {
 
                         <div className="space-y-6">
                             <div>
-                                <h2 className="text-2xl font-bold text-slate-900">{user?.displayName || 'Student Name'}</h2>
-                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 capitalize">
+                                <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{user?.displayName || 'Student Name'}</h2>
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 capitalize">
                                     <Shield size={12} />
                                     {userRole} Account
                                 </span>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="p-4 bg-slate-50 rounded-xl">
-                                    <div className="flex items-center gap-2 text-slate-500 text-sm mb-1">
+                                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm mb-1">
                                         <Mail size={16} /> Email Address
                                     </div>
-                                    <div className="font-medium text-slate-900">{user?.email}</div>
+                                    <div className="font-medium text-slate-900 dark:text-slate-100">{user?.email}</div>
                                 </div>
-                                <div className="p-4 bg-slate-50 rounded-xl">
-                                    <div className="flex items-center gap-2 text-slate-500 text-sm mb-1">
+                                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm mb-1">
                                         <Phone size={16} /> Phone
                                     </div>
-                                    <div className="font-medium text-slate-900">+91 98765 43210</div>
+                                    <div className="font-medium text-slate-900 dark:text-slate-100">+91 98765 43210</div>
                                 </div>
-                                <div className="p-4 bg-slate-50 rounded-xl sm:col-span-2">
-                                    <div className="flex items-center gap-2 text-slate-500 text-sm mb-1">
+                                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl sm:col-span-2">
+                                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm mb-1">
                                         <MapPin size={16} /> Location
                                     </div>
-                                    <div className="font-medium text-slate-900">Mumbai, Maharashtra</div>
+                                    <div className="font-medium text-slate-900 dark:text-slate-100">Mumbai, Maharashtra</div>
                                 </div>
                             </div>
                         </div>
@@ -102,12 +102,12 @@ export default function StudentProfile() {
 
                 {/* Data Management Card */}
                 <div className="space-y-6">
-                    <div className="bg-white p-6 rounded-3xl border border-slate-100 h-fit">
-                        <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                            <RefreshCw size={20} className="text-indigo-600" />
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 h-fit">
+                        <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+                            <RefreshCw size={20} className="text-indigo-600 dark:text-indigo-400" />
                             Data Management
                         </h3>
-                        <p className="text-sm text-slate-500 mb-6">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
                             Use these tools to reset the application data. Useful for testing new features.
                         </p>
 
@@ -115,7 +115,7 @@ export default function StudentProfile() {
                             <button
                                 onClick={handleClearData}
                                 disabled={isClearing}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition-colors disabled:opacity-50"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors disabled:opacity-50"
                             >
                                 {isClearing ? (
                                     <RefreshCw size={18} className="animate-spin" />
@@ -140,7 +140,7 @@ export default function StudentProfile() {
                         </div>
 
                         {message && (
-                            <div className={`mt-4 p-3 rounded-xl flex items-start gap-2 text-sm ${message.type === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
+                            <div className={`mt-4 p-3 rounded-xl flex items-start gap-2 text-sm ${message.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400'
                                 }`}>
                                 {message.type === 'success' ? (
                                     <CheckCircle size={16} className="mt-0.5 shrink-0" />

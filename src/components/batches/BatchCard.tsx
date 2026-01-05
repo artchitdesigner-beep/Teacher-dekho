@@ -29,7 +29,7 @@ export default function BatchCard({ batch }: BatchCardProps) {
     };
 
     return (
-        <div className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-100/50 transition-all duration-500 group flex flex-col h-full">
+        <div className="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-2xl hover:shadow-indigo-100/50 dark:hover:shadow-none transition-all duration-500 group flex flex-col h-full">
             {/* Image/Header */}
             <div className="relative h-48 overflow-hidden">
                 <img
@@ -52,18 +52,18 @@ export default function BatchCard({ batch }: BatchCardProps) {
             {/* Content */}
             <div className="p-6 flex-grow flex flex-col">
                 <div className="mb-4">
-                    <h3 className="text-lg font-bold text-slate-900 mb-1 line-clamp-1 group-hover:text-indigo-600 transition-colors">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1 line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                         {batch.title}
                     </h3>
-                    <p className="text-sm text-slate-500">by <span className="font-semibold text-slate-700">{batch.teacherName}</span></p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">by <span className="font-semibold text-slate-700 dark:text-slate-300">{batch.teacherName}</span></p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="flex items-center gap-2 text-slate-500 text-xs">
+                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs">
                         <Users size={14} className="text-indigo-600" />
                         <span>Class {batch.class}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-slate-500 text-xs">
+                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs">
                         <Calendar size={14} className="text-indigo-600" />
                         <span>Starts {batch.startDate}</span>
                     </div>
@@ -75,7 +75,7 @@ export default function BatchCard({ batch }: BatchCardProps) {
                         <span>Seats Filled</span>
                         <span>{batch.studentCount}/{batch.maxStudents}</span>
                     </div>
-                    <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                         <div
                             className="h-full bg-indigo-600 rounded-full transition-all duration-1000"
                             style={{ width: `${progress}%` }}
@@ -84,14 +84,14 @@ export default function BatchCard({ batch }: BatchCardProps) {
                 </div>
 
                 {/* Footer */}
-                <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
+                <div className="mt-auto pt-6 border-t border-slate-50 dark:border-slate-800 flex items-center justify-between">
                     <div>
-                        <div className="text-2xl font-bold text-slate-900">₹{batch.price}</div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">₹{batch.price}</div>
                         <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Full Course</div>
                     </div>
                     <button
                         onClick={handleJoin}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-indigo-600 transition-all active:scale-95 group/btn"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-slate-800 text-white text-sm font-bold rounded-xl hover:bg-indigo-600 dark:hover:bg-indigo-600 transition-all active:scale-95 group/btn"
                     >
                         Join Now
                         <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />

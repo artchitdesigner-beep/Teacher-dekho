@@ -47,22 +47,22 @@ export default function LandingPage() {
                 <GridBackground />
                 <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
                     <div className="inline-block mb-6">
-                        <span className="text-xs font-bold tracking-widest text-slate-500 uppercase">Education Redefined</span>
+                        <span className="text-xs font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase">Education Redefined</span>
                     </div>
 
-                    <h1 className="text-5xl md:text-7xl font-serif font-medium text-slate-900 mb-8 leading-[1.1] max-w-5xl mx-auto">
+                    <h1 className="text-5xl md:text-7xl font-serif font-medium text-slate-900 dark:text-slate-100 mb-8 leading-[1.1] max-w-5xl mx-auto">
                         Built by expert teachers, <br />
-                        <span className="italic text-slate-600">for ambitious students.</span>
+                        <span className="italic text-slate-600 dark:text-slate-400">for ambitious students.</span>
                     </h1>
 
-                    <p className="text-lg md:text-xl text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
                         The world's smartest students trust TeacherDekho to find the perfect mentor.
                         Personalized 1-on-1 learning that fits your schedule.
                     </p>
 
                     {/* Search Bar */}
                     <div className="max-w-4xl mx-auto mb-12">
-                        <form onSubmit={handleSearch} className="bg-white p-2 rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-100 mb-6">
+                        <form onSubmit={handleSearch} className="bg-white dark:bg-slate-900 p-2 rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 mb-6">
                             <div className="flex flex-col md:flex-row items-center gap-2">
                                 <div className="relative flex-grow w-full">
                                     <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
@@ -71,7 +71,7 @@ export default function LandingPage() {
                                         placeholder="Search for teacher or subject..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-14 pr-4 py-4 bg-transparent outline-none text-lg"
+                                        className="w-full pl-14 pr-4 py-4 bg-transparent outline-none text-lg dark:text-white dark:placeholder-slate-500"
                                     />
                                 </div>
 
@@ -80,7 +80,7 @@ export default function LandingPage() {
                                 <select
                                     value={selectedClass}
                                     onChange={(e) => setSelectedClass(e.target.value)}
-                                    className="w-full md:w-auto px-4 py-4 bg-transparent font-bold text-slate-700 outline-none cursor-pointer"
+                                    className="w-full md:w-auto px-4 py-4 bg-transparent font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
                                 >
                                     <option value="11th">Class 11th</option>
                                     <option value="12th">Class 12th</option>
@@ -91,7 +91,7 @@ export default function LandingPage() {
                                 <select
                                     value={selectedLanguage}
                                     onChange={(e) => setSelectedLanguage(e.target.value)}
-                                    className="w-full md:w-auto px-4 py-4 bg-transparent font-bold text-slate-700 outline-none cursor-pointer"
+                                    className="w-full md:w-auto px-4 py-4 bg-transparent font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
                                 >
                                     <option value="English">English</option>
                                     <option value="Hinglish">Hinglish</option>
@@ -110,7 +110,7 @@ export default function LandingPage() {
 
                         {/* Popular Suggestions */}
                         <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
-                            <div className="flex items-center gap-1 text-slate-500 font-medium">
+                            <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400 font-medium">
                                 <Sparkles size={14} /> Popular:
                             </div>
                             <Link to="/search?q=Physics" className="px-3 py-1 bg-green-100 text-green-700 rounded-full font-bold hover:bg-green-200 transition-colors">Physics</Link>
@@ -157,49 +157,49 @@ export default function LandingPage() {
             </section>
 
             {/* How it Works */}
-            <section className="py-24 bg-white">
+            <section className="py-24 bg-white dark:bg-slate-950/50">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900 mb-4">How TeacherDekho Works</h2>
-                        <p className="text-slate-500 max-w-2xl mx-auto">Get started in 3 simple steps. No complicated processes, just pure learning.</p>
+                        <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900 dark:text-slate-100 mb-4">How TeacherDekho Works</h2>
+                        <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Get started in 3 simple steps. No complicated processes, just pure learning.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
                         {/* Connecting Line (Desktop) */}
                         <div className="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gradient-to-r from-indigo-50 via-indigo-100 to-indigo-50 -z-10"></div>
 
-                        <div className="text-center relative bg-white p-4">
+                        <div className="text-center relative bg-white dark:bg-slate-900 p-4 rounded-2xl">
                             <div className="w-24 h-24 mx-auto mb-6 flex items-center justify-center">
                                 <img src={SearchIcon} alt="Search" className="w-full h-full object-contain" />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Search</h3>
-                            <p className="text-slate-500 leading-relaxed">Browse profiles of top teachers from IITs, AIIMS, and top universities. Filter by subject and budget.</p>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">Search</h3>
+                            <p className="text-slate-500 dark:text-slate-400 leading-relaxed">Browse profiles of top teachers from IITs, AIIMS, and top universities. Filter by subject and budget.</p>
                         </div>
-                        <div className="text-center relative bg-white p-4">
+                        <div className="text-center relative bg-white dark:bg-slate-900 p-4 rounded-2xl">
                             <div className="w-24 h-24 mx-auto mb-6 flex items-center justify-center">
                                 <img src={BookDemoIcon} alt="Book Demo" className="w-full h-full object-contain" />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Book Demo</h3>
-                            <p className="text-slate-500 leading-relaxed">Schedule a free trial class to see if the teacher's teaching style matches your learning needs.</p>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">Book Demo</h3>
+                            <p className="text-slate-500 dark:text-slate-400 leading-relaxed">Schedule a free trial class to see if the teacher's teaching style matches your learning needs.</p>
                         </div>
-                        <div className="text-center relative bg-white p-4">
+                        <div className="text-center relative bg-white dark:bg-slate-900 p-4 rounded-2xl">
                             <div className="w-24 h-24 mx-auto mb-6 flex items-center justify-center">
                                 <img src={LearnIcon} alt="Learn" className="w-full h-full object-contain" />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Learn</h3>
-                            <p className="text-slate-500 leading-relaxed">Connect 1-on-1 via high-quality video calls. Get personalized attention and clear your doubts.</p>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">Learn</h3>
+                            <p className="text-slate-500 dark:text-slate-400 leading-relaxed">Connect 1-on-1 via high-quality video calls. Get personalized attention and clear your doubts.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* Popular Subjects */}
-            <section className="py-24 bg-[#FDFCF8] border-y border-slate-100">
+            <section className="py-24 bg-slate-50 dark:bg-slate-950 border-y border-slate-100 dark:border-slate-800">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="flex items-end justify-between mb-12">
                         <div>
-                            <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900 mb-4">Popular Subjects</h2>
-                            <p className="text-slate-500">Find expert guidance in the subjects that matter most.</p>
+                            <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900 dark:text-slate-100 mb-4">Popular Subjects</h2>
+                            <p className="text-slate-500 dark:text-slate-400">Find expert guidance in the subjects that matter most.</p>
                         </div>
                         <Link to="/search" className="hidden md:flex items-center gap-2 text-indigo-600 font-bold hover:gap-3 transition-all">
                             View all subjects <Users size={18} />
@@ -208,11 +208,11 @@ export default function LandingPage() {
 
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                         {subjects.map(subject => (
-                            <Link key={subject.name} to={`/search?subject=${subject.name}`} className="bg-white p-6 rounded-2xl border border-slate-100 hover:border-indigo-200 hover:shadow-lg transition-all text-center group">
+                            <Link key={subject.name} to={`/search?subject=${subject.name}`} className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:shadow-lg transition-all text-center group">
                                 <div className="w-12 h-12 mx-auto mb-4 group-hover:scale-110 transition-transform">
                                     <img src={subject.icon} alt={subject.name} className="w-full h-full object-contain" />
                                 </div>
-                                <div className="font-bold text-slate-900">{subject.name}</div>
+                                <div className="font-bold text-slate-900 dark:text-slate-100">{subject.name}</div>
                             </Link>
                         ))}
                     </div>
@@ -220,11 +220,11 @@ export default function LandingPage() {
             </section>
 
             {/* Testimonials */}
-            <section className="py-24 bg-white">
+            <section className="py-24 bg-white dark:bg-slate-950/50">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900 mb-4">Loved by Students & Parents</h2>
-                        <p className="text-slate-500">Don't just take our word for it.</p>
+                        <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900 dark:text-slate-100 mb-4">Loved by Students & Parents</h2>
+                        <p className="text-slate-500 dark:text-slate-400">Don't just take our word for it.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -276,14 +276,14 @@ export default function LandingPage() {
 
 function Testimonial({ quote, author, role }: { quote: string, author: string, role: string }) {
     return (
-        <div className="bg-[#FDFCF8] p-8 rounded-3xl border border-slate-100">
+        <div className="bg-slate-50 dark:bg-slate-950 p-8 rounded-3xl border border-slate-100 dark:border-slate-800">
             <div className="flex gap-1 text-amber-400 mb-4">
                 {[1, 2, 3, 4, 5].map(i => <Zap key={i} size={16} fill="currentColor" />)}
             </div>
-            <p className="text-slate-700 text-lg mb-6 leading-relaxed font-medium">"{quote}"</p>
+            <p className="text-slate-700 dark:text-slate-300 text-lg mb-6 leading-relaxed font-medium">"{quote}"</p>
             <div>
-                <div className="font-bold text-slate-900">{author}</div>
-                <div className="text-sm text-slate-500">{role}</div>
+                <div className="font-bold text-slate-900 dark:text-slate-100">{author}</div>
+                <div className="text-sm text-slate-500 dark:text-slate-400">{role}</div>
             </div>
         </div>
     )

@@ -32,22 +32,22 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-[#FDFCF8] flex flex-col items-center justify-center p-4 font-sans">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-4 font-sans">
             <div className="w-full max-w-md">
                 <Link
                     to="/"
-                    className="flex items-center gap-2 text-slate-500 hover:text-slate-900 mb-8 font-medium transition-colors"
+                    className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 mb-8 font-medium transition-colors"
                 >
                     <ChevronLeft size={18} /> Back
                 </Link>
 
-                <div className="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
+                <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
                     <div className="mb-8">
                         <div className="mb-4">
                             <img src={logoIndigo} alt="TeacherDekho" className="h-12 w-auto" />
                         </div>
-                        <h2 className="text-2xl font-serif font-bold text-slate-900">Welcome back</h2>
-                        <p className="text-slate-500 text-sm">Please enter your details to sign in.</p>
+                        <h2 className="text-2xl font-serif font-bold text-slate-900 dark:text-slate-100">Welcome back</h2>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Please enter your details to sign in.</p>
                     </div>
 
                     {error && (
@@ -63,7 +63,7 @@ export default function Login() {
                             placeholder="Email Address"
                             value={formData.email}
                             onChange={e => setFormData({ ...formData, email: e.target.value })}
-                            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
                         />
                         <input
                             required
@@ -71,7 +71,7 @@ export default function Login() {
                             placeholder="Password"
                             value={formData.password}
                             onChange={e => setFormData({ ...formData, password: e.target.value })}
-                            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
                         />
 
                         <button

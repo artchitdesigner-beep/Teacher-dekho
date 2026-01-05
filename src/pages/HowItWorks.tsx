@@ -2,12 +2,12 @@ import { Search, Calendar, Video, Award, CheckCircle2, Users, ShieldCheck, Zap }
 
 export default function HowItWorks() {
     return (
-        <div className="min-h-screen bg-[#FDFCF8] py-20">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-20">
             <div className="max-w-7xl mx-auto px-6">
                 {/* Hero Section */}
                 <div className="text-center max-w-3xl mx-auto mb-20">
-                    <h1 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-6">How TeacherDekho Works</h1>
-                    <p className="text-lg text-slate-600 leading-relaxed">
+                    <h1 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 dark:text-slate-100 mb-6">How TeacherDekho Works</h1>
+                    <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
                         We've simplified the process of finding and booking the perfect tutor. Whether you're a student looking to excel or a teacher ready to inspire, we've got you covered.
                     </p>
                 </div>
@@ -18,7 +18,7 @@ export default function HowItWorks() {
                         <div className="w-12 h-12 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-600/20">
                             <Users size={24} />
                         </div>
-                        <h2 className="text-3xl font-serif font-bold text-slate-900">For Students</h2>
+                        <h2 className="text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">For Students</h2>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -39,10 +39,10 @@ export default function HowItWorks() {
                                 description: "Join your interactive online classroom and start learning. Pay only after your first class if you're satisfied with the experience."
                             }
                         ].map((step, index) => (
-                            <div key={index} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-100/50 transition-all duration-300 group">
+                            <div key={index} className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-indigo-100/50 dark:hover:shadow-none transition-all duration-300 group">
                                 <div className="mb-6 group-hover:scale-110 transition-transform duration-300">{step.icon}</div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-4">{step.title}</h3>
-                                <p className="text-slate-600 leading-relaxed">{step.description}</p>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">{step.title}</h3>
+                                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{step.description}</p>
                             </div>
                         ))}
                     </div>
@@ -54,7 +54,7 @@ export default function HowItWorks() {
                         <div className="w-12 h-12 bg-emerald-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-600/20">
                             <Award size={24} />
                         </div>
-                        <h2 className="text-3xl font-serif font-bold text-slate-900">For Teachers</h2>
+                        <h2 className="text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">For Teachers</h2>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -75,10 +75,10 @@ export default function HowItWorks() {
                                 description: "Manage your schedule, accept booking requests, and conduct classes. Build your reputation and grow your teaching career."
                             }
                         ].map((step, index) => (
-                            <div key={index} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-100/50 transition-all duration-300 group">
+                            <div key={index} className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-emerald-100/50 dark:hover:shadow-none transition-all duration-300 group">
                                 <div className="mb-6 group-hover:scale-110 transition-transform duration-300">{step.icon}</div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-4">{step.title}</h3>
-                                <p className="text-slate-600 leading-relaxed">{step.description}</p>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">{step.title}</h3>
+                                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{step.description}</p>
                             </div>
                         ))}
                     </div>

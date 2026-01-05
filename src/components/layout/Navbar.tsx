@@ -1,13 +1,18 @@
 import { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, X, ChevronDown, Heart, Wallet } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import ProfileDropdown from './ProfileDropdown';
 import logoIndigo from '@/assets/Logo Indigo.svg';
+import { ModeToggle } from '@/components/mode-toggle';
 
 export default function Navbar() {
     const { user, userRole } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const location = useLocation();
+
+    // Determine current view mode based on URL or User Role
+    const isStudentView = userRole === 'student' || location.pathname.startsWith('/student');
 
     const navLinks = [
         { label: 'Find a Tutor', to: '/search', hasDropdown: true },
@@ -17,12 +22,12 @@ export default function Navbar() {
     ];
 
     return (
-        <nav className="sticky top-0 z-50 bg-[#FDFCF8]/80 backdrop-blur-md border-b border-slate-100">
+        <nav className="sticky top-0 z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800">
             <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                 {/* Logo */}
                 <Link to="/" className="flex items-center gap-2">
                     <img src={logoIndigo} alt="TeacherDekho" className="h-10 w-auto" />
-                    <span className="font-bold text-2xl tracking-tight font-serif text-slate-900">TeacherDekho</span>
+                    <span className="font-bold text-2xl tracking-tight font-serif text-slate-900 dark:text-slate-100">TeacherDekho</span>
                 </Link>
 
                 {/* Desktop Navigation */}
@@ -34,8 +39,8 @@ export default function Navbar() {
                             className={({ isActive }) => `
                                 flex items-center gap-1 px-3 py-2 text-sm font-medium transition-all duration-200 rounded-lg
                                 ${isActive
-                                    ? 'text-indigo-600 bg-indigo-50/50'
-                                    : 'text-slate-600 hover:text-indigo-600 hover:bg-slate-50'}
+                                    ? 'text-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/20'
+                                    : 'text-slate-600 dark:text-slate-300 hover:text-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-800'}
                             `}
                         >
                             {link.label}
@@ -46,17 +51,12 @@ export default function Navbar() {
 
                 {/* Auth Buttons / Profile Dropdown */}
                 <div className="hidden lg:flex items-center gap-4">
+
                     {user ? (
                         <div className="flex items-center gap-4">
-                            {userRole === 'student' && (
+                            {isStudentView && (
                                 <>
-                                    <Link
-                                        to="/student/wallet"
-                                        className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
-                                        title="My Wallet"
-                                    >
-                                        <Wallet size={20} />
-                                    </Link>
+
                                     <Link
                                         to="/student/saved"
                                         className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
@@ -70,7 +70,7 @@ export default function Navbar() {
                         </div>
                     ) : (
                         <>
-                            <Link to="/login" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">
+                            <Link to="/login" className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 transition-colors">
                                 Log in
                             </Link>
                             <Link
@@ -85,7 +85,7 @@ export default function Navbar() {
 
                 {/* Mobile Menu Button */}
                 <button
-                    className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                    className="lg:hidden p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
                     {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -94,7 +94,11 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="lg:hidden bg-white border-b border-slate-100 py-6 px-6 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                <div className="lg:hidden bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 py-6 px-6 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                    <div className="flex items-center justify-between mb-4">
+                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Theme</span>
+                        <ModeToggle />
+                    </div>
                     {navLinks.map((link) => (
                         <NavLink
                             key={link.label}
@@ -102,14 +106,14 @@ export default function Navbar() {
                             onClick={() => setIsMenuOpen(false)}
                             className={({ isActive }) => `
                                 block py-2 text-base font-medium transition-colors
-                                ${isActive ? 'text-indigo-600' : 'text-slate-600'}
+                                ${isActive ? 'text-indigo-600' : 'text-slate-600 dark:text-slate-300'}
                             `}
                         >
                             {link.label}
                         </NavLink>
                     ))}
                     <div className="pt-4 flex flex-col gap-3">
-                        {user && userRole === 'student' && (
+                        {user && isStudentView && (
                             <>
                                 <Link
                                     to="/student/wallet"
@@ -136,7 +140,7 @@ export default function Navbar() {
                         )}
                         {user ? (
                             <Link
-                                to={userRole === 'teacher' ? '/teacher/dashboard' : '/student/dashboard'}
+                                to={isStudentView ? '/student/dashboard' : '/teacher/dashboard'}
                                 onClick={() => setIsMenuOpen(false)}
                                 className="w-full py-3 bg-indigo-600 text-white text-center font-semibold rounded-xl shadow-md shadow-indigo-600/10"
                             >
@@ -147,7 +151,7 @@ export default function Navbar() {
                                 <Link
                                     to="/login"
                                     onClick={() => setIsMenuOpen(false)}
-                                    className="w-full py-3 bg-slate-50 text-slate-600 text-center font-semibold rounded-xl border border-slate-200"
+                                    className="w-full py-3 bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300 text-center font-semibold rounded-xl border border-slate-200 dark:border-slate-800"
                                 >
                                     Log in
                                 </Link>

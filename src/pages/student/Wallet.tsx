@@ -19,8 +19,8 @@ export default function Wallet() {
     return (
         <div className="space-y-8">
             <div>
-                <h1 className="text-3xl font-serif font-bold text-slate-900">My Wallet</h1>
-                <p className="text-slate-500">Manage your earnings and transactions</p>
+                <h1 className="text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">My Wallet</h1>
+                <p className="text-slate-500 dark:text-slate-400">Manage your earnings and transactions</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -116,42 +116,42 @@ export default function Wallet() {
                         </div>
                     </div>
 
-                    <div className="bg-white p-6 rounded-3xl border border-slate-100">
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800">
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center">
+                            <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center">
                                 <CreditCard size={16} />
                             </div>
-                            <h3 className="font-bold text-slate-900">Saved Cards</h3>
+                            <h3 className="font-bold text-slate-900 dark:text-slate-100">Saved Cards</h3>
                         </div>
-                        <p className="text-xs text-slate-500 mb-3">Manage your saved payment methods.</p>
-                        <button className="text-indigo-600 text-xs font-bold hover:underline">View Cards</button>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Manage your saved payment methods.</p>
+                        <button className="text-indigo-600 dark:text-indigo-400 text-xs font-bold hover:underline">View Cards</button>
                     </div>
                 </div>
             </div>
 
             {/* Transaction History */}
-            <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden">
-                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                    <h3 className="font-bold text-lg text-slate-900 flex items-center gap-2">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+                <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 flex items-center gap-2">
                         <History size={20} className="text-slate-400" />
                         Transaction History
                     </h3>
-                    <button className="text-sm text-indigo-600 font-bold hover:underline">View All</button>
+                    <button className="text-sm text-indigo-600 dark:text-indigo-400 font-bold hover:underline">View All</button>
                 </div>
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-slate-100 dark:divide-slate-800">
                     {transactions.map(tx => (
-                        <div key={tx.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                        <div key={tx.id} className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                             <div className="flex items-center gap-4">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'credit' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-600'
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'credit' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                                     }`}>
                                     {tx.type === 'credit' ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />}
                                 </div>
                                 <div>
-                                    <p className="font-bold text-slate-900 text-sm">{tx.description}</p>
-                                    <p className="text-xs text-slate-500">{new Date(tx.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                                    <p className="font-bold text-slate-900 dark:text-slate-100 text-sm">{tx.description}</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">{new Date(tx.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                                 </div>
                             </div>
-                            <div className={`font-bold ${tx.type === 'credit' ? 'text-emerald-600' : 'text-slate-900'}`}>
+                            <div className={`font-bold ${tx.type === 'credit' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100'}`}>
                                 {tx.type === 'credit' ? '+' : '-'}₹{tx.amount.toLocaleString()}
                             </div>
                         </div>

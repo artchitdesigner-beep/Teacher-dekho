@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, query, where, getDocs, Timestamp, updateDoc, doc, deleteDoc } from 'firebase/firestore';
@@ -25,6 +26,15 @@ export default function MyRequests() {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    useEffect(() => {
+        if (searchParams.get('action') === 'new') {
+            setShowForm(true);
+            // Clear the param so refreshing doesn't reopen it
+            setSearchParams({}, { replace: true });
+        }
+    }, [searchParams]);
 
     const [formData, setFormData] = useState({
         topic: '',
@@ -133,8 +143,8 @@ export default function MyRequests() {
         <div className="space-y-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900">My Requests</h1>
-                    <p className="text-sm md:text-base text-slate-500">Post a requirement and let teachers contact you.</p>
+                    <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">My Requests</h1>
+                    <p className="text-sm md:text-base text-slate-500 dark:text-slate-400">Post a requirement and let teachers contact you.</p>
                 </div>
                 <button
                     onClick={() => {
@@ -161,7 +171,7 @@ export default function MyRequests() {
                         placeholder="Search your requests..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                        className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
                     />
                 </div>
                 <div className="flex items-center gap-2">
@@ -169,7 +179,7 @@ export default function MyRequests() {
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="px-4 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500"
+                        className="px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold text-slate-700 dark:text-slate-300 outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500"
                     >
                         <option value="All">All Status</option>
                         <option value="Open">Open</option>
@@ -180,19 +190,19 @@ export default function MyRequests() {
             </div>
 
             {showForm && (
-                <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl animate-in slide-in-from-top-4">
-                    <h3 className="text-xl font-bold text-slate-900 mb-6">
+                <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-xl animate-in slide-in-from-top-4">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">
                         {editingId ? 'Edit Request' : 'Create New Request'}
                     </h3>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Subject</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Subject</label>
                                 <select
                                     required
                                     value={formData.subject}
                                     onChange={e => setFormData({ ...formData, subject: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm dark:text-white"
                                 >
                                     <option value="">Select Subject</option>
                                     <option value="Mathematics">Mathematics</option>
@@ -204,12 +214,12 @@ export default function MyRequests() {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Course / Level</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Course / Level</label>
                                 <select
                                     required
                                     value={formData.course}
                                     onChange={e => setFormData({ ...formData, course: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm dark:text-white"
                                 >
                                     <option value="">Select Course</option>
                                     <option value="JEE Mains/Adv">JEE Mains/Adv</option>
@@ -224,22 +234,22 @@ export default function MyRequests() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Specific Topic</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Specific Topic</label>
                                 <input
                                     required
                                     placeholder="e.g. Organic Chemistry, Calculus"
                                     value={formData.topic}
                                     onChange={e => setFormData({ ...formData, topic: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm dark:text-white"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Preferred Time Slot</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Preferred Time Slot</label>
                                 <select
                                     required
                                     value={formData.timeSlot}
                                     onChange={e => setFormData({ ...formData, timeSlot: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm dark:text-white"
                                 >
                                     <option value="">Select Time Slot</option>
                                     <option value="Morning (8 AM - 12 PM)">Morning (8 AM - 12 PM)</option>
@@ -252,7 +262,7 @@ export default function MyRequests() {
 
                         <div>
                             <div className="flex justify-between mb-2">
-                                <label className="block text-sm font-medium text-slate-700">Budget: ₹{formData.budget}/hr</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Budget: ₹{formData.budget}/hr</label>
                             </div>
                             <input
                                 type="range"
@@ -261,7 +271,7 @@ export default function MyRequests() {
                                 step="50"
                                 value={formData.budget}
                                 onChange={e => setFormData({ ...formData, budget: e.target.value })}
-                                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                                className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                             />
                             <div className="flex justify-between text-[10px] text-slate-400 mt-1">
                                 <span>₹200</span>
@@ -270,13 +280,13 @@ export default function MyRequests() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Description (Optional)</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Description (Optional)</label>
                             <textarea
                                 rows={3}
                                 placeholder="Describe what you need help with..."
                                 value={formData.description}
                                 onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none resize-none text-sm"
+                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none resize-none text-sm dark:text-white"
                             />
                         </div>
 
@@ -284,7 +294,7 @@ export default function MyRequests() {
                             <button
                                 type="button"
                                 onClick={() => setShowForm(false)}
-                                className="w-full sm:w-auto px-6 py-2.5 text-slate-500 font-bold hover:bg-slate-50 rounded-xl transition-colors text-sm"
+                                className="w-full sm:w-auto px-6 py-2.5 text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors text-sm"
                             >
                                 Cancel
                             </button>
@@ -302,45 +312,45 @@ export default function MyRequests() {
 
             <div className="grid grid-cols-1 gap-4">
                 {filteredRequests.length === 0 ? (
-                    <div className="text-center py-12 bg-white rounded-3xl border border-slate-100">
-                        <MessageSquare className="mx-auto text-slate-300 mb-3" size={32} />
-                        <p className="text-slate-500">No requests found matching your criteria.</p>
+                    <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800">
+                        <MessageSquare className="mx-auto text-slate-300 dark:text-slate-600 mb-3" size={32} />
+                        <p className="text-slate-500 dark:text-slate-400">No requests found matching your criteria.</p>
                     </div>
                 ) : (
                     filteredRequests.map(req => (
-                        <div key={req.id} className="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div key={req.id} className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div className="min-w-0">
                                 <div className="flex flex-wrap items-center gap-2 mb-1">
-                                    <h3 className="font-bold text-slate-900 text-base md:text-lg truncate">{req.topic}</h3>
-                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${req.status === 'open' ? 'bg-blue-50 text-blue-600' :
-                                        req.status === 'accepted' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'
+                                    <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base md:text-lg truncate">{req.topic}</h3>
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${req.status === 'open' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' :
+                                        req.status === 'accepted' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                                         }`}>
                                         {req.status}
                                     </span>
                                 </div>
                                 <div className="flex flex-wrap gap-2 mb-3">
-                                    <span className="text-[10px] md:text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-lg font-medium">{req.subject}</span>
-                                    <span className="text-[10px] md:text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-lg font-medium">{req.course}</span>
-                                    <span className="text-[10px] md:text-xs bg-amber-50 text-amber-600 px-2 py-1 rounded-lg font-medium">{req.timeSlot}</span>
+                                    <span className="text-[10px] md:text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-lg font-medium">{req.subject}</span>
+                                    <span className="text-[10px] md:text-xs bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded-lg font-medium">{req.course}</span>
+                                    <span className="text-[10px] md:text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 px-2 py-1 rounded-lg font-medium">{req.timeSlot}</span>
                                 </div>
-                                <p className="text-slate-500 mb-3 text-sm line-clamp-2">{req.description}</p>
+                                <p className="text-slate-500 dark:text-slate-400 mb-3 text-sm line-clamp-2">{req.description}</p>
                                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] md:text-xs text-slate-400">
                                     <span className="flex items-center gap-1"><Clock size={12} /> {req.createdAt.toDate().toLocaleDateString()}</span>
-                                    {req.budget && <span className="font-bold text-slate-600">Budget: ₹{req.budget}/hr</span>}
+                                    {req.budget && <span className="font-bold text-slate-600 dark:text-slate-300">Budget: ₹{req.budget}/hr</span>}
                                 </div>
                             </div>
                             {req.status === 'open' && (
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={() => handleEdit(req)}
-                                        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                                        className="p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all"
                                         title="Edit Request"
                                     >
                                         <Edit2 size={18} />
                                     </button>
                                     <button
                                         onClick={() => handleDelete(req.id)}
-                                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                        className="p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
                                         title="Delete Request"
                                     >
                                         <Trash2 size={18} />
@@ -349,7 +359,7 @@ export default function MyRequests() {
                             )}
                             {req.status === 'accepted' && (
                                 <div className="flex sm:justify-end">
-                                    <span className="px-4 py-2 bg-emerald-50 text-emerald-600 text-sm font-bold rounded-xl flex items-center gap-2">
+                                    <span className="px-4 py-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-sm font-bold rounded-xl flex items-center gap-2">
                                         <CheckCircle size={18} /> Accepted
                                     </span>
                                 </div>

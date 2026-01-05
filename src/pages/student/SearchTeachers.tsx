@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { Search, SlidersHorizontal, Plus } from 'lucide-react';
 import { collection, query, getDocs, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/lib/auth-context';
@@ -19,6 +19,15 @@ export default function SearchTeachers() {
             navigate('/student/search' + location.search, { replace: true });
         }
     }, [user, userRole, location.pathname, navigate, location.search]);
+
+    // Determine active tab based on URL path
+    useEffect(() => {
+        if (location.pathname === '/student/batches') {
+            setActiveTab('batches');
+        } else if (location.pathname === '/student/search') {
+            setActiveTab('teachers');
+        }
+    }, [location.pathname]);
 
     const [teachers, setTeachers] = useState<any[]>([]);
     const [batches, setBatches] = useState<any[]>([]);
@@ -111,11 +120,11 @@ export default function SearchTeachers() {
 
     const handleTabChange = (tab: 'teachers' | 'batches') => {
         setActiveTab(tab);
-        setSearchParams(prev => {
-            const newParams = new URLSearchParams(prev);
-            newParams.set('tab', tab);
-            return newParams;
-        });
+        if (tab === 'batches') {
+            navigate('/student/batches');
+        } else {
+            navigate('/student/search');
+        }
     };
 
     const isDashboard = location.pathname.startsWith('/student');
@@ -123,26 +132,20 @@ export default function SearchTeachers() {
     return (
         <div className={`${isDashboard ? '' : 'max-w-7xl mx-auto px-4 md:px-8'} space-y-8 py-8`}>
             {/* Header / Search Bar */}
-            <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
                 <div className="max-w-3xl">
-                    <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 mb-2">Find your perfect mentor</h1>
-                    <p className="text-sm md:text-base text-slate-500 mb-6">Search from over 2,000+ verified teachers and courses.</p>
-
-                    {/* Tabs */}
-                    <div className="flex p-1 bg-slate-100 rounded-xl w-fit mb-6">
+                    <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 dark:text-slate-100 mb-2">Find your perfect mentor</h1>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                        <p className="text-sm md:text-base text-slate-500 dark:text-slate-400">Search from over 2,000+ verified teachers and courses.</p>
                         <button
-                            onClick={() => handleTabChange('teachers')}
-                            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'teachers' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                            onClick={() => navigate('/student/requests?action=new')}
+                            className="px-4 py-2 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 dark:shadow-none flex items-center gap-2 w-fit"
                         >
-                            Find Teachers
-                        </button>
-                        <button
-                            onClick={() => handleTabChange('batches')}
-                            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'batches' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                        >
-                            Explore Batches
+                            <Plus size={18} /> Post a Requirement
                         </button>
                     </div>
+
+
 
                     <div className="flex flex-col md:flex-row items-center gap-4">
                         <div className="relative flex-grow w-full">
@@ -162,7 +165,7 @@ export default function SearchTeachers() {
                                         tab: activeTab
                                     });
                                 }}
-                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition text-base"
+                                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition text-base dark:text-white"
                             />
                         </div>
 
@@ -216,7 +219,7 @@ export default function SearchTeachers() {
             {activeTab === 'batches' ? (
                 <div className="space-y-6">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-serif font-bold text-slate-900">Available Batches</h2>
+                        <h2 className="text-2xl font-serif font-bold text-slate-900 dark:text-slate-100">Available Batches</h2>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {batches
@@ -229,7 +232,7 @@ export default function SearchTeachers() {
                             ))}
                     </div>
                     {batches.length === 0 && (
-                        <div className="text-center py-20 text-slate-500">No batches found.</div>
+                        <div className="text-center py-20 text-slate-500 dark:text-slate-400">No batches found.</div>
                     )}
                 </div>
             ) : (
@@ -238,7 +241,7 @@ export default function SearchTeachers() {
                     <div className="w-full lg:w-64 flex-shrink-0">
                         <button
                             onClick={() => setShowMobileFilters(!showMobileFilters)}
-                            className="lg:hidden w-full flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-100 mb-4 font-bold text-slate-900"
+                            className="lg:hidden w-full flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 mb-4 font-bold text-slate-900 dark:text-slate-100"
                         >
                             <div className="flex items-center gap-2">
                                 <SlidersHorizontal size={20} /> Filters
@@ -246,18 +249,18 @@ export default function SearchTeachers() {
                             <span className="text-indigo-600 text-sm">{showMobileFilters ? 'Hide' : 'Show'}</span>
                         </button>
 
-                        <div className={`${showMobileFilters ? 'block' : 'hidden'} lg:block bg-white p-6 rounded-2xl border border-slate-100 sticky top-24 animate-in fade-in slide-in-from-top-2 lg:animate-none`}>
-                            <div className="hidden lg:flex items-center gap-2 font-bold text-slate-900 mb-6">
+                        <div className={`${showMobileFilters ? 'block' : 'hidden'} lg:block bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 sticky top-24 animate-in fade-in slide-in-from-top-2 lg:animate-none`}>
+                            <div className="hidden lg:flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 mb-6">
                                 <SlidersHorizontal size={20} /> Filters
                             </div>
 
                             {/* Subject Filter */}
                             <div className="mb-8">
-                                <h4 className="text-xs font-bold text-slate-900 mb-4 uppercase tracking-wider">Subject</h4>
+                                <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 mb-4 uppercase tracking-wider">Subject</h4>
                                 <div className="space-y-2">
                                     {subjects.map(subject => (
                                         <label key={subject} className="flex items-center gap-3 cursor-pointer group">
-                                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${selectedSubject === subject ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 bg-white group-hover:border-indigo-400'}`}>
+                                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${selectedSubject === subject ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 group-hover:border-indigo-400'}`}>
                                                 {selectedSubject === subject && <div className="w-2 h-2 bg-white rounded-full" />}
                                             </div>
                                             <input
@@ -278,7 +281,7 @@ export default function SearchTeachers() {
                                                     if (window.innerWidth < 1024) setShowMobileFilters(false);
                                                 }}
                                             />
-                                            <span className={`text-sm ${selectedSubject === subject ? 'text-indigo-600 font-medium' : 'text-slate-600'}`}>
+                                            <span className={`text-sm ${selectedSubject === subject ? 'text-indigo-600 dark:text-indigo-400 font-medium' : 'text-slate-600 dark:text-slate-400'}`}>
                                                 {subject}
                                             </span>
                                         </label>
@@ -288,9 +291,9 @@ export default function SearchTeachers() {
 
                             {/* Price Filter (Mock) */}
                             <div className="mb-8">
-                                <h4 className="text-xs font-bold text-slate-900 mb-4 uppercase tracking-wider">Hourly Rate</h4>
+                                <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 mb-4 uppercase tracking-wider">Hourly Rate</h4>
                                 <div className="space-y-4">
-                                    <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
+                                    <div className="h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                         <div className="w-1/2 h-full bg-indigo-600 rounded-full"></div>
                                     </div>
                                     <div className="flex justify-between text-[10px] text-slate-500 font-medium">
@@ -302,11 +305,11 @@ export default function SearchTeachers() {
 
                             {/* Rating Filter */}
                             <div className="mb-8">
-                                <h4 className="text-xs font-bold text-slate-900 mb-4 uppercase tracking-wider">Rating</h4>
+                                <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 mb-4 uppercase tracking-wider">Rating</h4>
                                 <div className="space-y-2">
                                     {[4, 3, 2, 0].map(rating => (
                                         <label key={rating} className="flex items-center gap-3 cursor-pointer group">
-                                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${minRating === rating ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 bg-white group-hover:border-indigo-400'}`}>
+                                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${minRating === rating ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 group-hover:border-indigo-400'}`}>
                                                 {minRating === rating && <div className="w-2 h-2 bg-white rounded-full" />}
                                             </div>
                                             <input
@@ -327,7 +330,7 @@ export default function SearchTeachers() {
                                                     if (window.innerWidth < 1024) setShowMobileFilters(false);
                                                 }}
                                             />
-                                            <span className={`text-sm ${minRating === rating ? 'text-indigo-600 font-medium' : 'text-slate-600'} flex items-center gap-1`}>
+                                            <span className={`text-sm ${minRating === rating ? 'text-indigo-600 dark:text-indigo-400 font-medium' : 'text-slate-600 dark:text-slate-400'} flex items-center gap-1`}>
                                                 {rating === 0 ? 'Any Rating' : `${rating}+ Stars`}
                                             </span>
                                         </label>
@@ -340,18 +343,18 @@ export default function SearchTeachers() {
                     {/* Main Content: Teacher List */}
                     <div className="flex-grow">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="font-bold text-slate-900">
+                            <h2 className="font-bold text-slate-900 dark:text-slate-100">
                                 {filteredTeachers.length} {selectedSubject !== 'All' ? selectedSubject : ''} teachers found
                             </h2>
-                            <div className="flex items-center gap-2 text-sm text-slate-500">
-                                Sort by: <span className="font-medium text-slate-900">Best Match</span>
+                            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                                Sort by: <span className="font-medium text-slate-900 dark:text-slate-100">Best Match</span>
                             </div>
                         </div>
 
                         {loading ? (
                             <div className="space-y-4">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className="h-48 bg-white rounded-2xl animate-pulse border border-slate-100" />
+                                    <div key={i} className="h-48 bg-white dark:bg-slate-900 rounded-2xl animate-pulse border border-slate-100 dark:border-slate-800" />
                                 ))}
                             </div>
                         ) : (
@@ -364,12 +367,12 @@ export default function SearchTeachers() {
                                     />
                                 ))}
 
-                                <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 border-dashed">
-                                    <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 border-dashed">
+                                    <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <Search size={24} />
                                     </div>
-                                    <h3 className="text-lg font-bold text-slate-900 mb-1">Populate Demo Data</h3>
-                                    <p className="text-slate-500 mb-4">Click the button below to seed the database with rich batch and teacher data.</p>
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">Populate Demo Data</h3>
+                                    <p className="text-slate-500 dark:text-slate-400 mb-4">Click the button below to seed the database with rich batch and teacher data.</p>
                                     <button
                                         onClick={async () => {
                                             setLoading(true);
@@ -379,7 +382,7 @@ export default function SearchTeachers() {
                                             await seedBookings(user?.uid || 'dummy_student_1', user?.displayName || 'Demo Student');
                                             window.location.reload();
                                         }}
-                                        className="px-6 py-2 bg-indigo-50 text-indigo-600 font-bold rounded-xl hover:bg-indigo-100 transition-colors"
+                                        className="px-6 py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 font-bold rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors"
                                     >
                                         Populate Demo Data
                                     </button>

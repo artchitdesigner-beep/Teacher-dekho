@@ -81,11 +81,11 @@ export default function TeacherProfilePublic() {
     const isDashboard = location.pathname.startsWith('/student');
 
     return (
-        <div className="min-h-screen bg-[#FDFCF8] pb-20">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
             {/* Header / Breadcrumb */}
-            <div className="bg-white border-b border-slate-100">
+            <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
                 <div className={`${isDashboard ? '' : 'max-w-7xl mx-auto px-4 md:px-8'} py-4`}>
-                    <button onClick={() => navigate(-1)} className="text-sm text-slate-500 hover:text-indigo-600">
+                    <button onClick={() => navigate(-1)} className="text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400">
                         &larr; Back to Search
                     </button>
                 </div>
@@ -97,7 +97,7 @@ export default function TeacherProfilePublic() {
 
                     {/* Profile Header */}
                     <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start text-center sm:text-left">
-                        <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full ${teacher.avatarColor || 'bg-indigo-100'} flex-shrink-0 flex items-center justify-center text-3xl md:text-4xl font-bold text-indigo-600 border-4 border-white shadow-lg`}>
+                        <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full ${teacher.avatarColor || 'bg-indigo-100 dark:bg-indigo-900/20'} flex-shrink-0 flex items-center justify-center text-3xl md:text-4xl font-bold text-indigo-600 dark:text-indigo-400 border-4 border-white dark:border-slate-800 shadow-lg`}>
                             {teacher.photoURL ? (
                                 <img src={teacher.photoURL} alt={teacher.name} className="w-full h-full rounded-full object-cover" />
                             ) : (
@@ -105,13 +105,13 @@ export default function TeacherProfilePublic() {
                             )}
                         </div>
                         <div>
-                            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100 flex flex-wrap items-center justify-center sm:justify-start gap-2">
                                 {teacher.name}
                                 {teacher.kycStatus === 'verified' && <ShieldCheck size={20} className="text-emerald-500" fill="currentColor" stroke="white" />}
                             </h1>
-                            <p className="text-base md:text-lg text-slate-600 font-medium mb-2">{teacher.subject} Expert • {teacher.experience} Experience</p>
+                            <p className="text-base md:text-lg text-slate-600 dark:text-slate-300 font-medium mb-2">{teacher.subject} Expert • {teacher.experience} Experience</p>
 
-                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-slate-500 mb-4">
+                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-slate-500 dark:text-slate-400 mb-4">
                                 <div className="flex items-center gap-1">
                                     <MapPin size={16} /> {teacher.college || 'Online'}
                                 </div>
@@ -119,7 +119,7 @@ export default function TeacherProfilePublic() {
                                     <Star size={16} fill="currentColor" /> {teacher.rating || 'New'} ({teacher.reviewCount || 0})
                                 </div>
                                 {teacher.joiningDate && (
-                                    <div className="flex items-center gap-1 text-slate-400">
+                                    <div className="flex items-center gap-1 text-slate-400 dark:text-slate-500">
                                         <Calendar size={16} /> Joined {teacher.joiningDate.toDate().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
                                     </div>
                                 )}
@@ -129,22 +129,22 @@ export default function TeacherProfilePublic() {
                             {teacher.socialLinks && (
                                 <div className="flex items-center justify-center sm:justify-start gap-3 mb-6">
                                     {teacher.socialLinks.linkedin && (
-                                        <a href={teacher.socialLinks.linkedin} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 text-slate-500 hover:text-[#0077b5] hover:bg-[#0077b5]/10 rounded-full transition-colors">
+                                        <a href={teacher.socialLinks.linkedin} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-[#0077b5] hover:bg-[#0077b5]/10 rounded-full transition-colors">
                                             <Linkedin size={18} />
                                         </a>
                                     )}
                                     {teacher.socialLinks.twitter && (
-                                        <a href={teacher.socialLinks.twitter} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 text-slate-500 hover:text-[#1DA1F2] hover:bg-[#1DA1F2]/10 rounded-full transition-colors">
+                                        <a href={teacher.socialLinks.twitter} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-[#1DA1F2] hover:bg-[#1DA1F2]/10 rounded-full transition-colors">
                                             <Twitter size={18} />
                                         </a>
                                     )}
                                     {teacher.socialLinks.youtube && (
-                                        <a href={teacher.socialLinks.youtube} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 text-slate-500 hover:text-[#FF0000] hover:bg-[#FF0000]/10 rounded-full transition-colors">
+                                        <a href={teacher.socialLinks.youtube} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-[#FF0000] hover:bg-[#FF0000]/10 rounded-full transition-colors">
                                             <Youtube size={18} />
                                         </a>
                                     )}
                                     {teacher.socialLinks.website && (
-                                        <a href={teacher.socialLinks.website} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
+                                        <a href={teacher.socialLinks.website} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
                                             <Globe size={18} />
                                         </a>
                                     )}
@@ -154,7 +154,7 @@ export default function TeacherProfilePublic() {
                             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
                                 <button
                                     onClick={() => setIsSaved(!isSaved)}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all border ${isSaved ? 'bg-rose-50 border-rose-100 text-rose-600' : 'bg-white border-slate-200 text-slate-600 hover:border-rose-200 hover:text-rose-600'}`}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all border ${isSaved ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-rose-200 dark:hover:border-rose-800 hover:text-rose-600 dark:hover:text-rose-400'}`}
                                 >
                                     <Heart size={18} fill={isSaved ? "currentColor" : "none"} />
                                     {isSaved ? 'Saved' : 'Save'}
@@ -165,7 +165,7 @@ export default function TeacherProfilePublic() {
                                         setShowShareToast(true);
                                         setTimeout(() => setShowShareToast(false), 2000);
                                     }}
-                                    className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:border-indigo-200 hover:text-indigo-600 transition-all"
+                                    className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 hover:border-indigo-200 dark:hover:border-indigo-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
                                 >
                                     <Share2 size={18} />
                                     Share
@@ -201,8 +201,8 @@ export default function TeacherProfilePublic() {
 
                     {/* About Section */}
                     <section>
-                        <h2 className="text-xl font-bold text-slate-900 mb-4">About {teacher.name.split(' ')[0]}</h2>
-                        <p className="text-slate-600 leading-relaxed text-base md:text-lg">
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">About {teacher.name.split(' ')[0]}</h2>
+                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base md:text-lg">
                             {teacher.bio}
                             <br /><br />
                             I believe in a conceptual approach to learning. My teaching methodology focuses on real-world examples and problem-solving techniques that help students not just memorize, but understand the core principles.
@@ -211,24 +211,24 @@ export default function TeacherProfilePublic() {
 
                     {/* Education & Certifications */}
                     <section>
-                        <h2 className="text-xl font-bold text-slate-900 mb-4">Education & Qualifications</h2>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Education & Qualifications</h2>
                         <div className="space-y-4">
                             <div className="flex gap-4">
-                                <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                                <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                                     <Award size={24} />
                                 </div>
                                 <div>
-                                    <div className="font-bold text-slate-900">PhD in {teacher.subject}</div>
-                                    <div className="text-slate-500">{teacher.college || 'University'}, 2018</div>
+                                    <div className="font-bold text-slate-900 dark:text-slate-100">PhD in {teacher.subject}</div>
+                                    <div className="text-slate-500 dark:text-slate-400">{teacher.college || 'University'}, 2018</div>
                                 </div>
                             </div>
                             <div className="flex gap-4">
-                                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
+                                <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                                     <CheckCircle2 size={24} />
                                 </div>
                                 <div>
-                                    <div className="font-bold text-slate-900">Certified Online Educator</div>
-                                    <div className="text-slate-500">Global Teaching Association, 2020</div>
+                                    <div className="font-bold text-slate-900 dark:text-slate-100">Certified Online Educator</div>
+                                    <div className="text-slate-500 dark:text-slate-400">Global Teaching Association, 2020</div>
                                 </div>
                             </div>
                         </div>
@@ -237,10 +237,10 @@ export default function TeacherProfilePublic() {
                     {/* Certificates Gallery */}
                     {teacher.certificates && teacher.certificates.length > 0 && (
                         <section>
-                            <h2 className="text-xl font-bold text-slate-900 mb-4">Certificates</h2>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Certificates</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 {teacher.certificates.map((cert: string, index: number) => (
-                                    <div key={index} className="aspect-[4/3] bg-slate-100 rounded-xl overflow-hidden border border-slate-200 cursor-pointer hover:shadow-md transition-shadow">
+                                    <div key={index} className="aspect-[4/3] bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 cursor-pointer hover:shadow-md transition-shadow">
                                         <img src={cert} alt={`Certificate ${index + 1}`} className="w-full h-full object-cover" />
                                     </div>
                                 ))}
@@ -251,7 +251,7 @@ export default function TeacherProfilePublic() {
                     {/* Public Resources */}
                     {teacher.resources && teacher.resources.length > 0 && (
                         <section>
-                            <h2 className="text-xl font-bold text-slate-900 mb-4">Free Resources</h2>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Free Resources</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {teacher.resources.map((resource: any, index: number) => (
                                     <a
@@ -259,18 +259,18 @@ export default function TeacherProfilePublic() {
                                         href={resource.url}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="flex gap-4 p-4 bg-white border border-slate-200 rounded-2xl hover:border-indigo-200 hover:shadow-md transition-all group"
+                                        className="flex gap-4 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-indigo-200 dark:hover:border-indigo-800 hover:shadow-md transition-all group"
                                     >
-                                        <div className="w-16 h-16 bg-slate-100 rounded-xl overflow-hidden shrink-0 relative">
+                                        <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden shrink-0 relative">
                                             <img src={resource.thumbnail} alt={resource.title} className="w-full h-full object-cover" />
                                             <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
                                                 {resource.type === 'video' ? <PlayCircle size={24} className="text-white drop-shadow-md" /> : <FileText size={24} className="text-white drop-shadow-md" />}
                                             </div>
                                         </div>
                                         <div className="min-w-0">
-                                            <h3 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{resource.title}</h3>
-                                            <p className="text-xs text-slate-500 capitalize mb-2">{resource.type}</p>
-                                            <span className="text-xs font-bold text-indigo-600">View Resource &rarr;</span>
+                                            <h3 className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">{resource.title}</h3>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 capitalize mb-2">{resource.type}</p>
+                                            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">View Resource &rarr;</span>
                                         </div>
                                     </a>
                                 ))}
@@ -280,22 +280,22 @@ export default function TeacherProfilePublic() {
 
                     {/* Reviews Preview */}
                     <section>
-                        <h2 className="text-xl font-bold text-slate-900 mb-4">Student Reviews</h2>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Student Reviews</h2>
 
                         {/* Rating Breakdown */}
                         {teacher.ratingBreakdown && (
-                            <div className="bg-slate-50 p-6 rounded-2xl mb-6">
+                            <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl mb-6">
                                 <div className="flex items-center gap-4 mb-6">
                                     <div className="text-center">
-                                        <div className="text-4xl font-bold text-slate-900">{teacher.rating}</div>
+                                        <div className="text-4xl font-bold text-slate-900 dark:text-slate-100">{teacher.rating}</div>
                                         <div className="flex text-amber-400 justify-center my-1">
                                             <Star size={16} fill="currentColor" />
                                             <Star size={16} fill="currentColor" />
                                             <Star size={16} fill="currentColor" />
                                             <Star size={16} fill="currentColor" />
-                                            <Star size={16} fill="currentColor" className="text-slate-300" />
+                                            <Star size={16} fill="currentColor" className="text-slate-300 dark:text-slate-600" />
                                         </div>
-                                        <div className="text-xs text-slate-500">{teacher.reviewCount} Reviews</div>
+                                        <div className="text-xs text-slate-500 dark:text-slate-400">{teacher.reviewCount} Reviews</div>
                                     </div>
                                     <div className="flex-1 space-y-2">
                                         {[5, 4, 3, 2, 1].map((star) => {
@@ -304,11 +304,11 @@ export default function TeacherProfilePublic() {
                                             const percentage = total > 0 ? (count / total) * 100 : 0;
                                             return (
                                                 <div key={star} className="flex items-center gap-3 text-xs">
-                                                    <div className="w-8 font-bold text-slate-600 flex items-center gap-1">{star} <Star size={10} fill="currentColor" className="text-slate-400" /></div>
-                                                    <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+                                                    <div className="w-8 font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1">{star} <Star size={10} fill="currentColor" className="text-slate-400 dark:text-slate-500" /></div>
+                                                    <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                                                         <div className="h-full bg-amber-400 rounded-full" style={{ width: `${percentage}%` }}></div>
                                                     </div>
-                                                    <div className="w-8 text-right text-slate-400">{count}</div>
+                                                    <div className="w-8 text-right text-slate-400 dark:text-slate-500">{count}</div>
                                                 </div>
                                             );
                                         })}
@@ -319,15 +319,15 @@ export default function TeacherProfilePublic() {
 
                         <div className="grid gap-4">
                             {[1, 2].map((i) => (
-                                <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100">
+                                <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800">
                                     <div className="flex items-center gap-2 mb-2">
                                         <div className="flex text-amber-400">
                                             {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} fill="currentColor" />)}
                                         </div>
-                                        <span className="text-sm font-bold text-slate-900">Excellent Teacher!</span>
+                                        <span className="text-sm font-bold text-slate-900 dark:text-slate-100">Excellent Teacher!</span>
                                     </div>
-                                    <p className="text-slate-600 mb-3">"Explains concepts very clearly. Highly recommended for anyone struggling with {teacher.subject}."</p>
-                                    <div className="text-sm text-slate-400">- Student Name</div>
+                                    <p className="text-slate-600 dark:text-slate-300 mb-3">"Explains concepts very clearly. Highly recommended for anyone struggling with {teacher.subject}."</p>
+                                    <div className="text-sm text-slate-400 dark:text-slate-500">- Student Name</div>
                                 </div>
                             ))}
                         </div>
@@ -336,28 +336,28 @@ export default function TeacherProfilePublic() {
 
                 {/* Right Column: Booking Card */}
                 <div className="lg:col-span-1">
-                    <div className="lg:sticky lg:top-24 bg-white rounded-3xl border border-slate-200 p-6 shadow-xl shadow-slate-200/50">
+                    <div className="lg:sticky lg:top-24 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-xl shadow-slate-200/50 dark:shadow-none">
                         <div className="flex justify-between items-end mb-6">
                             <div>
-                                <div className="text-2xl md:text-3xl font-bold text-slate-900">₹{teacher.hourlyRate}</div>
-                                <div className="text-slate-500 text-sm">per hour</div>
+                                <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">₹{teacher.hourlyRate}</div>
+                                <div className="text-slate-500 dark:text-slate-400 text-sm">per hour</div>
                             </div>
-                            <div className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold">
+                            <div className="flex items-center gap-1 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold">
                                 <Clock size={12} /> Available Now
                             </div>
                         </div>
 
                         <div className="space-y-4 mb-6">
-                            <div className="flex items-center gap-3 text-slate-600 text-sm">
-                                <Video size={18} className="text-indigo-600" />
+                            <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300 text-sm">
+                                <Video size={18} className="text-indigo-600 dark:text-indigo-400" />
                                 <span>1-on-1 Online Class</span>
                             </div>
-                            <div className="flex items-center gap-3 text-slate-600 text-sm">
-                                <Calendar size={18} className="text-indigo-600" />
+                            <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300 text-sm">
+                                <Calendar size={18} className="text-indigo-600 dark:text-indigo-400" />
                                 <span>Flexible Scheduling</span>
                             </div>
-                            <div className="flex items-center gap-3 text-slate-600 text-sm">
-                                <ShieldCheck size={18} className="text-indigo-600" />
+                            <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300 text-sm">
+                                <ShieldCheck size={18} className="text-indigo-600 dark:text-indigo-400" />
                                 <span>Satisfaction Guaranteed</span>
                             </div>
                         </div>
@@ -369,7 +369,7 @@ export default function TeacherProfilePublic() {
                             Book Class
                         </button>
 
-                        <p className="text-center text-[10px] md:text-xs text-slate-400">
+                        <p className="text-center text-[10px] md:text-xs text-slate-400 dark:text-slate-500">
                             Pay after your first class. No upfront payment required.
                         </p>
 

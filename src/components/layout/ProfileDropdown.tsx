@@ -1,14 +1,20 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { User, Heart, ArrowLeftRight, LogOut, Wallet } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { User, Heart, ArrowLeftRight, LogOut, Wallet, Moon, Sun, MessageSquare } from 'lucide-react';
+import { useTheme } from '@/components/theme-provider';
 import { useAuth } from '@/lib/auth-context';
 
 export default function ProfileDropdown() {
     const { user, userRole, logout } = useAuth();
+    const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
+    const location = useLocation(); // Add useLocation
     const [isProfileOpen, setIsProfileOpen] = useState(false);
 
     if (!user) return null;
+
+    // Determine current view mode based on URL or User Role
+    const isStudentView = userRole === 'student' || location.pathname.startsWith('/student');
 
     // Mock profile completion percentage
     const profileCompletion = 75;
@@ -18,7 +24,7 @@ export default function ProfileDropdown() {
 
     return (
         <div className="flex items-center gap-4">
-            {userRole === 'student' && (
+            {isStudentView && (
                 <Link to="/student/wallet" className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-full text-sm font-bold hover:bg-indigo-100 transition-colors">
                     <Wallet size={16} />
                     <span>₹1,250</span>
@@ -81,31 +87,48 @@ export default function ProfileDropdown() {
                             </div>
 
                             <Link
-                                to={userRole === 'teacher' ? '/teacher/profile' : '/student/profile'}
+                                to={isStudentView ? '/student/profile' : '/teacher/profile'}
                                 className="flex items-center gap-3 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
                                 onClick={() => setIsProfileOpen(false)}
                             >
                                 <User size={18} /> View Profile
                             </Link>
 
-                            {userRole === 'student' && (
-                                <Link
-                                    to="/student/saved"
-                                    className="flex items-center gap-3 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
-                                    onClick={() => setIsProfileOpen(false)}
-                                >
-                                    <Heart size={18} /> Saved Teachers
-                                </Link>
+                            {isStudentView && (
+                                <>
+                                    <Link
+                                        to="/student/saved"
+                                        className="flex items-center gap-3 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
+                                        onClick={() => setIsProfileOpen(false)}
+                                    >
+                                        <Heart size={18} /> Saved Teachers
+                                    </Link>
+                                    <Link
+                                        to="/student/requests"
+                                        className="flex items-center gap-3 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
+                                        onClick={() => setIsProfileOpen(false)}
+                                    >
+                                        <MessageSquare size={18} /> My Requests
+                                    </Link>
+                                </>
                             )}
 
                             <button
                                 className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
                                 onClick={() => {
                                     setIsProfileOpen(false);
-                                    navigate(userRole === 'teacher' ? '/student/dashboard' : '/teacher/dashboard');
+                                    navigate(isStudentView ? '/teacher/dashboard' : '/student/dashboard');
                                 }}
                             >
-                                <ArrowLeftRight size={18} /> Switch to {userRole === 'teacher' ? 'Student' : 'Teacher'}
+                                <ArrowLeftRight size={18} /> Switch to {isStudentView ? 'Teacher' : 'Student'}
+                            </button>
+
+                            <button
+                                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
+                                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                            >
+                                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
                             </button>
 
                             <div className="h-px bg-slate-50 my-2" />

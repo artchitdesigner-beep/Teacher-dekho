@@ -1,14 +1,15 @@
 import { useEffect, useRef } from 'react';
+import { useTheme } from '@/components/theme-provider';
 
 const GridBackground = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const { theme } = useTheme();
 
     // Configuration: Adjust these values to match your website's theme
     const config = {
         gridSize: 30,               // Spacing between lines
-        lineColor: [199, 210, 254], // RGB value for Indigo-200
-        // lineColor: [255, 255, 255], // Use this for Dark mode
-        maxOpacity: 0.6,            // Grid line opacity
+        lineColor: theme === 'dark' ? [30, 41, 59] : [199, 210, 254], // Slate-800 for dark, Indigo-200 for light
+        maxOpacity: 0.8,            // Grid line opacity
         maskRadius: 800,            // Size of the spotlight effect
         maxDotRadius: 1,            // Max size of the dots
         dotOpacity: 0.8,            // Opacity of the dots
@@ -196,7 +197,7 @@ const GridBackground = () => {
             cancelAnimationFrame(animationFrameId);
             clearTimeout(idleTimeout);
         };
-    }, []);
+    }, [theme]);
 
     return (
         <canvas

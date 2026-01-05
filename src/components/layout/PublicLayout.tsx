@@ -4,13 +4,13 @@ import logoIndigo from '@/assets/Logo Indigo.svg';
 
 export default function PublicLayout() {
     return (
-        <div className="min-h-screen bg-[#FDFCF8]">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
             <Navbar />
             <main>
                 <Outlet />
             </main>
             {/* Footer */}
-            <footer className="bg-[#FDFCF8] border-t border-slate-200 pt-20 pb-10">
+            <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 pt-20 pb-10">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
                         <div>

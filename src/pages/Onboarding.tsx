@@ -94,45 +94,45 @@ export default function Onboarding() {
     };
 
     return (
-        <div className="min-h-screen bg-[#FDFCF8] flex flex-col items-center justify-center p-4 font-sans">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-4 font-sans">
             <div className="w-full max-w-md">
                 <button
                     onClick={step === 'role' ? () => navigate('/') : () => setStep('role')}
-                    className="flex items-center gap-2 text-slate-500 hover:text-slate-900 mb-8 font-medium transition-colors"
+                    className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 mb-8 font-medium transition-colors"
                 >
                     <ChevronLeft size={18} /> Back
                 </button>
 
-                <div className="bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
+                <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
                     {step === 'role' ? (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <h2 className="text-3xl font-serif font-bold text-slate-900 mb-2">Welcome!</h2>
-                            <p className="text-slate-500 mb-8">Choose how you want to use TeacherDekho.</p>
+                            <h2 className="text-3xl font-serif font-bold text-slate-900 dark:text-slate-100 mb-2">Welcome!</h2>
+                            <p className="text-slate-500 dark:text-slate-400 mb-8">Choose how you want to use TeacherDekho.</p>
 
                             <div className="space-y-4">
                                 <button
                                     onClick={() => handleRoleSelect('student')}
-                                    className="w-full p-4 rounded-2xl border-2 border-slate-100 hover:border-indigo-600 hover:bg-indigo-50 transition-all group flex items-center gap-4 text-left"
+                                    className="w-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 hover:border-indigo-600 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group flex items-center gap-4 text-left"
                                 >
-                                    <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                                         <User size={24} />
                                     </div>
                                     <div>
-                                        <div className="font-bold text-slate-900">I am a Student</div>
-                                        <div className="text-sm text-slate-500">I want to find mentors and learn.</div>
+                                        <div className="font-bold text-slate-900 dark:text-slate-100">I am a Student</div>
+                                        <div className="text-sm text-slate-500 dark:text-slate-400">I want to find mentors and learn.</div>
                                     </div>
                                 </button>
 
                                 <button
                                     onClick={() => handleRoleSelect('teacher')}
-                                    className="w-full p-4 rounded-2xl border-2 border-slate-100 hover:border-indigo-600 hover:bg-indigo-50 transition-all group flex items-center gap-4 text-left"
+                                    className="w-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 hover:border-indigo-600 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group flex items-center gap-4 text-left"
                                 >
-                                    <div className="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                                         <GraduationCap size={24} />
                                     </div>
                                     <div>
-                                        <div className="font-bold text-slate-900">I am a Teacher</div>
-                                        <div className="text-sm text-slate-500">I want to teach and earn.</div>
+                                        <div className="font-bold text-slate-900 dark:text-slate-100">I am a Teacher</div>
+                                        <div className="text-sm text-slate-500 dark:text-slate-400">I want to teach and earn.</div>
                                     </div>
                                 </button>
                             </div>
@@ -140,8 +140,8 @@ export default function Onboarding() {
                     ) : (
                         <form onSubmit={handleSubmit} className="animate-in fade-in slide-in-from-right-4 duration-500 space-y-4">
                             <div>
-                                <h2 className="text-2xl font-serif font-bold text-slate-900">Create {role} account</h2>
-                                <p className="text-slate-500 text-sm">Fill in your details to get started.</p>
+                                <h2 className="text-2xl font-serif font-bold text-slate-900 dark:text-slate-100">Create {role} account</h2>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm">Fill in your details to get started.</p>
                             </div>
 
                             {error && (
@@ -157,7 +157,7 @@ export default function Onboarding() {
                                     placeholder="Full Name"
                                     value={formData.name}
                                     onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
                                 />
                                 <input
                                     required
@@ -165,7 +165,7 @@ export default function Onboarding() {
                                     placeholder="Email Address"
                                     value={formData.email}
                                     onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
                                 />
                                 <input
                                     required
@@ -173,7 +173,7 @@ export default function Onboarding() {
                                     placeholder="Password"
                                     value={formData.password}
                                     onChange={e => setFormData({ ...formData, password: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
                                 />
 
                                 {role === 'teacher' && (
@@ -185,7 +185,7 @@ export default function Onboarding() {
                                                 placeholder="Subject (e.g. Physics)"
                                                 value={formData.subject}
                                                 onChange={e => setFormData({ ...formData, subject: e.target.value })}
-                                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
                                             />
                                             <input
                                                 required
@@ -193,7 +193,7 @@ export default function Onboarding() {
                                                 placeholder="Rate (₹/hr)"
                                                 value={formData.hourlyRate}
                                                 onChange={e => setFormData({ ...formData, hourlyRate: e.target.value })}
-                                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
                                             />
                                         </div>
                                         <textarea
@@ -201,7 +201,7 @@ export default function Onboarding() {
                                             placeholder="Short Bio..."
                                             value={formData.bio}
                                             onChange={e => setFormData({ ...formData, bio: e.target.value })}
-                                            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition h-24 resize-none"
+                                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition h-24 resize-none dark:text-white"
                                         />
                                     </>
                                 )}

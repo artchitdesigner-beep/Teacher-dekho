@@ -1,9 +1,10 @@
 import { Outlet, Navigate, Link } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { useAuth } from '@/lib/auth-context';
-import { Loader2, Menu, Heart, Wallet } from 'lucide-react';
+import { Loader2, Menu, Heart } from 'lucide-react';
 import { useState } from 'react';
 import ProfileDropdown from './ProfileDropdown';
+
 
 interface DashboardLayoutProps {
     role: 'student' | 'teacher';
@@ -17,7 +18,7 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#FDFCF8]">
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
                 <Loader2 className="animate-spin text-indigo-600" size={32} />
             </div>
         );
@@ -34,29 +35,24 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
 
 
     return (
-        <div className="min-h-screen bg-[#FDFCF8]">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
             {/* Dashboard Header */}
-            <header className="fixed top-0 right-0 left-0 lg:left-64 h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 z-30 px-6 flex items-center justify-between">
+            <header className="fixed top-0 right-0 left-0 lg:left-64 h-20 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 z-30 px-6 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => setIsSidebarOpen(true)}
-                        className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                        className="lg:hidden p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                     >
                         <Menu size={24} />
                     </button>
-                    <h1 className="text-lg font-semibold text-slate-900 lg:hidden">TeacherDekho</h1>
+                    <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100 lg:hidden">TeacherDekho</h1>
                 </div>
 
                 <div className="flex items-center gap-4">
+
                     {role === 'student' && (
                         <div className="hidden md:flex items-center gap-2">
-                            <Link
-                                to="/student/wallet"
-                                className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
-                                title="My Wallet"
-                            >
-                                <Wallet size={20} />
-                            </Link>
+
                             <Link
                                 to="/student/saved"
                                 className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
