@@ -29,7 +29,7 @@ export default function BatchCard({ batch }: BatchCardProps) {
     };
 
     return (
-        <div className="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-2xl hover:shadow-indigo-100/50 dark:hover:shadow-none transition-all duration-500 group flex flex-col h-full">
+        <div className="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-2xl hover:shadow-cyan-100/50 dark:hover:shadow-none transition-all duration-500 group flex flex-col h-full">
             {/* Image/Header */}
             <div className="relative h-48 overflow-hidden">
                 <img
@@ -39,7 +39,7 @@ export default function BatchCard({ batch }: BatchCardProps) {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
-                    <span className="px-3 py-1 bg-indigo-600 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
+                    <span className="px-3 py-1 bg-cyan-700 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
                         {batch.subject}
                     </span>
                     <div className="flex items-center gap-1 bg-white/20 backdrop-blur-md px-2 py-1 rounded-lg text-white text-xs font-bold">
@@ -52,7 +52,7 @@ export default function BatchCard({ batch }: BatchCardProps) {
             {/* Content */}
             <div className="p-6 flex-grow flex flex-col">
                 <div className="mb-4">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1 line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1 line-clamp-1 group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors">
                         {batch.title}
                     </h3>
                     <p className="text-sm text-slate-500 dark:text-slate-400">by <span className="font-semibold text-slate-700 dark:text-slate-300">{batch.teacherName}</span></p>
@@ -60,11 +60,11 @@ export default function BatchCard({ batch }: BatchCardProps) {
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
                     <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs">
-                        <Users size={14} className="text-indigo-600" />
+                        <Users size={14} className="text-cyan-700" />
                         <span>Class {batch.class}</span>
                     </div>
                     <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs">
-                        <Calendar size={14} className="text-indigo-600" />
+                        <Calendar size={14} className="text-cyan-700" />
                         <span>Starts {batch.startDate}</span>
                     </div>
                 </div>
@@ -77,7 +77,7 @@ export default function BatchCard({ batch }: BatchCardProps) {
                     </div>
                     <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                         <div
-                            className="h-full bg-indigo-600 rounded-full transition-all duration-1000"
+                            className="h-full bg-cyan-700 rounded-full transition-all duration-1000"
                             style={{ width: `${progress}%` }}
                         />
                     </div>
@@ -91,7 +91,7 @@ export default function BatchCard({ batch }: BatchCardProps) {
                     </div>
                     <button
                         onClick={handleJoin}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-slate-800 text-white text-sm font-bold rounded-xl hover:bg-indigo-600 dark:hover:bg-indigo-600 transition-all active:scale-95 group/btn"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-slate-800 text-white text-sm font-bold rounded-xl hover:bg-cyan-700 dark:hover:bg-cyan-700 transition-all active:scale-95 group/btn"
                     >
                         Join Now
                         <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />

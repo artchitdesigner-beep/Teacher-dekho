@@ -75,7 +75,7 @@ export default function TeacherProfilePublic() {
         setShowBookingModal(true);
     };
 
-    if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin text-indigo-600" /></div>;
+    if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin text-cyan-700" /></div>;
     if (!teacher) return <div className="flex items-center justify-center min-h-screen">Teacher not found</div>;
 
     const isDashboard = location.pathname.startsWith('/student');
@@ -85,7 +85,7 @@ export default function TeacherProfilePublic() {
             {/* Header / Breadcrumb */}
             <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
                 <div className={`${isDashboard ? '' : 'max-w-7xl mx-auto px-4 md:px-8'} py-4`}>
-                    <button onClick={() => navigate(-1)} className="text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400">
+                    <button onClick={() => navigate(-1)} className="text-sm text-slate-500 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400">
                         &larr; Back to Search
                     </button>
                 </div>
@@ -97,79 +97,83 @@ export default function TeacherProfilePublic() {
 
                     {/* Profile Header */}
                     <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start text-center sm:text-left">
-                        <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full ${teacher.avatarColor || 'bg-indigo-100 dark:bg-indigo-900/20'} flex-shrink-0 flex items-center justify-center text-3xl md:text-4xl font-bold text-indigo-600 dark:text-indigo-400 border-4 border-white dark:border-slate-800 shadow-lg`}>
+                        <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full ${teacher.avatarColor || 'bg-cyan-100 dark:bg-cyan-900/20'} flex-shrink-0 flex items-center justify-center text-3xl md:text-4xl font-bold text-cyan-700 dark:text-cyan-400 border-4 border-white dark:border-slate-800 shadow-lg`}>
                             {teacher.photoURL ? (
                                 <img src={teacher.photoURL} alt={teacher.name} className="w-full h-full rounded-full object-cover" />
                             ) : (
                                 teacher.name.charAt(0)
                             )}
                         </div>
-                        <div>
-                            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100 flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                                {teacher.name}
-                                {teacher.kycStatus === 'verified' && <ShieldCheck size={20} className="text-emerald-500" fill="currentColor" stroke="white" />}
-                            </h1>
-                            <p className="text-base md:text-lg text-slate-600 dark:text-slate-300 font-medium mb-2">{teacher.subject} Expert • {teacher.experience} Experience</p>
+                        <div className="flex-grow w-full">
+                            <div className="flex flex-row justify-between items-start gap-4">
+                                <div className="flex-1 min-w-0">
+                                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100 flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                                        {teacher.name}
+                                        {teacher.kycStatus === 'verified' && <ShieldCheck size={20} className="text-emerald-500" fill="currentColor" stroke="white" />}
+                                    </h1>
+                                    <p className="text-base md:text-lg text-slate-600 dark:text-slate-300 font-medium mb-2">{teacher.subject} Expert • {teacher.experience} Experience</p>
 
-                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-slate-500 dark:text-slate-400 mb-4">
-                                <div className="flex items-center gap-1">
-                                    <MapPin size={16} /> {teacher.college || 'Online'}
-                                </div>
-                                <div className="flex items-center gap-1 text-amber-500 font-bold">
-                                    <Star size={16} fill="currentColor" /> {teacher.rating || 'New'} ({teacher.reviewCount || 0})
-                                </div>
-                                {teacher.joiningDate && (
-                                    <div className="flex items-center gap-1 text-slate-400 dark:text-slate-500">
-                                        <Calendar size={16} /> Joined {teacher.joiningDate.toDate().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
+                                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-slate-500 dark:text-slate-400 mb-4">
+                                        <div className="flex items-center gap-1">
+                                            <MapPin size={16} /> {teacher.college || 'Online'}
+                                        </div>
+                                        <div className="flex items-center gap-1 text-amber-500 font-bold">
+                                            <Star size={16} fill="currentColor" /> {teacher.rating || 'New'} ({teacher.reviewCount || 0})
+                                        </div>
+                                        {teacher.joiningDate && (
+                                            <div className="flex items-center gap-1 text-slate-400 dark:text-slate-500">
+                                                <Calendar size={16} /> Joined {teacher.joiningDate.toDate().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
 
-                            {/* Social Links */}
-                            {teacher.socialLinks && (
-                                <div className="flex items-center justify-center sm:justify-start gap-3 mb-6">
-                                    {teacher.socialLinks.linkedin && (
-                                        <a href={teacher.socialLinks.linkedin} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-[#0077b5] hover:bg-[#0077b5]/10 rounded-full transition-colors">
-                                            <Linkedin size={18} />
-                                        </a>
-                                    )}
-                                    {teacher.socialLinks.twitter && (
-                                        <a href={teacher.socialLinks.twitter} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-[#1DA1F2] hover:bg-[#1DA1F2]/10 rounded-full transition-colors">
-                                            <Twitter size={18} />
-                                        </a>
-                                    )}
-                                    {teacher.socialLinks.youtube && (
-                                        <a href={teacher.socialLinks.youtube} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-[#FF0000] hover:bg-[#FF0000]/10 rounded-full transition-colors">
-                                            <Youtube size={18} />
-                                        </a>
-                                    )}
-                                    {teacher.socialLinks.website && (
-                                        <a href={teacher.socialLinks.website} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
-                                            <Globe size={18} />
-                                        </a>
+                                    {/* Social Links */}
+                                    {teacher.socialLinks && (
+                                        <div className="flex items-center justify-center sm:justify-start gap-3 mb-6">
+                                            {teacher.socialLinks.linkedin && (
+                                                <a href={teacher.socialLinks.linkedin} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-[#0077b5] hover:bg-[#0077b5]/10 rounded-full transition-colors">
+                                                    <Linkedin size={18} />
+                                                </a>
+                                            )}
+                                            {teacher.socialLinks.twitter && (
+                                                <a href={teacher.socialLinks.twitter} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-[#1DA1F2] hover:bg-[#1DA1F2]/10 rounded-full transition-colors">
+                                                    <Twitter size={18} />
+                                                </a>
+                                            )}
+                                            {teacher.socialLinks.youtube && (
+                                                <a href={teacher.socialLinks.youtube} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-[#FF0000] hover:bg-[#FF0000]/10 rounded-full transition-colors">
+                                                    <Youtube size={18} />
+                                                </a>
+                                            )}
+                                            {teacher.socialLinks.website && (
+                                                <a href={teacher.socialLinks.website} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-cyan-700 hover:bg-cyan-50 rounded-full transition-colors">
+                                                    <Globe size={18} />
+                                                </a>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
-                            )}
 
-                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
-                                <button
-                                    onClick={() => setIsSaved(!isSaved)}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all border ${isSaved ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-rose-200 dark:hover:border-rose-800 hover:text-rose-600 dark:hover:text-rose-400'}`}
-                                >
-                                    <Heart size={18} fill={isSaved ? "currentColor" : "none"} />
-                                    {isSaved ? 'Saved' : 'Save'}
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(window.location.href);
-                                        setShowShareToast(true);
-                                        setTimeout(() => setShowShareToast(false), 2000);
-                                    }}
-                                    className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 hover:border-indigo-200 dark:hover:border-indigo-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
-                                >
-                                    <Share2 size={18} />
-                                    Share
-                                </button>
+                                <div className="flex items-center gap-2 self-start flex-shrink-0">
+                                    <button
+                                        onClick={() => setIsSaved(!isSaved)}
+                                        className={`p-3 rounded-xl transition-all border ${isSaved ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10'}`}
+                                        title={isSaved ? 'Saved' : 'Save Teacher'}
+                                    >
+                                        <Heart size={20} fill={isSaved ? "currentColor" : "none"} />
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(window.location.href);
+                                            setShowShareToast(true);
+                                            setTimeout(() => setShowShareToast(false), 2000);
+                                        }}
+                                        className="p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-400 hover:text-cyan-700 hover:bg-cyan-50 dark:hover:bg-cyan-900/10 hover:border-cyan-200 dark:hover:border-cyan-800 transition-all"
+                                        title="Share Profile"
+                                    >
+                                        <Share2 size={20} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -214,7 +218,7 @@ export default function TeacherProfilePublic() {
                         <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Education & Qualifications</h2>
                         <div className="space-y-4">
                             <div className="flex gap-4">
-                                <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                                <div className="w-12 h-12 bg-cyan-50 dark:bg-cyan-900/20 rounded-xl flex items-center justify-center text-cyan-700 dark:text-cyan-400">
                                     <Award size={24} />
                                 </div>
                                 <div>
@@ -259,7 +263,7 @@ export default function TeacherProfilePublic() {
                                         href={resource.url}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="flex gap-4 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-indigo-200 dark:hover:border-indigo-800 hover:shadow-md transition-all group"
+                                        className="flex gap-4 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-cyan-200 dark:hover:border-cyan-800 hover:shadow-md transition-all group"
                                     >
                                         <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden shrink-0 relative">
                                             <img src={resource.thumbnail} alt={resource.title} className="w-full h-full object-cover" />
@@ -268,9 +272,9 @@ export default function TeacherProfilePublic() {
                                             </div>
                                         </div>
                                         <div className="min-w-0">
-                                            <h3 className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">{resource.title}</h3>
+                                            <h3 className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors line-clamp-1">{resource.title}</h3>
                                             <p className="text-xs text-slate-500 dark:text-slate-400 capitalize mb-2">{resource.type}</p>
-                                            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">View Resource &rarr;</span>
+                                            <span className="text-xs font-bold text-cyan-700 dark:text-cyan-400">View Resource &rarr;</span>
                                         </div>
                                     </a>
                                 ))}
@@ -349,22 +353,22 @@ export default function TeacherProfilePublic() {
 
                         <div className="space-y-4 mb-6">
                             <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300 text-sm">
-                                <Video size={18} className="text-indigo-600 dark:text-indigo-400" />
+                                <Video size={18} className="text-cyan-700 dark:text-cyan-400" />
                                 <span>1-on-1 Online Class</span>
                             </div>
                             <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300 text-sm">
-                                <Calendar size={18} className="text-indigo-600 dark:text-indigo-400" />
+                                <Calendar size={18} className="text-cyan-700 dark:text-cyan-400" />
                                 <span>Flexible Scheduling</span>
                             </div>
                             <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300 text-sm">
-                                <ShieldCheck size={18} className="text-indigo-600 dark:text-indigo-400" />
+                                <ShieldCheck size={18} className="text-cyan-700 dark:text-cyan-400" />
                                 <span>Satisfaction Guaranteed</span>
                             </div>
                         </div>
 
                         <button
                             onClick={handleBookClick}
-                            className="w-full py-3.5 md:py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 active:scale-95 mb-4"
+                            className="w-full py-3.5 md:py-4 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all shadow-lg shadow-cyan-700/20 active:scale-95 mb-4"
                         >
                             Book Class
                         </button>

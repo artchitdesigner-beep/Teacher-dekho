@@ -24,7 +24,7 @@ export default function AvailabilityMap({ availability, onSlotClick }: Availabil
     return (
         <div className="bg-white rounded-2xl border border-slate-100 p-4 mt-6">
             <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <Clock size={16} className="text-indigo-600" />
+                <Clock size={16} className="text-cyan-700" />
                 Weekly Availability
             </h3>
 

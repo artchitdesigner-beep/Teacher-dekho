@@ -1,10 +1,10 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Calendar, MessageSquare, Settings, LogOut, User, X, Bell, Layers, Users } from 'lucide-react';
+import { LayoutDashboard, Calendar, MessageSquare, Settings, LogOut, User, X, Bell, Layers, Users, Clock } from 'lucide-react';
 import { auth, db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import logoIndigo from '@/assets/Logo Indigo.svg';
+import logocyan from '@/assets/Logo cyan.svg';
 
 interface SidebarProps {
     role: 'student' | 'teacher';
@@ -46,6 +46,7 @@ export default function Sidebar({ role, isOpen, onClose }: SidebarProps) {
             { to: '/teacher/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
             { to: '/teacher/requests', icon: MessageSquare, label: 'Requests' },
             { to: '/teacher/schedule', icon: Calendar, label: 'Schedule' },
+            { to: '/teacher/availability', icon: Clock, label: 'Availability' },
             { to: '/teacher/profile', icon: User, label: 'Profile' },
             { to: '/notifications', icon: Bell, label: 'Notifications', badge: true },
         ];
@@ -53,7 +54,7 @@ export default function Sidebar({ role, isOpen, onClose }: SidebarProps) {
     const isTeacher = role === 'teacher';
     const activeClass = isTeacher
         ? 'bg-emerald-50 text-emerald-600 font-medium'
-        : 'bg-indigo-50 text-indigo-600 font-medium';
+        : 'bg-cyan-50 text-cyan-700 font-medium';
     const hoverClass = isTeacher
         ? 'hover:bg-emerald-50 hover:text-emerald-900'
         : 'hover:bg-slate-50 hover:text-slate-900';
@@ -74,7 +75,7 @@ export default function Sidebar({ role, isOpen, onClose }: SidebarProps) {
             `}>
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                     <NavLink to="/" className="flex items-center gap-2">
-                        <img src={logoIndigo} alt="TeacherDekho" className="h-8 w-auto" />
+                        <img src={logocyan} alt="TeacherDekho" className="h-8 w-auto" />
                         <span className="font-bold text-xl font-serif text-slate-900 dark:text-slate-100">TeacherDekho</span>
                     </NavLink>
                     {onClose && (

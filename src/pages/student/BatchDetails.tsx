@@ -126,7 +126,7 @@ export default function BatchDetails() {
         }
     };
 
-    if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin text-indigo-600" /></div>;
+    if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin text-cyan-700" /></div>;
     if (!batch) return <div className="flex items-center justify-center min-h-screen">Batch not found</div>;
 
     const isDashboard = location.pathname.startsWith('/student');
@@ -138,7 +138,7 @@ export default function BatchDetails() {
             {/* Header / Breadcrumb */}
             <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
                 <div className={`${isDashboard ? '' : 'max-w-7xl mx-auto px-4 md:px-8'} py-4`}>
-                    <button onClick={() => navigate(-1)} className="text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-2">
+                    <button onClick={() => navigate(-1)} className="text-sm text-slate-500 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400 flex items-center gap-2">
                         <ArrowRight size={16} className="rotate-180" /> Back to Batches
                     </button>
                 </div>
@@ -151,7 +151,7 @@ export default function BatchDetails() {
                     {/* Hero Section */}
                     <div className="space-y-4">
                         <div className="flex items-center gap-2">
-                            <span className="px-3 py-1 bg-indigo-100 text-indigo-600 text-xs font-bold rounded-full uppercase tracking-wider">
+                            <span className="px-3 py-1 bg-cyan-100 text-cyan-700 text-xs font-bold rounded-full uppercase tracking-wider">
                                 {batch.subject}
                             </span>
                             <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-full uppercase tracking-wider">
@@ -171,11 +171,11 @@ export default function BatchDetails() {
                                 <Star size={18} fill="currentColor" /> {batch.rating}
                             </div>
                             <div className="flex items-center gap-2">
-                                <Users size={18} className="text-indigo-600 dark:text-indigo-400" />
+                                <Users size={18} className="text-cyan-700 dark:text-cyan-400" />
                                 <span className="font-medium">{batch.studentCount} Students Enrolled</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Calendar size={18} className="text-indigo-600 dark:text-indigo-400" />
+                                <Calendar size={18} className="text-cyan-700 dark:text-cyan-400" />
                                 <span className="font-medium">Starts {batch.startDate}</span>
                             </div>
                         </div>
@@ -231,7 +231,7 @@ export default function BatchDetails() {
                     {/* Syllabus */}
                     <section>
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-3">
-                            <BookOpen className="text-indigo-600 dark:text-indigo-400" /> Curriculum
+                            <BookOpen className="text-cyan-700 dark:text-cyan-400" /> Curriculum
                         </h2>
                         <div className="space-y-4">
                             {batch.syllabus?.map((module: any, index: number) => (
@@ -241,7 +241,7 @@ export default function BatchDetails() {
                                         className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className="w-8 h-8 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-lg flex items-center justify-center font-bold text-sm">
+                                            <div className="w-8 h-8 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400 rounded-lg flex items-center justify-center font-bold text-sm">
                                                 {index + 1}
                                             </div>
                                             <span className="font-bold text-slate-900 dark:text-slate-100">{module.title}</span>
@@ -252,7 +252,7 @@ export default function BatchDetails() {
                                         <div className="px-6 pb-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
                                             {module.lessons.map((lesson: string, lIndex: number) => (
                                                 <div key={lIndex} className="flex items-center gap-3 text-slate-600 dark:text-slate-300 pl-12">
-                                                    <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full" />
+                                                    <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full" />
                                                     <span className="text-sm">{lesson}</span>
                                                 </div>
                                             ))}
@@ -264,7 +264,7 @@ export default function BatchDetails() {
                     </section>
 
                     {/* Instructor */}
-                    <section className="bg-indigo-900 rounded-3xl p-8 text-white relative overflow-hidden">
+                    <section className="bg-cyan-900 rounded-3xl p-8 text-white relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
                         <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center md:items-start">
                             <div className="w-32 h-32 rounded-2xl overflow-hidden flex-shrink-0 border-4 border-white/10 shadow-2xl">
@@ -272,14 +272,14 @@ export default function BatchDetails() {
                             </div>
                             <div className="text-center md:text-left">
                                 <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-                                    <GraduationCap size={20} className="text-indigo-300" />
-                                    <span className="text-indigo-200 font-bold uppercase tracking-widest text-xs">Lead Instructor</span>
+                                    <GraduationCap size={20} className="text-cyan-300" />
+                                    <span className="text-cyan-200 font-bold uppercase tracking-widest text-xs">Lead Instructor</span>
                                 </div>
                                 <h3 className="text-2xl font-bold mb-3">{batch.teacherName}</h3>
-                                <p className="text-indigo-100/80 leading-relaxed mb-6 max-w-xl">
+                                <p className="text-cyan-100/80 leading-relaxed mb-6 max-w-xl">
                                     {batch.teacherBio}
                                 </p>
-                                <button className="px-6 py-2.5 bg-white text-indigo-900 font-bold rounded-xl hover:bg-indigo-50 transition-all active:scale-95 text-sm">
+                                <button className="px-6 py-2.5 bg-white text-cyan-900 font-bold rounded-xl hover:bg-cyan-50 transition-all active:scale-95 text-sm">
                                     View Full Profile
                                 </button>
                             </div>
@@ -309,7 +309,7 @@ export default function BatchDetails() {
                                 </div>
                                 <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                     <div
-                                        className={`h-full rounded-full transition-all duration-1000 ${batch.studentCount >= batch.maxStudents ? 'bg-rose-500' : 'bg-indigo-600'}`}
+                                        className={`h-full rounded-full transition-all duration-1000 ${batch.studentCount >= batch.maxStudents ? 'bg-rose-500' : 'bg-cyan-700'}`}
                                         style={{ width: `${progress}%` }}
                                     />
                                 </div>
@@ -331,7 +331,7 @@ export default function BatchDetails() {
                             <button
                                 onClick={handleEnroll}
                                 disabled={enrolling || batch.studentCount >= batch.maxStudents}
-                                className="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20 active:scale-95 mb-4 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-400 disabled:shadow-none"
+                                className="w-full py-4 bg-cyan-700 text-white font-bold rounded-2xl hover:bg-cyan-700 transition-all shadow-xl shadow-cyan-700/20 active:scale-95 mb-4 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-400 disabled:shadow-none"
                             >
                                 {enrolling ? (
                                     <Loader2 className="animate-spin" size={20} />
@@ -344,11 +344,11 @@ export default function BatchDetails() {
 
                             <div className="space-y-3">
                                 <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400 text-xs">
-                                    <Clock size={14} className="text-indigo-600 dark:text-indigo-400" />
+                                    <Clock size={14} className="text-cyan-700 dark:text-cyan-400" />
                                     <span>Lifetime access to recordings</span>
                                 </div>
                                 <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400 text-xs">
-                                    <CheckCircle2 size={14} className="text-indigo-600 dark:text-indigo-400" />
+                                    <CheckCircle2 size={14} className="text-cyan-700 dark:text-cyan-400" />
                                     <span>Money-back guarantee</span>
                                 </div>
                             </div>

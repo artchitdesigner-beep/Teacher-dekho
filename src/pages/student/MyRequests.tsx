@@ -155,7 +155,7 @@ export default function MyRequests() {
                             setShowForm(!showForm);
                         }
                     }}
-                    className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto px-5 py-2.5 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all flex items-center justify-center gap-2"
                 >
                     {showForm && editingId ? <X size={20} /> : <Plus size={20} />}
                     {showForm && editingId ? 'Cancel Edit' : 'New Request'}
@@ -171,7 +171,7 @@ export default function MyRequests() {
                         placeholder="Search your requests..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
+                        className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none transition dark:text-white"
                     />
                 </div>
                 <div className="flex items-center gap-2">
@@ -179,7 +179,7 @@ export default function MyRequests() {
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold text-slate-700 dark:text-slate-300 outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500"
+                        className="px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold text-slate-700 dark:text-slate-300 outline-none cursor-pointer focus:ring-2 focus:ring-cyan-500"
                     >
                         <option value="All">All Status</option>
                         <option value="Open">Open</option>
@@ -202,7 +202,7 @@ export default function MyRequests() {
                                     required
                                     value={formData.subject}
                                     onChange={e => setFormData({ ...formData, subject: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm dark:text-white"
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none text-sm dark:text-white"
                                 >
                                     <option value="">Select Subject</option>
                                     <option value="Mathematics">Mathematics</option>
@@ -219,7 +219,7 @@ export default function MyRequests() {
                                     required
                                     value={formData.course}
                                     onChange={e => setFormData({ ...formData, course: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm dark:text-white"
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none text-sm dark:text-white"
                                 >
                                     <option value="">Select Course</option>
                                     <option value="JEE Mains/Adv">JEE Mains/Adv</option>
@@ -240,7 +240,7 @@ export default function MyRequests() {
                                     placeholder="e.g. Organic Chemistry, Calculus"
                                     value={formData.topic}
                                     onChange={e => setFormData({ ...formData, topic: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm dark:text-white"
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none text-sm dark:text-white"
                                 />
                             </div>
                             <div>
@@ -249,7 +249,7 @@ export default function MyRequests() {
                                     required
                                     value={formData.timeSlot}
                                     onChange={e => setFormData({ ...formData, timeSlot: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm dark:text-white"
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none text-sm dark:text-white"
                                 >
                                     <option value="">Select Time Slot</option>
                                     <option value="Morning (8 AM - 12 PM)">Morning (8 AM - 12 PM)</option>
@@ -271,7 +271,7 @@ export default function MyRequests() {
                                 step="50"
                                 value={formData.budget}
                                 onChange={e => setFormData({ ...formData, budget: e.target.value })}
-                                className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                                className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-700"
                             />
                             <div className="flex justify-between text-[10px] text-slate-400 mt-1">
                                 <span>₹200</span>
@@ -286,7 +286,7 @@ export default function MyRequests() {
                                 placeholder="Describe what you need help with..."
                                 value={formData.description}
                                 onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none resize-none text-sm dark:text-white"
+                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none resize-none text-sm dark:text-white"
                             />
                         </div>
 
@@ -301,7 +301,7 @@ export default function MyRequests() {
                             <button
                                 type="submit"
                                 disabled={submitting}
-                                className="w-full sm:w-auto px-8 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50 shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 text-sm"
+                                className="w-full sm:w-auto px-8 py-2.5 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all disabled:opacity-50 shadow-lg shadow-cyan-100 flex items-center justify-center gap-2 text-sm"
                             >
                                 {submitting ? <Loader2 className="animate-spin" size={20} /> : (editingId ? 'Update Request' : 'Post Request')}
                             </button>
@@ -330,7 +330,7 @@ export default function MyRequests() {
                                 </div>
                                 <div className="flex flex-wrap gap-2 mb-3">
                                     <span className="text-[10px] md:text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-lg font-medium">{req.subject}</span>
-                                    <span className="text-[10px] md:text-xs bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded-lg font-medium">{req.course}</span>
+                                    <span className="text-[10px] md:text-xs bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400 px-2 py-1 rounded-lg font-medium">{req.course}</span>
                                     <span className="text-[10px] md:text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 px-2 py-1 rounded-lg font-medium">{req.timeSlot}</span>
                                 </div>
                                 <p className="text-slate-500 dark:text-slate-400 mb-3 text-sm line-clamp-2">{req.description}</p>
@@ -343,7 +343,7 @@ export default function MyRequests() {
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={() => handleEdit(req)}
-                                        className="p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all"
+                                        className="p-2 text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-lg transition-all"
                                         title="Edit Request"
                                     >
                                         <Edit2 size={18} />

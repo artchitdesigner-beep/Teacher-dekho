@@ -92,7 +92,7 @@ export default function TeacherProfile() {
     };
 
     if (loading) {
-        return <div className="flex justify-center p-12"><Loader2 className="animate-spin text-indigo-600" /></div>;
+        return <div className="flex justify-center p-12"><Loader2 className="animate-spin text-cyan-700" /></div>;
     }
 
     return (
@@ -136,7 +136,7 @@ export default function TeacherProfile() {
                                 required
                                 value={formData.name}
                                 onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition"
                             />
                         </div>
                         <div className="space-y-2">
@@ -146,7 +146,7 @@ export default function TeacherProfile() {
                                 required
                                 value={formData.subject}
                                 onChange={e => setFormData({ ...formData, subject: e.target.value })}
-                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition"
                             />
                         </div>
                     </div>
@@ -160,7 +160,7 @@ export default function TeacherProfile() {
                                 min="0"
                                 value={formData.hourlyRate}
                                 onChange={e => setFormData({ ...formData, hourlyRate: e.target.value })}
-                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition"
                             />
                         </div>
                         <div className="space-y-2">
@@ -170,7 +170,7 @@ export default function TeacherProfile() {
                                 placeholder="https://youtube.com/..."
                                 value={formData.videoIntroUrl}
                                 onChange={e => setFormData({ ...formData, videoIntroUrl: e.target.value })}
-                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition"
                             />
                         </div>
                     </div>
@@ -184,7 +184,7 @@ export default function TeacherProfile() {
                                 placeholder="e.g. IIT Delhi"
                                 value={formData.college}
                                 onChange={e => setFormData({ ...formData, college: e.target.value })}
-                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition"
                             />
                         </div>
                         <div className="space-y-2">
@@ -195,7 +195,7 @@ export default function TeacherProfile() {
                                 placeholder="e.g. 5 years"
                                 value={formData.experience}
                                 onChange={e => setFormData({ ...formData, experience: e.target.value })}
-                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition"
                             />
                         </div>
                     </div>
@@ -207,7 +207,7 @@ export default function TeacherProfile() {
                             rows={4}
                             value={formData.bio}
                             onChange={e => setFormData({ ...formData, bio: e.target.value })}
-                            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition resize-none"
+                            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition resize-none"
                         />
                     </div>
 
@@ -215,7 +215,7 @@ export default function TeacherProfile() {
                         <button
                             type="submit"
                             disabled={saving}
-                            className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all flex items-center gap-2 disabled:opacity-50"
+                            className="px-6 py-3 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all flex items-center gap-2 disabled:opacity-50"
                         >
                             {saving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
                             Save Changes

@@ -8,7 +8,7 @@ export default function PublicRoute() {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
-                <Loader2 className="animate-spin text-indigo-600" size={32} />
+                <Loader2 className="animate-spin text-cyan-700" size={32} />
             </div>
         );
     }

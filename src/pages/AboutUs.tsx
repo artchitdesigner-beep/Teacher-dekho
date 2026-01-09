@@ -1,21 +1,35 @@
 import { Heart, Target, Shield, Star, Users, Award, Zap, CheckCircle2 } from 'lucide-react';
+import GridBackground from '@/components/landing/GridBackground';
 
 export default function AboutUs() {
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-20">
-            <div className="max-w-7xl mx-auto px-6">
-                {/* Hero Section */}
-                <div className="text-center max-w-3xl mx-auto mb-24">
-                    <h1 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 dark:text-slate-100 mb-6">Empowering Education through Personalized Mentorship</h1>
-                    <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
-                        At TeacherDekho, we believe that every student deserves access to high-quality, personalized education. Our mission is to bridge the gap between expert educators and eager learners.
-                    </p>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+            {/* Hero Section */}
+            <div className="relative pt-20 pb-20 overflow-hidden bg-white dark:bg-slate-950">
+                <div className="absolute inset-0">
+                    <GridBackground
+                        darkLineColor={[255, 255, 255]}
+                        darkDotColor={[99, 102, 241]}
+                        darkBlockColor={[79, 70, 229]}
+                        maxOpacity={0.1}
+                    />
                 </div>
+                <div className="max-w-7xl mx-auto px-6 relative z-10">
+                    <div className="text-center max-w-3xl mx-auto">
+                        <h1 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 dark:text-slate-100 mb-6">Empowering Education through Personalized Mentorship</h1>
+                        <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+                            At TeacherDekho, we believe that every student deserves access to high-quality, personalized education. Our mission is to bridge the gap between expert educators and eager learners.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-6 py-20">
 
                 {/* Mission & Vision */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-32">
-                    <div className="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-indigo-100/30 dark:hover:shadow-none transition-all duration-500">
-                        <div className="w-14 h-14 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mb-6">
+                    <div className="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:shadow-cyan-100/30 dark:hover:shadow-none transition-all duration-500">
+                        <div className="w-14 h-14 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400 rounded-2xl flex items-center justify-center mb-6">
                             <Target size={28} />
                         </div>
                         <h2 className="text-2xl font-serif font-bold text-slate-900 dark:text-slate-100 mb-4">Our Mission</h2>
@@ -44,7 +58,7 @@ export default function AboutUs() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {[
                             {
-                                icon: <Shield className="text-indigo-600" size={24} />,
+                                icon: <Shield className="text-cyan-700" size={24} />,
                                 title: "Trust & Safety",
                                 description: "We rigorously verify every tutor to ensure a safe and reliable learning environment."
                             },
@@ -59,7 +73,7 @@ export default function AboutUs() {
                                 description: "We foster a supportive community of learners and educators growing together."
                             },
                             {
-                                icon: <Zap className="text-indigo-600" size={24} />,
+                                icon: <Zap className="text-cyan-700" size={24} />,
                                 title: "Innovation",
                                 description: "We continuously improve our platform to provide the best learning experience."
                             }
@@ -90,7 +104,7 @@ export default function AboutUs() {
                                     "Dedicated support for every student"
                                 ].map((item, index) => (
                                     <div key={index} className="flex items-center gap-4">
-                                        <div className="w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <div className="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center flex-shrink-0">
                                             <CheckCircle2 size={14} />
                                         </div>
                                         <span className="text-slate-300">{item}</span>
@@ -99,10 +113,10 @@ export default function AboutUs() {
                             </div>
                         </div>
                         <div className="relative">
-                            <div className="absolute inset-0 bg-indigo-500/20 blur-[100px] rounded-full" />
+                            <div className="absolute inset-0 bg-cyan-500/20 blur-[100px] rounded-full" />
                             <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-3xl">
                                 <div className="flex items-center gap-4 mb-8">
-                                    <div className="w-12 h-12 bg-indigo-500 rounded-2xl flex items-center justify-center">
+                                    <div className="w-12 h-12 bg-cyan-500 rounded-2xl flex items-center justify-center">
                                         <Award size={24} />
                                     </div>
                                     <div>

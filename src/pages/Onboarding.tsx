@@ -78,7 +78,7 @@ export default function Onboarding() {
                     hourlyRate: parseFloat(formData.hourlyRate),
                     rating: 0,
                     reviewCount: 0,
-                    avatarColor: 'bg-indigo-100 text-indigo-600' // Default
+                    avatarColor: 'bg-cyan-100 text-cyan-700' // Default
                 });
                 console.log('Step 4: Teacher Document Created');
             }
@@ -112,9 +112,9 @@ export default function Onboarding() {
                             <div className="space-y-4">
                                 <button
                                     onClick={() => handleRoleSelect('student')}
-                                    className="w-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 hover:border-indigo-600 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group flex items-center gap-4 text-left"
+                                    className="w-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 hover:border-cyan-700 dark:hover:border-cyan-500 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all group flex items-center gap-4 text-left"
                                 >
-                                    <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <div className="w-12 h-12 bg-cyan-100 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                                         <User size={24} />
                                     </div>
                                     <div>
@@ -125,7 +125,7 @@ export default function Onboarding() {
 
                                 <button
                                     onClick={() => handleRoleSelect('teacher')}
-                                    className="w-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 hover:border-indigo-600 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group flex items-center gap-4 text-left"
+                                    className="w-full p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 hover:border-cyan-700 dark:hover:border-cyan-500 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all group flex items-center gap-4 text-left"
                                 >
                                     <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                                         <GraduationCap size={24} />
@@ -157,7 +157,7 @@ export default function Onboarding() {
                                     placeholder="Full Name"
                                     value={formData.name}
                                     onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition dark:text-white"
                                 />
                                 <input
                                     required
@@ -165,7 +165,7 @@ export default function Onboarding() {
                                     placeholder="Email Address"
                                     value={formData.email}
                                     onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition dark:text-white"
                                 />
                                 <input
                                     required
@@ -173,7 +173,7 @@ export default function Onboarding() {
                                     placeholder="Password"
                                     value={formData.password}
                                     onChange={e => setFormData({ ...formData, password: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition dark:text-white"
                                 />
 
                                 {role === 'teacher' && (
@@ -185,7 +185,7 @@ export default function Onboarding() {
                                                 placeholder="Subject (e.g. Physics)"
                                                 value={formData.subject}
                                                 onChange={e => setFormData({ ...formData, subject: e.target.value })}
-                                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
+                                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition dark:text-white"
                                             />
                                             <input
                                                 required
@@ -193,7 +193,7 @@ export default function Onboarding() {
                                                 placeholder="Rate (₹/hr)"
                                                 value={formData.hourlyRate}
                                                 onChange={e => setFormData({ ...formData, hourlyRate: e.target.value })}
-                                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
+                                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition dark:text-white"
                                             />
                                         </div>
                                         <textarea
@@ -201,7 +201,7 @@ export default function Onboarding() {
                                             placeholder="Short Bio..."
                                             value={formData.bio}
                                             onChange={e => setFormData({ ...formData, bio: e.target.value })}
-                                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition h-24 resize-none dark:text-white"
+                                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition h-24 resize-none dark:text-white"
                                         />
                                     </>
                                 )}
@@ -210,7 +210,7 @@ export default function Onboarding() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="w-full py-3 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 {loading ? <Loader2 className="animate-spin" /> : <>Create Account <ArrowRight size={18} /></>}
                             </button>

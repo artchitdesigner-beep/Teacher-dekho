@@ -4,6 +4,7 @@ import HowItWorks from './pages/HowItWorks';
 import AboutUs from './pages/AboutUs';
 import Onboarding from './pages/Onboarding';
 import Login from './pages/Login';
+import BecomeTutor from './pages/BecomeTutor';
 import DashboardLayout from './components/layout/DashboardLayout';
 import PublicRoute from './components/layout/PublicRoute';
 import PublicLayout from './components/layout/PublicLayout';
@@ -26,7 +27,9 @@ import TeacherRequests from './pages/teacher/TeacherRequests';
 import TeacherSchedule from './pages/teacher/TeacherSchedule';
 import TeacherProfile from './pages/teacher/TeacherProfile';
 import TeacherBookingDetail from './pages/teacher/TeacherBookingDetail';
+import TeacherAvailability from './pages/teacher/TeacherAvailability';
 import Notifications from './pages/Notifications';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -38,6 +41,7 @@ function App() {
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/search" element={<SearchTeachers />} />
+          <Route path="/become-tutor" element={<BecomeTutor />} />
           <Route path="/batch/:id" element={<BatchDetails />} />
           <Route path="/teacher/:id" element={<TeacherProfilePublic />} />
         </Route>
@@ -70,6 +74,7 @@ function App() {
           <Route path="dashboard" element={<TeacherDashboard />} />
           <Route path="requests" element={<TeacherRequests />} />
           <Route path="schedule" element={<TeacherSchedule />} />
+          <Route path="availability" element={<TeacherAvailability />} />
           <Route path="profile" element={<TeacherProfile />} />
           <Route path="bookings/:id" element={<TeacherBookingDetail />} />
           <Route path="notifications" element={<Notifications />} />
@@ -77,7 +82,7 @@ function App() {
         </Route>
 
         {/* Catch all */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

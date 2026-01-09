@@ -144,7 +144,7 @@ export default function TeacherBookingDetail() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-700"></div>
             </div>
         );
     }
@@ -157,7 +157,7 @@ export default function TeacherBookingDetail() {
                 <p className="text-slate-500 mb-6">{error || "Something went wrong."}</p>
                 <button
                     onClick={() => navigate(-1)}
-                    className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all"
+                    className="px-6 py-2 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all"
                 >
                     Go Back
                 </button>
@@ -171,7 +171,7 @@ export default function TeacherBookingDetail() {
             <div className="flex items-center justify-between">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 font-medium transition-colors"
+                    className="flex items-center gap-2 text-slate-500 hover:text-cyan-700 font-medium transition-colors"
                 >
                     <ChevronLeft size={20} />
                     Back to Dashboard
@@ -188,7 +188,7 @@ export default function TeacherBookingDetail() {
             <div className="bg-white rounded-[2.5rem] p-6 md:p-12 border border-slate-100 shadow-sm relative overflow-hidden">
                 <div className="relative z-10">
                     <div className="flex flex-wrap items-center gap-3 mb-4">
-                        <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold uppercase rounded-lg">
+                        <span className="px-3 py-1 bg-cyan-50 text-cyan-700 text-[10px] font-bold uppercase rounded-lg">
                             {booking.totalSessions} Sessions Course
                         </span>
                         <span className="hidden md:inline text-slate-300">|</span>
@@ -203,7 +203,7 @@ export default function TeacherBookingDetail() {
                         <p className="text-slate-500 text-base md:text-lg max-w-2xl">{booking.description}</p>
                     )}
                 </div>
-                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl opacity-50"></div>
+                <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-50 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl opacity-50"></div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -212,12 +212,12 @@ export default function TeacherBookingDetail() {
                     <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                <Clock className="text-indigo-600" size={20} />
+                                <Clock className="text-cyan-700" size={20} />
                                 Course Sessions
                             </h3>
                             <button
                                 onClick={() => setShowAddSession(true)}
-                                className="flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors"
+                                className="flex items-center gap-1 text-xs font-bold text-cyan-700 hover:text-cyan-700 bg-cyan-50 px-3 py-1.5 rounded-lg transition-colors"
                             >
                                 <Plus size={14} /> Add Session
                             </button>
@@ -233,7 +233,7 @@ export default function TeacherBookingDetail() {
                                         <div>
                                             <div className="flex items-center gap-2 mb-0.5">
                                                 <span className="text-sm font-bold text-slate-900">Session {idx + 1}</span>
-                                                {session.isDemo && <span className="text-[8px] font-bold bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded uppercase">Demo</span>}
+                                                {session.isDemo && <span className="text-[8px] font-bold bg-cyan-100 text-cyan-700 px-1.5 py-0.5 rounded uppercase">Demo</span>}
                                             </div>
                                             <div className="text-xs text-slate-500 flex items-center gap-2">
                                                 <Clock size={12} /> {session.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -247,7 +247,7 @@ export default function TeacherBookingDetail() {
                                             </span>
                                         ) : (
                                             <div className="flex gap-2">
-                                                <button className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all">
+                                                <button className="p-2 bg-cyan-700 text-white rounded-lg hover:bg-cyan-700 transition-all">
                                                     <Video size={16} />
                                                 </button>
                                                 <button
@@ -268,7 +268,7 @@ export default function TeacherBookingDetail() {
                     {booking.members && booking.members.length > 0 && (
                         <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
                             <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                                <User className="text-indigo-600" size={20} />
+                                <User className="text-cyan-700" size={20} />
                                 Group Members
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -287,7 +287,7 @@ export default function TeacherBookingDetail() {
                     {/* Status Card */}
                     <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm">
                         <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                            <Info className="text-indigo-600" size={20} />
+                            <Info className="text-cyan-700" size={20} />
                             Course Status
                         </h3>
                         <div className="space-y-4">
@@ -343,7 +343,7 @@ export default function TeacherBookingDetail() {
                                     min={new Date().toISOString().split('T')[0]}
                                     value={newSessionData.date}
                                     onChange={e => setNewSessionData({ ...newSessionData, date: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition"
                                 />
                             </div>
                             <div>
@@ -355,8 +355,8 @@ export default function TeacherBookingDetail() {
                                             type="button"
                                             onClick={() => setNewSessionData({ ...newSessionData, time: slot })}
                                             className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all ${newSessionData.time === slot
-                                                ? 'bg-indigo-600 border-indigo-600 text-white'
-                                                : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300'
+                                                ? 'bg-cyan-700 border-cyan-700 text-white'
+                                                : 'bg-white border-slate-200 text-slate-600 hover:border-cyan-300'
                                                 }`}
                                         >
                                             {slot}
@@ -367,7 +367,7 @@ export default function TeacherBookingDetail() {
                             <button
                                 type="submit"
                                 disabled={addingSession || !newSessionData.date || !newSessionData.time}
-                                className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50"
+                                className="w-full py-3 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all disabled:opacity-50"
                             >
                                 {addingSession ? 'Adding...' : 'Add Session'}
                             </button>

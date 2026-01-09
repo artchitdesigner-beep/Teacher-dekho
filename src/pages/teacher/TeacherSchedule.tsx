@@ -74,7 +74,7 @@ export default function TeacherSchedule() {
 
     if (loading) return (
         <div className="flex items-center justify-center min-h-[40vh]">
-            <Loader2 className="animate-spin text-indigo-600" size={32} />
+            <Loader2 className="animate-spin text-cyan-700" size={32} />
         </div>
     );
 
@@ -95,23 +95,23 @@ export default function TeacherSchedule() {
                     upcomingSessions.map((session, idx) => (
                         <div key={`${session.bookingId}-${idx}`} className="bg-white p-6 rounded-2xl border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:shadow-md transition-all">
                             <div className="flex items-start gap-4">
-                                <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-xl flex flex-col items-center justify-center font-bold">
+                                <div className="w-14 h-14 bg-cyan-50 text-cyan-700 rounded-xl flex flex-col items-center justify-center font-bold">
                                     <span className="text-lg">{session.scheduledAt.toDate().getDate()}</span>
                                     <span className="text-[10px] uppercase">{session.scheduledAt.toDate().toLocaleString('default', { month: 'short' })}</span>
                                 </div>
                                 <div>
-                                    <Link to={`/teacher/bookings/${session.bookingId}`} className="font-bold text-slate-900 text-lg mb-1 hover:text-indigo-600 transition-colors block">
+                                    <Link to={`/teacher/bookings/${session.bookingId}`} className="font-bold text-slate-900 text-lg mb-1 hover:text-cyan-700 transition-colors block">
                                         {session.topic}
                                     </Link>
                                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
                                         <span className="flex items-center gap-1"><Clock size={14} /> {session.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                         <span className="flex items-center gap-1"><User size={14} /> {session.studentName}</span>
-                                        {session.isDemo && <span className="text-[10px] font-bold bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded uppercase">Demo</span>}
+                                        {session.isDemo && <span className="text-[10px] font-bold bg-cyan-100 text-cyan-700 px-1.5 py-0.5 rounded uppercase">Demo</span>}
                                     </div>
                                 </div>
                             </div>
 
-                            <button className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
+                            <button className="px-6 py-3 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all flex items-center justify-center gap-2">
                                 <Video size={20} />
                                 Start Session
                             </button>

@@ -41,28 +41,36 @@ export default function LandingPage() {
     ];
 
     return (
-        <div className="min-h-screen font-sans text-slate-900 selection:bg-indigo-100">
+
+        <div className="min-h-screen font-sans text-slate-900 dark:text-slate-100 selection:bg-cyan-100 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
             {/* Hero Section */}
-            <header className="relative pt-20 pb-32 overflow-hidden">
-                <GridBackground />
+            <header className="relative pt-20 pb-32 overflow-hidden bg-white dark:bg-gradient-to-b dark:from-slate-900 dark:via-slate-900 dark:to-cyan-950 transition-colors duration-300">
+                <div className="absolute inset-0">
+                    <GridBackground
+                        darkLineColor={[255, 255, 255]}
+                        darkDotColor={[99, 102, 241]}
+                        darkBlockColor={[79, 70, 229]}
+                        maxOpacity={0.1}
+                    />
+                </div>
                 <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
                     <div className="inline-block mb-6">
-                        <span className="text-xs font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase">Education Redefined</span>
+                        <span className="text-xs font-bold tracking-widest text-cyan-700 dark:text-cyan-400 uppercase">Education Redefined</span>
                     </div>
 
-                    <h1 className="text-5xl md:text-7xl font-serif font-medium text-slate-900 dark:text-slate-100 mb-8 leading-[1.1] max-w-5xl mx-auto">
+                    <h1 className="text-4xl md:text-7xl font-serif font-medium text-slate-900 dark:text-white mb-6 md:mb-8 leading-[1.1] max-w-5xl mx-auto">
                         Built by expert teachers, <br />
-                        <span className="italic text-slate-600 dark:text-slate-400">for ambitious students.</span>
+                        <span className="italic text-cyan-700 dark:text-cyan-200">for ambitious students.</span>
                     </h1>
 
-                    <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 mb-10 max-w-2xl mx-auto leading-relaxed">
                         The world's smartest students trust TeacherDekho to find the perfect mentor.
                         Personalized 1-on-1 learning that fits your schedule.
                     </p>
 
                     {/* Search Bar */}
                     <div className="max-w-4xl mx-auto mb-12">
-                        <form onSubmit={handleSearch} className="bg-white dark:bg-slate-900 p-2 rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 mb-6">
+                        <form onSubmit={handleSearch} className="bg-white dark:bg-slate-900 p-2 rounded-2xl border-2 border-cyan-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] dark:shadow-none mb-6">
                             <div className="flex flex-col md:flex-row items-center gap-2">
                                 <div className="relative flex-grow w-full">
                                     <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
@@ -101,7 +109,7 @@ export default function LandingPage() {
 
                                 <button
                                     type="submit"
-                                    className="w-full md:w-auto px-10 py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20"
+                                    className="w-full md:w-auto px-10 py-4 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all shadow-lg shadow-cyan-700/20"
                                 >
                                     Search
                                 </button>
@@ -133,24 +141,24 @@ export default function LandingPage() {
             </header>
 
             {/* Stats Section */}
-            <section className="py-10 bg-indigo-600 text-white">
+            <section className="py-10 bg-cyan-700 text-white">
                 <div className="max-w-7xl mx-auto px-6">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-indigo-500/50">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-cyan-500/50">
                         <div>
                             <div className="text-3xl md:text-4xl font-bold font-serif mb-1">500+</div>
-                            <div className="text-indigo-200 text-sm font-medium">Expert Mentors</div>
+                            <div className="text-cyan-200 text-sm font-medium">Expert Mentors</div>
                         </div>
                         <div>
                             <div className="text-3xl md:text-4xl font-bold font-serif mb-1">10k+</div>
-                            <div className="text-indigo-200 text-sm font-medium">Active Students</div>
+                            <div className="text-cyan-200 text-sm font-medium">Active Students</div>
                         </div>
                         <div>
                             <div className="text-3xl md:text-4xl font-bold font-serif mb-1">50k+</div>
-                            <div className="text-indigo-200 text-sm font-medium">Sessions Completed</div>
+                            <div className="text-cyan-200 text-sm font-medium">Sessions Completed</div>
                         </div>
                         <div>
                             <div className="text-3xl md:text-4xl font-bold font-serif mb-1">4.9/5</div>
-                            <div className="text-indigo-200 text-sm font-medium">Average Rating</div>
+                            <div className="text-cyan-200 text-sm font-medium">Average Rating</div>
                         </div>
                     </div>
                 </div>
@@ -166,7 +174,7 @@ export default function LandingPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
                         {/* Connecting Line (Desktop) */}
-                        <div className="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gradient-to-r from-indigo-50 via-indigo-100 to-indigo-50 -z-10"></div>
+                        <div className="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-50 via-cyan-100 to-cyan-50 -z-10"></div>
 
                         <div className="text-center relative bg-white dark:bg-slate-900 p-4 rounded-2xl">
                             <div className="w-24 h-24 mx-auto mb-6 flex items-center justify-center">
@@ -201,14 +209,14 @@ export default function LandingPage() {
                             <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900 dark:text-slate-100 mb-4">Popular Subjects</h2>
                             <p className="text-slate-500 dark:text-slate-400">Find expert guidance in the subjects that matter most.</p>
                         </div>
-                        <Link to="/search" className="hidden md:flex items-center gap-2 text-indigo-600 font-bold hover:gap-3 transition-all">
+                        <Link to="/search" className="hidden md:flex items-center gap-2 text-cyan-700 font-bold hover:gap-3 transition-all">
                             View all subjects <Users size={18} />
                         </Link>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                         {subjects.map(subject => (
-                            <Link key={subject.name} to={`/search?subject=${subject.name}`} className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:shadow-lg transition-all text-center group">
+                            <Link key={subject.name} to={`/search?subject=${subject.name}`} className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-cyan-200 dark:hover:border-cyan-800 hover:shadow-lg transition-all text-center group">
                                 <div className="w-12 h-12 mx-auto mb-4 group-hover:scale-110 transition-transform">
                                     <img src={subject.icon} alt={subject.name} className="w-full h-full object-contain" />
                                 </div>
@@ -248,23 +256,23 @@ export default function LandingPage() {
             </section>
 
             {/* CTA */}
-            <section className="py-24">
-                <div className="max-w-5xl mx-auto px-6">
-                    <div className="bg-[#4B4ACF] rounded-[3rem] p-12 md:p-20 text-center text-white relative overflow-hidden">
+            <section className="py-16 md:py-24">
+                <div className="max-w-5xl mx-auto px-4 md:px-6">
+                    <div className="bg-[#4B4ACF] rounded-[2rem] md:rounded-[3rem] p-8 md:p-20 text-center text-white relative overflow-hidden">
                         <div className="relative z-10">
-                            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6">Ready to start learning?</h2>
-                            <p className="text-indigo-100 text-lg mb-10 max-w-2xl mx-auto">Join thousands of students who are mastering their subjects with TeacherDekho today.</p>
+                            <h2 className="text-3xl md:text-5xl font-serif font-bold mb-4 md:mb-6">Ready to start learning?</h2>
+                            <p className="text-cyan-100 text-base md:text-lg mb-8 md:mb-10 max-w-2xl mx-auto">Join thousands of students who are mastering their subjects with TeacherDekho today.</p>
                             <button
                                 onClick={() => navigate('/onboarding')}
-                                className="px-10 py-4 bg-white text-indigo-600 rounded-xl font-bold text-lg hover:bg-indigo-50 transition-colors shadow-xl"
+                                className="w-full md:w-auto px-8 md:px-10 py-3 md:py-4 bg-white text-cyan-700 rounded-xl font-bold text-base md:text-lg hover:bg-cyan-50 transition-colors shadow-xl"
                             >
                                 Get Started for Free
                             </button>
                         </div>
 
                         {/* Decorative circles */}
-                        <div className="absolute top-0 left-0 -translate-x-1/4 -translate-y-1/4 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
-                        <div className="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 w-96 h-96 bg-indigo-500/50 rounded-full blur-3xl"></div>
+                        <div className="absolute top-0 left-0 -translate-x-1/4 -translate-y-1/4 w-64 h-64 md:w-96 md:h-96 bg-white/10 rounded-full blur-3xl"></div>
+                        <div className="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 w-64 h-64 md:w-96 md:h-96 bg-cyan-500/50 rounded-full blur-3xl"></div>
                     </div>
                 </div>
             </section>

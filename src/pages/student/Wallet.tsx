@@ -36,7 +36,7 @@ export default function Wallet() {
                         </div>
 
                         {/* The Card (Money) */}
-                        <div className="absolute top-6 left-6 right-6 h-48 bg-gradient-to-br from-emerald-500 via-teal-600 to-emerald-800 rounded-2xl shadow-xl transition-all duration-700 ease-out [transform:translateY(-40px)_translateZ(5px)] group-hover:[transform:translateY(-90px)_translateZ(20px)_rotateX(-5deg)] z-10 p-6 text-white border-t border-white/20 flex flex-col justify-between">
+                        <div className="absolute top-6 left-6 right-6 h-48 bg-gradient-to-br from-emerald-500 via-cyan-700 to-emerald-800 rounded-2xl shadow-xl transition-all duration-700 ease-out [transform:translateY(-40px)_translateZ(5px)] group-hover:[transform:translateY(-90px)_translateZ(20px)_rotateX(-5deg)] z-10 p-6 text-white border-t border-white/20 flex flex-col justify-between">
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-emerald-100/80 text-[10px] font-bold tracking-[0.2em] uppercase mb-1">Total Balance</p>
@@ -79,7 +79,7 @@ export default function Wallet() {
 
                             <div className="relative z-30 [transform:translateZ(20px)]">
                                 <div className="flex items-center gap-4 mb-6">
-                                    <div className="w-14 h-14 bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-900/50 border border-white/10">
+                                    <div className="w-14 h-14 bg-gradient-to-br from-cyan-700 to-violet-700 rounded-2xl flex items-center justify-center shadow-lg shadow-cyan-900/50 border border-white/10">
                                         <Gift className="text-white" size={28} />
                                     </div>
                                     <div>
@@ -89,7 +89,7 @@ export default function Wallet() {
                                 </div>
 
                                 <div className="p-3 bg-white/5 rounded-xl border border-white/5 backdrop-blur-sm group-hover:bg-white/10 transition-colors">
-                                    <p className="text-indigo-200 text-xs flex items-center gap-2 font-medium">
+                                    <p className="text-cyan-200 text-xs flex items-center gap-2 font-medium">
                                         <Info size={14} />
                                         <span>Hover to reveal balance</span>
                                     </p>
@@ -103,7 +103,7 @@ export default function Wallet() {
                 <div className="space-y-4">
                     <div
                         onClick={() => setShowReferralModal(true)}
-                        className="bg-gradient-to-br from-indigo-600 to-violet-600 p-6 rounded-3xl text-white cursor-pointer hover:shadow-lg hover:shadow-indigo-200 transition-all group relative overflow-hidden"
+                        className="bg-gradient-to-br from-cyan-700 to-violet-600 p-6 rounded-3xl text-white cursor-pointer hover:shadow-lg hover:shadow-cyan-200 transition-all group relative overflow-hidden"
                     >
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-white/20 transition-all"></div>
                         <div className="relative z-10">
@@ -111,8 +111,8 @@ export default function Wallet() {
                                 <Gift size={20} />
                             </div>
                             <h3 className="font-bold text-lg mb-1">Refer & Earn</h3>
-                            <p className="text-indigo-100 text-xs mb-3">Invite friends and earn ₹500 per referral.</p>
-                            <span className="inline-block bg-white text-indigo-600 text-xs font-bold px-3 py-1 rounded-lg">Invite Now</span>
+                            <p className="text-cyan-100 text-xs mb-3">Invite friends and earn ₹500 per referral.</p>
+                            <span className="inline-block bg-white text-cyan-700 text-xs font-bold px-3 py-1 rounded-lg">Invite Now</span>
                         </div>
                     </div>
 
@@ -124,7 +124,7 @@ export default function Wallet() {
                             <h3 className="font-bold text-slate-900 dark:text-slate-100">Saved Cards</h3>
                         </div>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Manage your saved payment methods.</p>
-                        <button className="text-indigo-600 dark:text-indigo-400 text-xs font-bold hover:underline">View Cards</button>
+                        <button className="text-cyan-700 dark:text-cyan-400 text-xs font-bold hover:underline">View Cards</button>
                     </div>
                 </div>
             </div>
@@ -136,7 +136,7 @@ export default function Wallet() {
                         <History size={20} className="text-slate-400" />
                         Transaction History
                     </h3>
-                    <button className="text-sm text-indigo-600 dark:text-indigo-400 font-bold hover:underline">View All</button>
+                    <button className="text-sm text-cyan-700 dark:text-cyan-400 font-bold hover:underline">View All</button>
                 </div>
                 <div className="divide-y divide-slate-100 dark:divide-slate-800">
                     {transactions.map(tx => (

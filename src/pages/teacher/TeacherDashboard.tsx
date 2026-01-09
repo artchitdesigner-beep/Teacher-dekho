@@ -106,10 +106,10 @@ export default function TeacherDashboard() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {/* Stats Cards */}
-                <div className="bg-indigo-600 text-white p-6 rounded-3xl shadow-lg shadow-indigo-200">
-                    <div className="text-indigo-200 text-sm font-medium mb-1">Total Earnings</div>
+                <div className="bg-cyan-700 text-white p-6 rounded-3xl shadow-lg shadow-cyan-200">
+                    <div className="text-cyan-200 text-sm font-medium mb-1">Total Earnings</div>
                     <div className="text-3xl font-bold">₹0</div>
-                    <div className="mt-4 text-xs bg-indigo-500/50 inline-block px-2 py-1 rounded-lg">
+                    <div className="mt-4 text-xs bg-cyan-500/50 inline-block px-2 py-1 rounded-lg">
                         +0% this month
                     </div>
                 </div>
@@ -128,7 +128,7 @@ export default function TeacherDashboard() {
                 <div className="space-y-6">
                     <div className="flex items-center justify-between">
                         <h2 className="text-xl font-bold text-slate-900">Active Courses</h2>
-                        <Link to="/teacher/schedule" className="text-indigo-600 text-sm font-bold hover:underline">View All</Link>
+                        <Link to="/teacher/schedule" className="text-cyan-700 text-sm font-bold hover:underline">View All</Link>
                     </div>
 
                     <div className="space-y-4">
@@ -149,7 +149,7 @@ export default function TeacherDashboard() {
                                     >
                                         <div className="flex justify-between items-start mb-4">
                                             <div>
-                                                <h3 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{booking.topic}</h3>
+                                                <h3 className="font-bold text-slate-900 group-hover:text-cyan-700 transition-colors">{booking.topic}</h3>
                                                 <p className="text-xs text-slate-500">Student: {booking.studentName}</p>
                                             </div>
                                             <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase ${booking.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
@@ -165,13 +165,13 @@ export default function TeacherDashboard() {
                                             </div>
                                             <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                                                 <div
-                                                    className="h-full bg-indigo-600 rounded-full transition-all duration-500"
+                                                    className="h-full bg-cyan-700 rounded-full transition-all duration-500"
                                                     style={{ width: `${(completedSessions / booking.totalSessions) * 100}%` }}
                                                 ></div>
                                             </div>
                                             {nextSession && (
                                                 <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 p-2 rounded-lg">
-                                                    <Clock size={14} className="text-indigo-500" />
+                                                    <Clock size={14} className="text-cyan-500" />
                                                     Next: {nextSession.scheduledAt.toDate().toLocaleDateString()} at {nextSession.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </div>
                                             )}
@@ -187,7 +187,7 @@ export default function TeacherDashboard() {
                 <div className="space-y-6">
                     <div className="flex items-center justify-between">
                         <h2 className="text-xl font-bold text-slate-900">New Requests</h2>
-                        <Link to="/teacher/requests" className="text-indigo-600 text-sm font-bold hover:underline">View All</Link>
+                        <Link to="/teacher/requests" className="text-cyan-700 text-sm font-bold hover:underline">View All</Link>
                     </div>
 
                     <div className="space-y-4">
@@ -212,7 +212,7 @@ export default function TeacherDashboard() {
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => handleStatusUpdate(booking.id, 'active')}
-                                            className="flex-1 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700 transition-all"
+                                            className="flex-1 py-2 bg-cyan-700 text-white text-xs font-bold rounded-xl hover:bg-cyan-700 transition-all"
                                         >
                                             Approve
                                         </button>
@@ -230,15 +230,15 @@ export default function TeacherDashboard() {
                 </div>
 
                 {/* Refer & Earn Card */}
-                <div className="bg-gradient-to-br from-violet-600 to-indigo-700 rounded-3xl p-6 text-white relative overflow-hidden group cursor-pointer" onClick={() => setShowReferralModal(true)}>
+                <div className="bg-gradient-to-br from-violet-600 to-cyan-700 rounded-3xl p-6 text-white relative overflow-hidden group cursor-pointer" onClick={() => setShowReferralModal(true)}>
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-white/20 transition-all"></div>
                     <div className="relative z-10">
                         <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-4 backdrop-blur-sm">
                             <Gift size={20} className="text-white" />
                         </div>
                         <h4 className="font-bold text-lg mb-1">Refer & Earn Bonus</h4>
-                        <p className="text-indigo-100 text-sm mb-4">Invite other teachers to Teacher Dekho and earn a joining bonus.</p>
-                        <button className="px-4 py-2 bg-white text-indigo-600 font-bold rounded-lg text-xs hover:bg-indigo-50 transition-colors">
+                        <p className="text-cyan-100 text-sm mb-4">Invite other teachers to Teacher Dekho and earn a joining bonus.</p>
+                        <button className="px-4 py-2 bg-white text-cyan-700 font-bold rounded-lg text-xs hover:bg-cyan-50 transition-colors">
                             Invite Teachers
                         </button>
                     </div>

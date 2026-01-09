@@ -240,7 +240,7 @@ export const DUMMY_TEACHERS = [
         bio: "Software Engineer at a top tech firm. Learn coding from someone who does it every day.",
         college: "IIIT Hyderabad",
         kycStatus: "verified",
-        avatarColor: "bg-indigo-100",
+        avatarColor: "bg-cyan-100",
         class: ["11th", "12th"],
         language: ["English", "Hinglish"],
         joiningDate: Timestamp.fromDate(new Date('2023-11-01')),

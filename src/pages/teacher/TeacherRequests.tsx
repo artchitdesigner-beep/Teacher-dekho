@@ -88,7 +88,7 @@ export default function TeacherRequests() {
                         placeholder="Search requests..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                        className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none transition"
                     />
                 </div>
                 <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ export default function TeacherRequests() {
                     <select
                         value={selectedSubject}
                         onChange={(e) => setSelectedSubject(e.target.value)}
-                        className="px-4 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500"
+                        className="px-4 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-cyan-500"
                     >
                         {subjects.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
@@ -114,7 +114,7 @@ export default function TeacherRequests() {
                         <div key={req.id} className="bg-white p-6 rounded-3xl border border-slate-100 hover:shadow-lg transition-all">
                             <div className="flex items-start justify-between mb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center">
+                                    <div className="w-10 h-10 bg-cyan-100 text-cyan-700 rounded-full flex items-center justify-center">
                                         <User size={20} />
                                     </div>
                                     <div>
@@ -135,7 +135,7 @@ export default function TeacherRequests() {
                             <button
                                 onClick={() => handleAccept(req.id)}
                                 disabled={!!processing}
-                                className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                className="w-full py-3 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                             >
                                 {processing === req.id ? <Loader2 className="animate-spin" /> : 'Accept Request'}
                             </button>

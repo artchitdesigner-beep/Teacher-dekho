@@ -57,11 +57,11 @@ export default function StudentProfile() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Profile Card */}
                 <div className="md:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden">
-                    <div className="h-32 bg-gradient-to-r from-indigo-500 to-violet-600"></div>
+                    <div className="h-32 bg-gradient-to-r from-cyan-500 to-violet-600"></div>
                     <div className="px-8 pb-8">
                         <div className="relative -mt-12 mb-6">
                             <div className="w-24 h-24 bg-white dark:bg-slate-900 rounded-2xl p-1 shadow-lg inline-block">
-                                <div className="w-full h-full bg-indigo-100 dark:bg-indigo-900/20 rounded-xl flex items-center justify-center text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+                                <div className="w-full h-full bg-cyan-100 dark:bg-cyan-900/20 rounded-xl flex items-center justify-center text-3xl font-bold text-cyan-700 dark:text-cyan-400">
                                     {user?.displayName?.[0] || 'U'}
                                 </div>
                             </div>
@@ -70,7 +70,7 @@ export default function StudentProfile() {
                         <div className="space-y-6">
                             <div>
                                 <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{user?.displayName || 'Student Name'}</h2>
-                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 capitalize">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400 capitalize">
                                     <Shield size={12} />
                                     {userRole} Account
                                 </span>
@@ -104,7 +104,7 @@ export default function StudentProfile() {
                 <div className="space-y-6">
                     <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 h-fit">
                         <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-                            <RefreshCw size={20} className="text-indigo-600 dark:text-indigo-400" />
+                            <RefreshCw size={20} className="text-cyan-700 dark:text-cyan-400" />
                             Data Management
                         </h3>
                         <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
@@ -128,7 +128,7 @@ export default function StudentProfile() {
                             <button
                                 onClick={handleSeedData}
                                 disabled={isSeeding}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-colors disabled:opacity-50"
                             >
                                 {isSeeding ? (
                                     <RefreshCw size={18} className="animate-spin" />

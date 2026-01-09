@@ -75,7 +75,7 @@ export default function Notifications() {
         }
     };
 
-    if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-indigo-600" /></div>;
+    if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-cyan-700" /></div>;
 
     return (
         <div className="max-w-3xl mx-auto space-y-6">
@@ -87,7 +87,7 @@ export default function Notifications() {
                 {notifications.some(n => !n.read) && (
                     <button
                         onClick={markAllAsRead}
-                        className="text-sm font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
+                        className="text-sm font-bold text-cyan-700 hover:text-cyan-700 flex items-center gap-1"
                     >
                         <Check size={16} />
                         Mark all as read
@@ -111,11 +111,11 @@ export default function Notifications() {
                             onClick={() => !notification.read && markAsRead(notification.id)}
                             className={`p-4 md:p-5 rounded-2xl border transition-all cursor-pointer ${notification.read
                                 ? 'bg-white border-slate-100 opacity-75'
-                                : 'bg-white border-indigo-100 shadow-md shadow-indigo-50 ring-1 ring-indigo-50'
+                                : 'bg-white border-cyan-100 shadow-md shadow-cyan-50 ring-1 ring-cyan-50'
                                 }`}
                         >
                             <div className="flex gap-4">
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${notification.read ? 'bg-slate-50' : 'bg-indigo-50'
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${notification.read ? 'bg-slate-50' : 'bg-cyan-50'
                                     }`}>
                                     {getIcon(notification.type)}
                                 </div>
@@ -125,7 +125,7 @@ export default function Notifications() {
                                             {notification.title}
                                         </h3>
                                         {!notification.read && (
-                                            <div className="w-2 h-2 bg-indigo-600 rounded-full shrink-0 mt-1.5" />
+                                            <div className="w-2 h-2 bg-cyan-700 rounded-full shrink-0 mt-1.5" />
                                         )}
                                     </div>
                                     <p className="text-slate-600 text-xs md:text-sm mb-2 leading-relaxed">

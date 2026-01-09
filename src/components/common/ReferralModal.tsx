@@ -51,7 +51,7 @@ export default function ReferralModal({ isOpen, onClose, userRole, userName }: R
                     className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative"
                 >
                     {/* Header */}
-                    <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-6 text-white text-center relative overflow-hidden">
+                    <div className="bg-gradient-to-br from-cyan-700 to-violet-700 p-6 text-white text-center relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
                         <button
                             onClick={onClose}
@@ -63,7 +63,7 @@ export default function ReferralModal({ isOpen, onClose, userRole, userName }: R
                             <Gift size={32} className="text-white" />
                         </div>
                         <h2 className="text-2xl font-bold mb-2">Refer & Earn</h2>
-                        <p className="text-indigo-100 text-sm max-w-xs mx-auto">
+                        <p className="text-cyan-100 text-sm max-w-xs mx-auto">
                             Invite your friends to Teacher Dekho and earn rewards for every successful signup!
                         </p>
                     </div>
@@ -79,7 +79,7 @@ export default function ReferralModal({ isOpen, onClose, userRole, userName }: R
                                 </div>
                                 <button
                                     onClick={handleCopy}
-                                    className="p-3 hover:bg-white rounded-lg transition-colors text-indigo-600 relative group"
+                                    className="p-3 hover:bg-white rounded-lg transition-colors text-cyan-700 relative group"
                                     title="Copy Code"
                                 >
                                     {copied ? <CheckCircle2 size={20} className="text-emerald-500" /> : <Copy size={20} />}
@@ -90,7 +90,7 @@ export default function ReferralModal({ isOpen, onClose, userRole, userName }: R
                         {/* Share Button */}
                         <button
                             onClick={handleShare}
-                            className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 active:scale-95 flex items-center justify-center gap-2"
+                            className="w-full py-3 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all shadow-lg shadow-cyan-700/20 active:scale-95 flex items-center justify-center gap-2"
                         >
                             <Share2 size={18} /> Share with Friends
                         </button>
@@ -122,7 +122,7 @@ export default function ReferralModal({ isOpen, onClose, userRole, userName }: R
                                 ].map((ref, i) => (
                                     <div key={i} className="flex items-center justify-between text-sm p-3 hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-100">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold text-xs">
+                                            <div className="w-8 h-8 bg-cyan-100 text-cyan-700 rounded-full flex items-center justify-center font-bold text-xs">
                                                 {ref.name[0]}
                                             </div>
                                             <div>

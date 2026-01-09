@@ -3,7 +3,7 @@ import { ChevronLeft, Loader2, ArrowRight } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
-import logoIndigo from '@/assets/Logo Indigo.svg';
+import logocyan from '@/assets/Logo cyan.svg';
 
 export default function Login() {
     const navigate = useNavigate();
@@ -44,7 +44,7 @@ export default function Login() {
                 <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
                     <div className="mb-8">
                         <div className="mb-4">
-                            <img src={logoIndigo} alt="TeacherDekho" className="h-12 w-auto" />
+                            <img src={logocyan} alt="TeacherDekho" className="h-12 w-auto" />
                         </div>
                         <h2 className="text-2xl font-serif font-bold text-slate-900 dark:text-slate-100">Welcome back</h2>
                         <p className="text-slate-500 dark:text-slate-400 text-sm">Please enter your details to sign in.</p>
@@ -63,7 +63,7 @@ export default function Login() {
                             placeholder="Email Address"
                             value={formData.email}
                             onChange={e => setFormData({ ...formData, email: e.target.value })}
-                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
+                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition dark:text-white"
                         />
                         <input
                             required
@@ -71,13 +71,13 @@ export default function Login() {
                             placeholder="Password"
                             value={formData.password}
                             onChange={e => setFormData({ ...formData, password: e.target.value })}
-                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition dark:text-white"
+                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition dark:text-white"
                         />
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                            className="w-full py-3 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                         >
                             {loading ? <Loader2 className="animate-spin" /> : <>Log In <ArrowRight size={18} /></>}
                         </button>
