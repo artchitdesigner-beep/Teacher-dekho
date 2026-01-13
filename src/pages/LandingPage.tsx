@@ -19,15 +19,11 @@ import CSIcon from '@/assets/icons for landing page/Computer Science.webp';
 export default function LandingPage() {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedClass, setSelectedClass] = useState('12th');
-    const [selectedLanguage, setSelectedLanguage] = useState('English');
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         const params = new URLSearchParams();
         if (searchQuery.trim()) params.set('q', searchQuery);
-        params.set('class', selectedClass);
-        params.set('lang', selectedLanguage);
         navigate(`/search?${params.toString()}`);
     };
 
@@ -44,7 +40,7 @@ export default function LandingPage() {
 
         <div className="min-h-screen font-sans text-slate-900 dark:text-slate-100 selection:bg-cyan-100 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
             {/* Hero Section */}
-            <header className="relative pt-20 pb-32 overflow-hidden bg-white dark:bg-gradient-to-b dark:from-slate-900 dark:via-slate-900 dark:to-cyan-950 transition-colors duration-300">
+            <header className="relative pt-16 pb-24 overflow-hidden bg-white dark:bg-gradient-to-b dark:from-slate-900 dark:via-slate-900 dark:to-cyan-950 transition-colors duration-300">
                 <div className="absolute inset-0">
                     <GridBackground
                         darkLineColor={[255, 255, 255]}
@@ -58,18 +54,18 @@ export default function LandingPage() {
                         <span className="text-xs font-bold tracking-widest text-cyan-700 dark:text-cyan-400 uppercase">Education Redefined</span>
                     </div>
 
-                    <h1 className="text-4xl md:text-7xl font-serif font-medium text-slate-900 dark:text-white mb-6 md:mb-8 leading-[1.1] max-w-5xl mx-auto">
+                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif font-medium text-slate-900 dark:text-white mb-6 md:mb-8 leading-[1.1] max-w-5xl mx-auto">
                         Built by expert teachers, <br />
                         <span className="italic text-cyan-700 dark:text-cyan-200">for ambitious students.</span>
                     </h1>
 
-                    <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-base md:text-lg text-slate-600 dark:text-slate-300 mb-10 max-w-2xl mx-auto leading-relaxed">
                         The world's smartest students trust TeacherDekho to find the perfect mentor.
                         Personalized 1-on-1 learning that fits your schedule.
                     </p>
 
                     {/* Search Bar */}
-                    <div className="max-w-4xl mx-auto mb-12">
+                    <div className="max-w-3xl mx-auto mb-12">
                         <form onSubmit={handleSearch} className="bg-white dark:bg-slate-900 p-2 rounded-2xl border-2 border-cyan-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] dark:shadow-none mb-6">
                             <div className="flex flex-col md:flex-row items-center gap-2">
                                 <div className="relative flex-grow w-full">
@@ -79,37 +75,13 @@ export default function LandingPage() {
                                         placeholder="Search for teacher or subject..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-14 pr-4 py-4 bg-transparent outline-none text-lg dark:text-white dark:placeholder-slate-500"
+                                        className="w-full pl-14 pr-4 py-3 bg-transparent outline-none text-lg dark:text-white dark:placeholder-slate-500"
                                     />
                                 </div>
 
-                                <div className="h-8 w-px bg-slate-200 hidden md:block"></div>
-
-                                <select
-                                    value={selectedClass}
-                                    onChange={(e) => setSelectedClass(e.target.value)}
-                                    className="w-full md:w-auto px-4 py-4 bg-transparent font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
-                                >
-                                    <option value="11th">Class 11th</option>
-                                    <option value="12th">Class 12th</option>
-                                </select>
-
-                                <div className="h-8 w-px bg-slate-200 hidden md:block"></div>
-
-                                <select
-                                    value={selectedLanguage}
-                                    onChange={(e) => setSelectedLanguage(e.target.value)}
-                                    className="w-full md:w-auto px-4 py-4 bg-transparent font-bold text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
-                                >
-                                    <option value="English">English</option>
-                                    <option value="Hinglish">Hinglish</option>
-                                    <option value="Hindi">Hindi</option>
-                                    <option value="Marathi">Marathi</option>
-                                </select>
-
                                 <button
                                     type="submit"
-                                    className="w-full md:w-auto px-10 py-4 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all shadow-lg shadow-cyan-700/20"
+                                    className="w-full md:w-auto px-8 py-3 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all shadow-lg shadow-cyan-700/20"
                                 >
                                     Search
                                 </button>

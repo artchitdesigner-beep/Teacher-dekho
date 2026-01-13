@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown, Heart, Wallet } from 'lucide-react';
+import { Menu, X, ChevronDown, Heart, Wallet, LogOut, User, LayoutDashboard, Calendar, Layers, Bell, Users } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
+import { auth } from '@/lib/firebase';
 import ProfileDropdown from './ProfileDropdown';
 import logocyan from '@/assets/Logo cyan.svg';
 import { ModeToggle } from '@/components/mode-toggle';
@@ -13,8 +14,21 @@ export default function Navbar() {
 
     // Determine current view mode based on URL or User Role
     const isStudentView = userRole === 'student' || location.pathname.startsWith('/student');
+    const isTeacherView = userRole === 'teacher' || location.pathname.startsWith('/teacher');
 
-    const navLinks = [
+    const handleLogout = () => {
+        auth.signOut();
+        window.location.href = '/';
+    };
+
+    interface NavLinkItem {
+        label: string;
+        to: string;
+        icon?: React.ElementType;
+        children?: { label: string; to: string; }[];
+    }
+
+    const publicLinks: NavLinkItem[] = [
         {
             label: 'Find a Tutor',
             to: '/search',
@@ -29,6 +43,53 @@ export default function Navbar() {
         { label: 'About Us', to: '/about-us' },
     ];
 
+    const studentLinks: NavLinkItem[] = [
+        { label: 'Dashboard', to: '/student/dashboard', icon: LayoutDashboard },
+        {
+            label: 'Find Teachers',
+            to: '/student/search',
+            icon: Users,
+            children: [
+                { label: 'Search Teachers', to: '/student/search' },
+                { label: 'Browse Batches', to: '/student/batches' },
+                { label: 'My Requests', to: '/student/requests' }
+            ]
+        },
+        {
+            label: 'My Learning',
+            to: '/student/courses',
+            icon: Layers,
+            children: [
+                { label: 'My Courses', to: '/student/courses' },
+                { label: 'Saved Teachers', to: '/student/saved' }
+            ]
+        },
+        { label: 'Wallet', to: '/student/wallet', icon: Wallet },
+    ];
+
+    const teacherLinks: NavLinkItem[] = [
+        { label: 'Dashboard', to: '/teacher/dashboard', icon: LayoutDashboard },
+        {
+            label: 'Teaching',
+            to: '/teacher/schedule',
+            icon: Calendar,
+            children: [
+                { label: 'My Schedule', to: '/teacher/schedule' },
+                { label: 'Requests', to: '/teacher/requests' },
+                { label: 'Availability', to: '/teacher/availability' }
+            ]
+        },
+        { label: 'Profile', to: '/teacher/profile', icon: User },
+    ];
+
+    const getNavLinks = () => {
+        if (user && isStudentView) return studentLinks;
+        if (user && isTeacherView) return teacherLinks;
+        return publicLinks;
+    };
+
+    const currentLinks = getNavLinks();
+
     return (
         <nav className="sticky top-0 z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800">
             <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -40,11 +101,12 @@ export default function Navbar() {
 
                 {/* Desktop Navigation */}
                 <div className="hidden lg:flex items-center gap-8">
-                    {navLinks.map((link) => (
+                    {currentLinks.map((link) => (
                         <div key={link.label} className="relative group">
                             {link.children ? (
                                 <>
                                     <button className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors rounded-lg group-hover:bg-slate-50 dark:group-hover:bg-slate-800">
+                                        {link.icon && <link.icon size={16} className="mr-1" />}
                                         {link.label}
                                         <ChevronDown size={14} className="opacity-50 group-hover:rotate-180 transition-transform duration-200" />
                                     </button>
@@ -72,6 +134,7 @@ export default function Navbar() {
                                             : 'text-slate-600 dark:text-slate-300 hover:text-cyan-700 hover:bg-slate-50 dark:hover:bg-slate-800'}
                                     `}
                                 >
+                                    {link.icon && <link.icon size={16} className="mr-1" />}
                                     {link.label}
                                 </NavLink>
                             )}
@@ -81,20 +144,23 @@ export default function Navbar() {
 
                 {/* Auth Buttons / Profile Dropdown */}
                 <div className="hidden lg:flex items-center gap-4">
-
                     {user ? (
                         <div className="flex items-center gap-4">
+                            <Link
+                                to="/notifications"
+                                className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-cyan-700 hover:bg-cyan-50 transition-all"
+                                title="Notifications"
+                            >
+                                <Bell size={20} />
+                            </Link>
                             {isStudentView && (
-                                <>
-
-                                    <Link
-                                        to="/student/saved"
-                                        className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
-                                        title="Saved Teachers"
-                                    >
-                                        <Heart size={20} />
-                                    </Link>
-                                </>
+                                <Link
+                                    to="/student/saved"
+                                    className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                                    title="Saved Teachers"
+                                >
+                                    <Heart size={20} />
+                                </Link>
                             )}
                             <ProfileDropdown />
                         </div>
@@ -124,16 +190,17 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="lg:hidden bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 py-6 px-6 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                <div className="lg:hidden bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 py-6 px-6 space-y-4 animate-in slide-in-from-top-2 duration-200 h-[calc(100vh-80px)] overflow-y-auto">
                     <div className="flex items-center justify-between mb-4">
                         <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Theme</span>
                         <ModeToggle />
                     </div>
-                    {navLinks.map((link) => (
+                    {currentLinks.map((link) => (
                         <div key={link.label}>
                             {link.children ? (
                                 <div className="space-y-2">
-                                    <div className="text-base font-medium text-slate-900 dark:text-slate-100 py-2">
+                                    <div className="flex items-center gap-2 text-base font-medium text-slate-900 dark:text-slate-100 py-2">
+                                        {link.icon && <link.icon size={18} />}
                                         {link.label}
                                     </div>
                                     <div className="pl-4 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 ml-1">
@@ -154,49 +221,36 @@ export default function Navbar() {
                                     to={link.to}
                                     onClick={() => setIsMenuOpen(false)}
                                     className={({ isActive }) => `
-                                        block py-2 text-base font-medium transition-colors
+                                        flex items-center gap-2 py-2 text-base font-medium transition-colors
                                         ${isActive ? 'text-cyan-700' : 'text-slate-600 dark:text-slate-300'}
                                     `}
                                 >
+                                    {link.icon && <link.icon size={18} />}
                                     {link.label}
                                 </NavLink>
                             )}
                         </div>
                     ))}
-                    <div className="pt-4 flex flex-col gap-3">
-                        {user && isStudentView && (
+
+                    <div className="pt-4 flex flex-col gap-3 border-t border-slate-100 dark:border-slate-800 mt-4">
+                        {user ? (
                             <>
                                 <Link
-                                    to="/student/wallet"
+                                    to="/notifications"
                                     onClick={() => setIsMenuOpen(false)}
-                                    className="flex items-center gap-2 py-2 text-base font-medium text-slate-600"
+                                    className="flex items-center gap-2 py-2 text-base font-medium text-slate-600 dark:text-slate-300"
                                 >
-                                    <span className="w-8 h-8 bg-cyan-50 text-cyan-700 rounded-full flex items-center justify-center">
-                                        <Wallet size={16} />
-                                    </span>
-                                    My Wallet (₹1,250)
+                                    <Bell size={18} />
+                                    Notifications
                                 </Link>
-                                <Link
-                                    to="/student/saved"
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="flex items-center gap-2 py-2 text-base font-medium text-slate-600"
+                                <button
+                                    onClick={handleLogout}
+                                    className="flex items-center gap-2 py-2 text-base font-medium text-red-500"
                                 >
-                                    <span className="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center">
-                                        <Heart size={16} />
-                                    </span>
-                                    Saved Teachers
-                                </Link>
-                                <div className="h-px bg-slate-50 my-2" />
+                                    <LogOut size={18} />
+                                    Log Out
+                                </button>
                             </>
-                        )}
-                        {user ? (
-                            <Link
-                                to={isStudentView ? '/student/dashboard' : '/teacher/dashboard'}
-                                onClick={() => setIsMenuOpen(false)}
-                                className="w-full py-3 bg-cyan-700 text-white text-center font-semibold rounded-xl shadow-md shadow-cyan-700/10"
-                            >
-                                Dashboard
-                            </Link>
                         ) : (
                             <>
                                 <Link
