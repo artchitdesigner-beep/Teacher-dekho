@@ -87,6 +87,24 @@ export const DUMMY_BATCHES = [
     }
 ];
 
+const generateAvailability = () => {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const availability: any = {};
+
+    days.forEach(day => {
+        availability[day] = {
+            enabled: true,
+            slots: [
+                { start: '09:00', end: '10:00', period: 'Morning' },
+                { start: '14:00', end: '15:00', period: 'Afternoon' },
+                { start: '18:00', end: '19:00', period: 'Evening' }
+            ]
+        };
+    });
+
+    return availability;
+};
+
 export const DUMMY_TEACHERS = [
     {
         name: "Dr. Aditi Sharma",
@@ -104,6 +122,7 @@ export const DUMMY_TEACHERS = [
         class: ["11th", "12th"],
         language: ["English", "Hindi"],
         joiningDate: Timestamp.fromDate(new Date('2023-01-15')),
+        availability: generateAvailability(),
         certificates: [
             "https://images.unsplash.com/photo-1589330694653-4a8b74c644db?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
             "https://images.unsplash.com/photo-1544531586-fde5298cdd40?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
@@ -136,6 +155,7 @@ export const DUMMY_TEACHERS = [
         class: ["12th"],
         language: ["English", "Hinglish"],
         joiningDate: Timestamp.fromDate(new Date('2022-06-10')),
+        availability: generateAvailability(),
         certificates: [
             "https://images.unsplash.com/photo-1589330694653-4a8b74c644db?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
         ],
@@ -164,6 +184,7 @@ export const DUMMY_TEACHERS = [
         class: ["11th"],
         language: ["Hindi", "Hinglish"],
         joiningDate: Timestamp.fromDate(new Date('2023-08-20')),
+        availability: generateAvailability(),
         certificates: [],
         socialLinks: {
             linkedin: "https://linkedin.com"
@@ -187,6 +208,7 @@ export const DUMMY_TEACHERS = [
         class: ["11th", "12th"],
         language: ["English"],
         joiningDate: Timestamp.fromDate(new Date('2021-03-05')),
+        availability: generateAvailability(),
         certificates: [
             "https://images.unsplash.com/photo-1589330694653-4a8b74c644db?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
             "https://images.unsplash.com/photo-1544531586-fde5298cdd40?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
@@ -216,6 +238,7 @@ export const DUMMY_TEACHERS = [
         class: ["12th"],
         language: ["English", "Marathi"],
         joiningDate: Timestamp.fromDate(new Date('2023-05-12')),
+        availability: generateAvailability(),
         certificates: [
             "https://images.unsplash.com/photo-1589330694653-4a8b74c644db?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
         ],
@@ -244,6 +267,7 @@ export const DUMMY_TEACHERS = [
         class: ["11th", "12th"],
         language: ["English", "Hinglish"],
         joiningDate: Timestamp.fromDate(new Date('2023-11-01')),
+        availability: generateAvailability(),
         certificates: [],
         socialLinks: {
             linkedin: "https://linkedin.com",

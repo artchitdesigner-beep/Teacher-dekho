@@ -1,8 +1,6 @@
-import { Zap, Users, Search, Sparkles } from 'lucide-react';
+import { Users, Search, Sparkles } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import HeroRight from '@/assets/right boy.webp';
-import HeroLeft from '@/assets/left girl.webp';
 import GridBackground from '@/components/landing/GridBackground';
 
 // Icons
@@ -103,12 +101,60 @@ export default function LandingPage() {
 
                 </div>
 
-                {/* Floating Images */}
-                <div className="hidden lg:block absolute top-1/2 left-0 -translate-y-1/2 w-80 xl:w-96 opacity-100 hover:scale-105 transition-transform duration-700 animate-float">
-                    <img src={HeroLeft} alt="Student learning" className="w-full h-auto object-contain" />
+                {/* Left Collage - Indian Teachers/Students */}
+                <div className="hidden lg:block absolute top-1/2 left-4 -translate-y-1/2 w-[300px] xl:w-[400px] h-[500px] pointer-events-none select-none">
+                    {/* Main Image - Senior Female Teacher */}
+                    <div className="absolute top-10 right-10 w-40 xl:w-48 h-56 xl:h-64 rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 transform -rotate-3 hover:scale-105 transition-transform duration-500 z-20">
+                        <img
+                            src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=400&h=500"
+                            alt="Senior Indian Teacher"
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+                    {/* Secondary Image - Classroom/Blackboard */}
+                    <div className="absolute bottom-20 left-4 w-32 xl:w-40 h-32 xl:h-40 rounded-2xl overflow-hidden shadow-xl border-4 border-white dark:border-slate-800 transform rotate-6 hover:scale-105 transition-transform duration-500 z-10">
+                        <img
+                            src="https://images.unsplash.com/photo-1577896334614-501d0c85b97e?auto=format&fit=crop&q=80&w=300&h=300"
+                            alt="Classroom"
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+                    {/* Small Accent Image - Male Teacher */}
+                    <div className="absolute top-0 left-10 w-24 xl:w-32 h-24 xl:h-32 rounded-2xl overflow-hidden shadow-lg border-4 border-white dark:border-slate-800 transform -rotate-12 hover:scale-105 transition-transform duration-500 z-0 opacity-90">
+                        <img
+                            src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=300&h=300"
+                            alt="Male Teacher"
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
                 </div>
-                <div className="hidden lg:block absolute top-1/2 right-0 -translate-y-1/2 w-80 xl:w-96 opacity-100 hover:scale-105 transition-transform duration-700 animate-float-delayed">
-                    <img src={HeroRight} alt="Teacher teaching" className="w-full h-auto object-contain" />
+
+                {/* Right Collage - Indian Teachers/Students */}
+                <div className="hidden lg:block absolute top-1/2 right-4 -translate-y-1/2 w-[300px] xl:w-[400px] h-[500px] pointer-events-none select-none">
+                    {/* Main Image - Male Professor */}
+                    <div className="absolute top-20 left-10 w-40 xl:w-48 h-52 xl:h-60 rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 transform rotate-3 hover:scale-105 transition-transform duration-500 z-20">
+                        <img
+                            src="https://images.unsplash.com/photo-1507537297725-24a1c029d3a8?auto=format&fit=crop&q=80&w=400&h=500"
+                            alt="Indian Professor"
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+                    {/* Secondary Image - Female Tutor */}
+                    <div className="absolute bottom-10 right-10 w-36 xl:w-44 h-48 xl:h-56 rounded-2xl overflow-hidden shadow-xl border-4 border-white dark:border-slate-800 transform -rotate-6 hover:scale-105 transition-transform duration-500 z-10">
+                        <img
+                            src="https://images.unsplash.com/photo-1595152772835-219674b2a8a6?auto=format&fit=crop&q=80&w=400&h=500"
+                            alt="Female Tutor"
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+                    {/* Small Accent Image - Student */}
+                    <div className="absolute top-0 right-20 w-24 xl:w-28 h-24 xl:h-28 rounded-2xl overflow-hidden shadow-lg border-4 border-white dark:border-slate-800 transform rotate-12 hover:scale-105 transition-transform duration-500 z-0 opacity-90">
+                        <img
+                            src="https://images.unsplash.com/photo-1623582854588-d60de57fa33f?auto=format&fit=crop&q=80&w=300&h=300"
+                            alt="Indian Student"
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
                 </div>
             </header>
 
@@ -137,37 +183,51 @@ export default function LandingPage() {
             </section>
 
             {/* How it Works */}
-            <section className="py-24 bg-white dark:bg-slate-950/50">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="text-center mb-16">
+            <section className="py-24 bg-white dark:bg-slate-950/50 relative overflow-hidden">
+                {/* Decorative Elements */}
+                <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                    <div className="absolute top-10 left-10 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-10 right-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
+                </div>
+
+                <div className="max-w-7xl mx-auto px-6 relative z-10">
+                    <div className="text-center mb-20">
                         <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900 dark:text-slate-100 mb-4">How TeacherDekho Works</h2>
-                        <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Get started in 3 simple steps. No complicated processes, just pure learning.</p>
+                        <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto text-lg">Your journey to excellence in 3 simple steps.</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
                         {/* Connecting Line (Desktop) */}
-                        <div className="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-50 via-cyan-100 to-cyan-50 -z-10"></div>
+                        <div className="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-100 dark:via-cyan-900 to-transparent -translate-y-1/2 -z-10"></div>
 
-                        <div className="text-center relative bg-white dark:bg-slate-900 p-4 rounded-2xl">
-                            <div className="w-24 h-24 mx-auto mb-6 flex items-center justify-center">
-                                <img src={SearchIcon} alt="Search" className="w-full h-full object-contain" />
+                        {/* Step 1 */}
+                        <div className="group relative bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-cyan-200 dark:hover:border-cyan-800 hover:shadow-xl hover:shadow-cyan-100/50 dark:hover:shadow-none transition-all duration-300 transform hover:-translate-y-1 text-center">
+                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-cyan-700 text-white rounded-full flex items-center justify-center font-bold text-xl border-4 border-white dark:border-slate-900 shadow-lg z-10">1</div>
+                            <div className="w-24 h-24 mx-auto mb-6 flex items-center justify-center bg-cyan-50 dark:bg-cyan-900/20 rounded-full group-hover:scale-110 transition-transform duration-300">
+                                <img src={SearchIcon} alt="Search" className="w-14 h-14 object-contain" />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">Search</h3>
-                            <p className="text-slate-500 dark:text-slate-400 leading-relaxed">Browse profiles of top teachers from IITs, AIIMS, and top universities. Filter by subject and budget.</p>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">Search Tutors</h3>
+                            <p className="text-slate-500 dark:text-slate-400 leading-relaxed">Browse profiles of top teachers from IITs, AIIMS, and top universities. Filter by subject, budget, and experience.</p>
                         </div>
-                        <div className="text-center relative bg-white dark:bg-slate-900 p-4 rounded-2xl">
-                            <div className="w-24 h-24 mx-auto mb-6 flex items-center justify-center">
-                                <img src={BookDemoIcon} alt="Book Demo" className="w-full h-full object-contain" />
+
+                        {/* Step 2 */}
+                        <div className="group relative bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-cyan-200 dark:hover:border-cyan-800 hover:shadow-xl hover:shadow-cyan-100/50 dark:hover:shadow-none transition-all duration-300 transform hover:-translate-y-1 text-center">
+                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-cyan-700 text-white rounded-full flex items-center justify-center font-bold text-xl border-4 border-white dark:border-slate-900 shadow-lg z-10">2</div>
+                            <div className="w-24 h-24 mx-auto mb-6 flex items-center justify-center bg-cyan-50 dark:bg-cyan-900/20 rounded-full group-hover:scale-110 transition-transform duration-300">
+                                <img src={BookDemoIcon} alt="Book Demo" className="w-14 h-14 object-contain" />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">Book Demo</h3>
-                            <p className="text-slate-500 dark:text-slate-400 leading-relaxed">Schedule a free trial class to see if the teacher's teaching style matches your learning needs.</p>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">Book Free Demo</h3>
+                            <p className="text-slate-500 dark:text-slate-400 leading-relaxed">Schedule a free trial class to interact with the teacher and see if their teaching style matches your needs.</p>
                         </div>
-                        <div className="text-center relative bg-white dark:bg-slate-900 p-4 rounded-2xl">
-                            <div className="w-24 h-24 mx-auto mb-6 flex items-center justify-center">
-                                <img src={LearnIcon} alt="Learn" className="w-full h-full object-contain" />
+
+                        {/* Step 3 */}
+                        <div className="group relative bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-cyan-200 dark:hover:border-cyan-800 hover:shadow-xl hover:shadow-cyan-100/50 dark:hover:shadow-none transition-all duration-300 transform hover:-translate-y-1 text-center">
+                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-cyan-700 text-white rounded-full flex items-center justify-center font-bold text-xl border-4 border-white dark:border-slate-900 shadow-lg z-10">3</div>
+                            <div className="w-24 h-24 mx-auto mb-6 flex items-center justify-center bg-cyan-50 dark:bg-cyan-900/20 rounded-full group-hover:scale-110 transition-transform duration-300">
+                                <img src={LearnIcon} alt="Learn" className="w-14 h-14 object-contain" />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">Learn</h3>
-                            <p className="text-slate-500 dark:text-slate-400 leading-relaxed">Connect 1-on-1 via high-quality video calls. Get personalized attention and clear your doubts.</p>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">Start Learning</h3>
+                            <p className="text-slate-500 dark:text-slate-400 leading-relaxed">Connect 1-on-1 via high-quality video calls. Get personalized attention, notes, and clear your doubts instantly.</p>
                         </div>
                     </div>
                 </div>
@@ -199,32 +259,40 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* Testimonials */}
-            <section className="py-24 bg-white dark:bg-slate-950/50">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900 dark:text-slate-100 mb-4">Loved by Students & Parents</h2>
-                        <p className="text-slate-500 dark:text-slate-400">Don't just take our word for it.</p>
-                    </div>
+            {/* Testimonials Marquee */}
+            <section className="py-24 bg-white dark:bg-slate-950/50 overflow-hidden">
+                <div className="max-w-7xl mx-auto px-6 mb-12 text-center">
+                    <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900 dark:text-slate-100 mb-4">Loved by the Community</h2>
+                    <p className="text-slate-500 dark:text-slate-400">Hear from our students, parents, and teachers.</p>
+                </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <Testimonial
-                            quote="I was struggling with Calculus for months. Found an amazing teacher from ISI Kolkata here who cleared my concepts in just 3 classes!"
-                            author="Rohan Mehta"
-                            role="Class 12 Student, Mumbai"
-                        />
-                        <Testimonial
-                            quote="As a parent, I love how easy it is to find verified tutors. My daughter's physics scores have improved significantly."
-                            author="Mrs. Priya Iyer"
-                            role="Parent, Bangalore"
-                        />
-                        <Testimonial
-                            quote="The 1-on-1 attention I get here is unmatched. It's much better than crowded coaching centers. Highly recommended!"
-                            author="Arjun Singh"
-                            role="JEE Aspirant, Delhi"
-                        />
+                <div className="relative w-full">
+                    {/* Gradient Masks */}
+                    <div className="absolute top-0 left-0 w-32 h-full bg-gradient-to-r from-white dark:from-slate-950 to-transparent z-10"></div>
+                    <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-white dark:from-slate-950 to-transparent z-10"></div>
+
+                    {/* Marquee Container */}
+                    <div className="flex gap-6 animate-marquee hover:pause">
+                        {[...testimonials, ...testimonials].map((t, i) => (
+                            <TestimonialCard key={i} {...t} />
+                        ))}
                     </div>
                 </div>
+
+                {/* Custom Animation Style */}
+                <style>{`
+                    @keyframes marquee {
+                        0% { transform: translateX(0); }
+                        100% { transform: translateX(-50%); }
+                    }
+                    .animate-marquee {
+                        animation: marquee 40s linear infinite;
+                        width: max-content;
+                    }
+                    .hover\\:pause:hover {
+                        animation-play-state: paused;
+                    }
+                `}</style>
             </section>
 
             {/* CTA */}
@@ -252,18 +320,76 @@ export default function LandingPage() {
     );
 }
 
-// Feature component removed as it is no longer used
+// Testimonial Data
+const testimonials = [
+    {
+        quote: "I was struggling with Calculus for months. Found an amazing teacher from ISI Kolkata here who cleared my concepts in just 3 classes!",
+        author: "Rohan Mehta",
+        role: "Student",
+        location: "Mumbai",
+        type: "student"
+    },
+    {
+        quote: "As a parent, I love how easy it is to find verified tutors. My daughter's physics scores have improved significantly.",
+        author: "Mrs. Priya Iyer",
+        role: "Parent",
+        location: "Bangalore",
+        type: "parent"
+    },
+    {
+        quote: "TeacherDekho has given me a platform to reach students globally. The payment system is transparent and timely.",
+        author: "Dr. Alok Sharma",
+        role: "Teacher",
+        location: "Delhi",
+        type: "teacher"
+    },
+    {
+        quote: "The 1-on-1 attention I get here is unmatched. It's much better than crowded coaching centers. Highly recommended!",
+        author: "Arjun Singh",
+        role: "Student",
+        location: "Kota",
+        type: "student"
+    },
+    {
+        quote: "Finding a female tutor for my daughter was my priority. This platform made it so simple and safe.",
+        author: "Sunita Verma",
+        role: "Parent",
+        location: "Pune",
+        type: "parent"
+    },
+    {
+        quote: "I've been teaching here for 6 months. The student quality is great and the dashboard is very intuitive.",
+        author: "Sneha Gupta",
+        role: "Teacher",
+        location: "Hyderabad",
+        type: "teacher"
+    }
+];
 
-function Testimonial({ quote, author, role }: { quote: string, author: string, role: string }) {
+function TestimonialCard({ quote, author, role, location, type }: { quote: string, author: string, role: string, location: string, type: string }) {
+    const getTypeColor = (type: string) => {
+        switch (type) {
+            case 'student': return 'bg-cyan-50 text-cyan-700 border-cyan-100';
+            case 'parent': return 'bg-amber-50 text-amber-700 border-amber-100';
+            case 'teacher': return 'bg-emerald-50 text-emerald-700 border-emerald-100';
+            default: return 'bg-slate-50 text-slate-700 border-slate-100';
+        }
+    };
+
     return (
-        <div className="bg-slate-50 dark:bg-slate-950 p-8 rounded-3xl border border-slate-100 dark:border-slate-800">
-            <div className="flex gap-1 text-amber-400 mb-4">
-                {[1, 2, 3, 4, 5].map(i => <Zap key={i} size={16} fill="currentColor" />)}
+        <div className="w-[350px] md:w-[400px] flex-shrink-0 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 hover:shadow-lg transition-shadow">
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold mb-4 border ${getTypeColor(type)}`}>
+                <span className="capitalize">{role}</span>
             </div>
-            <p className="text-slate-700 dark:text-slate-300 text-lg mb-6 leading-relaxed font-medium">"{quote}"</p>
-            <div>
-                <div className="font-bold text-slate-900 dark:text-slate-100">{author}</div>
-                <div className="text-sm text-slate-500 dark:text-slate-400">{role}</div>
+            <p className="text-slate-700 dark:text-slate-300 text-base mb-6 leading-relaxed font-medium min-h-[80px]">"{quote}"</p>
+            <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ${type === 'student' ? 'bg-cyan-500' : type === 'parent' ? 'bg-amber-500' : 'bg-emerald-500'}`}>
+                    {author.charAt(0)}
+                </div>
+                <div>
+                    <div className="font-bold text-slate-900 dark:text-slate-100 text-sm">{author}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">{location}</div>
+                </div>
             </div>
         </div>
     )

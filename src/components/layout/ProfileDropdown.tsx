@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, Heart, ArrowLeftRight, LogOut, Wallet, Moon, Sun, MessageSquare } from 'lucide-react';
+import { User, ArrowLeftRight, LogOut, Moon, Sun, Settings } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 import { useAuth } from '@/lib/auth-context';
 
@@ -24,13 +24,6 @@ export default function ProfileDropdown() {
 
     return (
         <div className="flex items-center gap-4">
-            {isStudentView && (
-                <Link to="/student/wallet" className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-cyan-50 text-cyan-700 rounded-full text-sm font-bold hover:bg-cyan-100 transition-colors">
-                    <Wallet size={16} />
-                    <span>₹1,250</span>
-                </Link>
-            )}
-
             <div className="relative">
                 <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -91,27 +84,24 @@ export default function ProfileDropdown() {
                                 className="flex items-center gap-3 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors"
                                 onClick={() => setIsProfileOpen(false)}
                             >
-                                <User size={18} /> View Profile
+                                <User size={18} /> My Profile
                             </Link>
 
-                            {isStudentView && (
-                                <>
-                                    <Link
-                                        to="/student/saved"
-                                        className="flex items-center gap-3 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors"
-                                        onClick={() => setIsProfileOpen(false)}
-                                    >
-                                        <Heart size={18} /> Saved Teachers
-                                    </Link>
-                                    <Link
-                                        to="/student/requests"
-                                        className="flex items-center gap-3 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors"
-                                        onClick={() => setIsProfileOpen(false)}
-                                    >
-                                        <MessageSquare size={18} /> My Requests
-                                    </Link>
-                                </>
-                            )}
+                            <Link
+                                to="/settings"
+                                className="flex items-center gap-3 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors"
+                                onClick={() => setIsProfileOpen(false)}
+                            >
+                                <Settings size={18} /> Settings
+                            </Link>
+
+                            <button
+                                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors"
+                                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                            >
+                                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                            </button>
 
                             <button
                                 className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors"
@@ -121,14 +111,6 @@ export default function ProfileDropdown() {
                                 }}
                             >
                                 <ArrowLeftRight size={18} /> Switch to {isStudentView ? 'Teacher' : 'Student'}
-                            </button>
-
-                            <button
-                                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors"
-                                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                            >
-                                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-                                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
                             </button>
 
                             <div className="h-px bg-slate-50 dark:bg-slate-800 my-2" />

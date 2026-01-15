@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, updateDoc, doc, Timestamp, orderBy } from 'firebase/firestore';
-import { Loader2, User, CheckCircle, Search, SlidersHorizontal } from 'lucide-react';
+import { Loader2, User, CheckCircle, Search, SlidersHorizontal, X } from 'lucide-react';
 
 interface Request {
     id: string;
@@ -17,9 +17,16 @@ export default function TeacherRequests() {
     const { user } = useAuth();
     const [requests, setRequests] = useState<Request[]>([]);
     const [loading, setLoading] = useState(true);
-    const [processing, setProcessing] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('All');
+
+    // Remark Modal State
+    const [remarkModal, setRemarkModal] = useState<{ isOpen: boolean, reqId: string | null }>({
+        isOpen: false,
+        reqId: null
+    });
+    const [remarkText, setRemarkText] = useState('');
+    const [processing, setProcessing] = useState(false);
 
     useEffect(() => {
         fetchRequests();
@@ -41,23 +48,31 @@ export default function TeacherRequests() {
         }
     }
 
-    const handleAccept = async (reqId: string) => {
-        if (!user) return;
-        setProcessing(reqId);
+    const openAcceptModal = (reqId: string) => {
+        setRemarkModal({ isOpen: true, reqId });
+        setRemarkText('');
+    };
+
+    const handleAccept = async () => {
+        if (!user || !remarkModal.reqId) return;
+        setProcessing(true);
         try {
-            await updateDoc(doc(db, 'open_requests', reqId), {
+            await updateDoc(doc(db, 'open_requests', remarkModal.reqId), {
                 status: 'accepted',
                 acceptedBy: user.uid,
-                acceptedAt: Timestamp.now()
+                acceptedAt: Timestamp.now(),
+                teacherRemark: remarkText
             });
 
             // Remove from list
-            setRequests(prev => prev.filter(r => r.id !== reqId));
-            alert('Request accepted! You can now contact the student.');
+            setRequests(prev => prev.filter(r => r.id !== remarkModal.reqId));
+
         } catch (error) {
             console.error('Error accepting request:', error);
+            alert('Failed to accept request.');
         } finally {
-            setProcessing(null);
+            setProcessing(false);
+            setRemarkModal({ isOpen: false, reqId: null });
         }
     };
 
@@ -133,16 +148,56 @@ export default function TeacherRequests() {
                             <p className="text-slate-500 text-sm mb-6">{req.description}</p>
 
                             <button
-                                onClick={() => handleAccept(req.id)}
-                                disabled={!!processing}
+                                onClick={() => openAcceptModal(req.id)}
                                 className="w-full py-3 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                             >
-                                {processing === req.id ? <Loader2 className="animate-spin" /> : 'Accept Request'}
+                                Accept Request
                             </button>
                         </div>
                     ))
                 )}
             </div>
+
+            {/* Remark Modal */}
+            {remarkModal.isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold text-slate-900">Accept Request</h3>
+                            <button onClick={() => setRemarkModal({ isOpen: false, reqId: null })} className="p-2 hover:bg-slate-100 rounded-full">
+                                <X size={20} className="text-slate-500" />
+                            </button>
+                        </div>
+
+                        <p className="text-slate-500 text-sm mb-4">
+                            Add a note for the student (e.g., "I can help you with this. I am available from 5 PM.").
+                        </p>
+
+                        <textarea
+                            value={remarkText}
+                            onChange={(e) => setRemarkText(e.target.value)}
+                            placeholder="Write your remark here..."
+                            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none resize-none h-32 mb-6"
+                        ></textarea>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setRemarkModal({ isOpen: false, reqId: null })}
+                                className="flex-1 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleAccept}
+                                disabled={processing || !remarkText.trim()}
+                                className="flex-1 py-3 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {processing ? 'Processing...' : 'Confirm Accept'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

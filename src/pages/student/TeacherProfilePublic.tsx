@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Star, MapPin, Clock, Award, ShieldCheck, Play, Video, Calendar, CheckCircle2, Loader2, Heart, Share2, Linkedin, Youtube, Twitter, Globe, FileText, PlayCircle } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import BookingModal from '@/components/booking/BookingModal';
+import BookingSelectionModal from '@/components/booking/BookingSelectionModal';
 import AvailabilityMap from '@/components/booking/AvailabilityMap';
 import { useAuth } from '@/lib/auth-context';
 
@@ -20,8 +20,7 @@ export default function TeacherProfilePublic() {
         }
     }, [user, userRole, location.pathname, navigate]);
     const [showBookingModal, setShowBookingModal] = useState(false);
-    const [selectedDate, setSelectedDate] = useState<string>('');
-    const [selectedTime, setSelectedTime] = useState<string>('');
+
     const [teacher, setTeacher] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [isSaved, setIsSaved] = useState(false);
@@ -45,35 +44,15 @@ export default function TeacherProfilePublic() {
         fetchTeacher();
     }, [id]);
 
-    const handleSlotClick = (day: string, slot: string) => {
-        if (!user) {
-            navigate('/login', { state: { from: `/teacher/${id}` } });
-            return;
-        }
-        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        const targetDayIndex = days.indexOf(day);
-        const today = new Date();
-        const currentDayIndex = today.getDay();
-
-        let diff = targetDayIndex - currentDayIndex;
-        if (diff < 0) diff += 7; // Next week
-
-        const targetDate = new Date(today);
-        targetDate.setDate(today.getDate() + diff);
-
-        const dateString = targetDate.toISOString().split('T')[0];
-        setSelectedDate(dateString);
-        setSelectedTime(slot);
-        setShowBookingModal(true);
-    };
-
-    const handleBookClick = () => {
+    const handleSlotClick = () => {
         if (!user) {
             navigate('/login', { state: { from: `/teacher/${id}` } });
             return;
         }
         setShowBookingModal(true);
     };
+
+
 
     if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="animate-spin text-cyan-700" /></div>;
     if (!teacher) return <div className="flex items-center justify-center min-h-screen">Teacher not found</div>;
@@ -108,7 +87,7 @@ export default function TeacherProfilePublic() {
                             <div className="flex flex-row justify-between items-start gap-4">
                                 <div className="flex-1 min-w-0">
                                     <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100 flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                                        {teacher.name}
+                                        {teacher.name || 'Teacher'}
                                         {teacher.kycStatus === 'verified' && <ShieldCheck size={20} className="text-emerald-500" fill="currentColor" stroke="white" />}
                                     </h1>
                                     <p className="text-base md:text-lg text-slate-600 dark:text-slate-300 font-medium mb-2">{teacher.subject} Expert • {teacher.experience} Experience</p>
@@ -120,59 +99,12 @@ export default function TeacherProfilePublic() {
                                         <div className="flex items-center gap-1 text-amber-500 font-bold">
                                             <Star size={16} fill="currentColor" /> {teacher.rating || 'New'} ({teacher.reviewCount || 0})
                                         </div>
-                                        {teacher.joiningDate && (
+                                        {teacher.joiningDate && teacher.joiningDate.toDate && (
                                             <div className="flex items-center gap-1 text-slate-400 dark:text-slate-500">
                                                 <Calendar size={16} /> Joined {teacher.joiningDate.toDate().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
                                             </div>
                                         )}
                                     </div>
-
-                                    {/* Social Links */}
-                                    {teacher.socialLinks && (
-                                        <div className="flex items-center justify-center sm:justify-start gap-3 mb-6">
-                                            {teacher.socialLinks.linkedin && (
-                                                <a href={teacher.socialLinks.linkedin} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-[#0077b5] hover:bg-[#0077b5]/10 rounded-full transition-colors">
-                                                    <Linkedin size={18} />
-                                                </a>
-                                            )}
-                                            {teacher.socialLinks.twitter && (
-                                                <a href={teacher.socialLinks.twitter} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-[#1DA1F2] hover:bg-[#1DA1F2]/10 rounded-full transition-colors">
-                                                    <Twitter size={18} />
-                                                </a>
-                                            )}
-                                            {teacher.socialLinks.youtube && (
-                                                <a href={teacher.socialLinks.youtube} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-[#FF0000] hover:bg-[#FF0000]/10 rounded-full transition-colors">
-                                                    <Youtube size={18} />
-                                                </a>
-                                            )}
-                                            {teacher.socialLinks.website && (
-                                                <a href={teacher.socialLinks.website} target="_blank" rel="noreferrer" className="p-2 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-cyan-700 hover:bg-cyan-50 rounded-full transition-colors">
-                                                    <Globe size={18} />
-                                                </a>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="flex items-center gap-2 self-start flex-shrink-0">
-                                    <button
-                                        onClick={() => setIsSaved(!isSaved)}
-                                        className={`p-3 rounded-xl transition-all border ${isSaved ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10'}`}
-                                        title={isSaved ? 'Saved' : 'Save Teacher'}
-                                    >
-                                        <Heart size={20} fill={isSaved ? "currentColor" : "none"} />
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            navigator.clipboard.writeText(window.location.href);
-                                            setShowShareToast(true);
-                                            setTimeout(() => setShowShareToast(false), 2000);
-                                        }}
-                                        className="p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-400 hover:text-cyan-700 hover:bg-cyan-50 dark:hover:bg-cyan-900/10 hover:border-cyan-200 dark:hover:border-cyan-800 transition-all"
-                                        title="Share Profile"
-                                    >
-                                        <Share2 size={20} />
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -198,14 +130,14 @@ export default function TeacherProfilePublic() {
                             className="w-full h-full object-cover opacity-60"
                         />
                         <div className="absolute bottom-4 left-4 text-white">
-                            <div className="font-bold text-lg">Meet {teacher.name.split(' ')[0]}</div>
+                            <div className="font-bold text-lg">Meet {teacher.name?.split(' ')[0] || 'Teacher'}</div>
                             <div className="text-sm opacity-80">Watch introduction video</div>
                         </div>
                     </div>
 
                     {/* About Section */}
                     <section>
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">About {teacher.name.split(' ')[0]}</h2>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">About {teacher.name?.split(' ')[0] || 'Teacher'}</h2>
                         <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base md:text-lg">
                             {teacher.bio}
                             <br /><br />
@@ -336,6 +268,35 @@ export default function TeacherProfilePublic() {
                             ))}
                         </div>
                     </section>
+
+                    {/* Social Links (Moved to Bottom) */}
+                    {teacher.socialLinks && (
+                        <section className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">Connect with {teacher.name?.split(' ')[0] || 'Teacher'}</h2>
+                            <div className="flex items-center gap-4">
+                                {teacher.socialLinks.linkedin && (
+                                    <a href={teacher.socialLinks.linkedin} target="_blank" rel="noreferrer" className="p-3 bg-[#0077b5] text-white rounded-full hover:opacity-90 transition-opacity shadow-lg shadow-[#0077b5]/20">
+                                        <Linkedin size={20} />
+                                    </a>
+                                )}
+                                {teacher.socialLinks.twitter && (
+                                    <a href={teacher.socialLinks.twitter} target="_blank" rel="noreferrer" className="p-3 bg-[#1DA1F2] text-white rounded-full hover:opacity-90 transition-opacity shadow-lg shadow-[#1DA1F2]/20">
+                                        <Twitter size={20} />
+                                    </a>
+                                )}
+                                {teacher.socialLinks.youtube && (
+                                    <a href={teacher.socialLinks.youtube} target="_blank" rel="noreferrer" className="p-3 bg-[#FF0000] text-white rounded-full hover:opacity-90 transition-opacity shadow-lg shadow-[#FF0000]/20">
+                                        <Youtube size={20} />
+                                    </a>
+                                )}
+                                {teacher.socialLinks.website && (
+                                    <a href={teacher.socialLinks.website} target="_blank" rel="noreferrer" className="p-3 bg-cyan-700 text-white rounded-full hover:bg-cyan-800 transition-colors shadow-lg shadow-cyan-700/20">
+                                        <Globe size={20} />
+                                    </a>
+                                )}
+                            </div>
+                        </section>
+                    )}
                 </div>
 
                 {/* Right Column: Booking Card */}
@@ -366,12 +327,35 @@ export default function TeacherProfilePublic() {
                             </div>
                         </div>
 
-                        <button
-                            onClick={handleBookClick}
-                            className="w-full py-3.5 md:py-4 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all shadow-lg shadow-cyan-700/20 active:scale-95 mb-4"
-                        >
-                            Book Class
-                        </button>
+                        <div className="space-y-3 mb-6">
+                            <button
+                                onClick={() => setShowBookingModal(true)}
+                                className="w-full py-3.5 md:py-4 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-800 transition-all shadow-lg shadow-cyan-700/20 active:scale-95 flex items-center justify-center gap-2"
+                            >
+                                Book Class
+                            </button>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setIsSaved(!isSaved)}
+                                    className={`flex-1 py-3 rounded-xl font-medium transition-all border flex items-center justify-center gap-2 ${isSaved ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+                                >
+                                    <Heart size={18} fill={isSaved ? "currentColor" : "none"} />
+                                    {isSaved ? 'Saved' : 'Save'}
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(window.location.href);
+                                        setShowShareToast(true);
+                                        setTimeout(() => setShowShareToast(false), 2000);
+                                    }}
+                                    className="flex-1 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2"
+                                >
+                                    <Share2 size={18} />
+                                    Share
+                                </button>
+                            </div>
+                        </div>
 
                         <p className="text-center text-[10px] md:text-xs text-slate-400 dark:text-slate-500">
                             Pay after your first class. No upfront payment required.
@@ -388,21 +372,10 @@ export default function TeacherProfilePublic() {
             </div>
 
             {showBookingModal && user && (
-                <BookingModal
+                <BookingSelectionModal
                     teacher={teacher}
                     studentId={user.uid}
-                    studentName={user.displayName || 'Student'}
-                    initialDate={selectedDate}
-                    initialTime={selectedTime}
-                    onClose={() => {
-                        setShowBookingModal(false);
-                        setSelectedDate('');
-                        setSelectedTime('');
-                    }}
-                    onSuccess={() => {
-                        alert('Booking request sent!');
-                        setShowBookingModal(false);
-                    }}
+                    onClose={() => setShowBookingModal(false)}
                 />
             )}
         </div>

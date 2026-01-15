@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, Timestamp, doc, updateDoc } from 'firebase/firestore';
-import { Clock, Gift } from 'lucide-react';
+import { Clock, Gift, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Session {
@@ -21,6 +21,7 @@ interface Booking {
     status: 'active' | 'pending' | 'completed' | 'rejected';
     paymentStatus: 'pending' | 'paid' | 'required';
     createdAt: Timestamp;
+    teacherRemark?: string;
 }
 
 import ReferralModal from '@/components/common/ReferralModal';
@@ -31,6 +32,15 @@ export default function TeacherDashboard() {
     const [pendingRequests, setPendingRequests] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(true);
     const [showReferralModal, setShowReferralModal] = useState(false);
+
+    // Remark Modal State
+    const [remarkModal, setRemarkModal] = useState<{ isOpen: boolean, bookingId: string | null, action: 'active' | 'rejected' | null }>({
+        isOpen: false,
+        bookingId: null,
+        action: null
+    });
+    const [remarkText, setRemarkText] = useState('');
+    const [processing, setProcessing] = useState(false);
 
     useEffect(() => {
         async function fetchDashboardData() {
@@ -73,19 +83,31 @@ export default function TeacherDashboard() {
         fetchDashboardData();
     }, [user]);
 
-    const handleStatusUpdate = async (bookingId: string, newStatus: 'active' | 'rejected') => {
+    const openRemarkModal = (bookingId: string, action: 'active' | 'rejected') => {
+        setRemarkModal({ isOpen: true, bookingId, action });
+        setRemarkText('');
+    };
+
+    const handleStatusUpdate = async () => {
+        if (!remarkModal.bookingId || !remarkModal.action) return;
+
+        setProcessing(true);
         try {
-            const bookingRef = doc(db, 'bookings', bookingId);
+            const bookingRef = doc(db, 'bookings', remarkModal.bookingId);
             await updateDoc(bookingRef, {
-                status: newStatus,
+                status: remarkModal.action,
+                teacherRemark: remarkText,
                 updatedAt: Timestamp.now()
             });
 
-            // Refresh data
+            // Refresh data (Optimistic update or reload)
             window.location.reload();
         } catch (error) {
             console.error('Error updating booking status:', error);
             alert('Failed to update status.');
+        } finally {
+            setProcessing(false);
+            setRemarkModal({ isOpen: false, bookingId: null, action: null });
         }
     };
 
@@ -106,20 +128,20 @@ export default function TeacherDashboard() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {/* Stats Cards */}
-                <div className="bg-cyan-700 text-white p-6 rounded-3xl shadow-lg shadow-cyan-200">
+                <Link to="/teacher/wallet" className="bg-cyan-700 text-white p-6 rounded-3xl shadow-lg shadow-cyan-200 hover:scale-[1.02] transition-transform cursor-pointer">
                     <div className="text-cyan-200 text-sm font-medium mb-1">Total Earnings</div>
-                    <div className="text-3xl font-bold">₹0</div>
+                    <div className="text-3xl font-bold">₹12,500</div>
                     <div className="mt-4 text-xs bg-cyan-500/50 inline-block px-2 py-1 rounded-lg">
-                        +0% this month
+                        +12% this month
                     </div>
-                </div>
+                </Link>
                 <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
                     <div className="text-slate-500 text-sm font-medium mb-1">Active Students</div>
-                    <div className="text-3xl font-bold text-slate-900">0</div>
+                    <div className="text-3xl font-bold text-slate-900">4</div>
                 </div>
                 <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm sm:col-span-2 lg:col-span-1">
                     <div className="text-slate-500 text-sm font-medium mb-1">Hours Taught</div>
-                    <div className="text-3xl font-bold text-slate-900">0h</div>
+                    <div className="text-3xl font-bold text-slate-900">24h</div>
                 </div>
             </div>
 
@@ -211,13 +233,13 @@ export default function TeacherDashboard() {
 
                                     <div className="flex gap-2">
                                         <button
-                                            onClick={() => handleStatusUpdate(booking.id, 'active')}
+                                            onClick={() => openRemarkModal(booking.id, 'active')}
                                             className="flex-1 py-2 bg-cyan-700 text-white text-xs font-bold rounded-xl hover:bg-cyan-700 transition-all"
                                         >
                                             Approve
                                         </button>
                                         <button
-                                            onClick={() => handleStatusUpdate(booking.id, 'rejected')}
+                                            onClick={() => openRemarkModal(booking.id, 'rejected')}
                                             className="flex-1 py-2 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all"
                                         >
                                             Decline
@@ -252,6 +274,52 @@ export default function TeacherDashboard() {
                 userRole="teacher"
                 userName={user?.displayName || "Teacher"}
             />
+
+            {/* Remark Modal */}
+            {remarkModal.isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold text-slate-900">
+                                {remarkModal.action === 'active' ? 'Approve Request' : 'Decline Request'}
+                            </h3>
+                            <button onClick={() => setRemarkModal({ isOpen: false, bookingId: null, action: null })} className="p-2 hover:bg-slate-100 rounded-full">
+                                <X size={20} className="text-slate-500" />
+                            </button>
+                        </div>
+
+                        <p className="text-slate-500 text-sm mb-4">
+                            {remarkModal.action === 'active'
+                                ? "Add a note for the student (e.g., 'Looking forward to our class!')."
+                                : "Please provide a reason for declining this request."}
+                        </p>
+
+                        <textarea
+                            value={remarkText}
+                            onChange={(e) => setRemarkText(e.target.value)}
+                            placeholder="Write your remark here..."
+                            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none resize-none h-32 mb-6"
+                        ></textarea>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setRemarkModal({ isOpen: false, bookingId: null, action: null })}
+                                className="flex-1 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleStatusUpdate}
+                                disabled={processing || (remarkModal.action === 'rejected' && !remarkText.trim())}
+                                className={`flex-1 py-3 font-bold rounded-xl text-white transition-colors ${remarkModal.action === 'active' ? 'bg-cyan-700 hover:bg-cyan-800' : 'bg-red-600 hover:bg-red-700'
+                                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            >
+                                {processing ? 'Processing...' : (remarkModal.action === 'active' ? 'Approve' : 'Decline')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

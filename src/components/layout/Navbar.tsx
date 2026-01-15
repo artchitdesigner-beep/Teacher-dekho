@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown, Heart, Wallet, LogOut, User, LayoutDashboard, Calendar, Layers, Bell, Users } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link, NavLink } from 'react-router-dom';
+import { Menu, X, ChevronDown, LogOut, User, LayoutDashboard, Calendar, Bell } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { auth } from '@/lib/firebase';
 import ProfileDropdown from './ProfileDropdown';
@@ -10,11 +10,11 @@ import { ModeToggle } from '@/components/mode-toggle';
 export default function Navbar() {
     const { user, userRole } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const location = useLocation();
 
-    // Determine current view mode based on URL or User Role
-    const isStudentView = userRole === 'student' || location.pathname.startsWith('/student');
-    const isTeacherView = userRole === 'teacher' || location.pathname.startsWith('/teacher');
+    // Determine current view mode based on User Role
+    const role = userRole?.toLowerCase();
+    const isStudentView = role === 'student';
+    const isTeacherView = role === 'teacher';
 
     const handleLogout = () => {
         auth.signOut();
@@ -28,43 +28,37 @@ export default function Navbar() {
         children?: { label: string; to: string; }[];
     }
 
-    const publicLinks: NavLinkItem[] = [
-        {
-            label: 'Find a Tutor',
-            to: '/search',
-            children: [
-                { label: 'Find Teacher', to: '/student/search' },
-                { label: 'Batches', to: '/student/batches' },
-                { label: 'Open Request', to: '/student/requests?action=new' }
-            ]
-        },
-        { label: 'How It Works', to: '/how-it-works' },
-        { label: 'Become a Tutor', to: '/become-tutor' },
-        { label: 'About Us', to: '/about-us' },
-    ];
-
     const studentLinks: NavLinkItem[] = [
-        { label: 'Dashboard', to: '/student/dashboard', icon: LayoutDashboard },
+        { label: 'Dashboard', to: '/student/dashboard' },
         {
             label: 'Find Teachers',
-            to: '/student/search',
-            icon: Users,
+            to: '#',
             children: [
-                { label: 'Search Teachers', to: '/student/search' },
-                { label: 'Browse Batches', to: '/student/batches' },
+                { label: 'Find Tutors', to: '/student/search' },
+                { label: 'Batches', to: '/student/batches' },
                 { label: 'My Requests', to: '/student/requests' }
             ]
         },
         {
-            label: 'My Learning',
-            to: '/student/courses',
-            icon: Layers,
+            label: 'My Account',
+            to: '#',
             children: [
+                { label: 'My Teachers', to: '/student/saved' },
                 { label: 'My Courses', to: '/student/courses' },
-                { label: 'Saved Teachers', to: '/student/saved' }
+                { label: 'Recordings', to: '/student/recordings' },
+                { label: 'Wallet', to: '/student/wallet' }
             ]
         },
-        { label: 'Wallet', to: '/student/wallet', icon: Wallet },
+        {
+            label: 'How It Works',
+            to: '#',
+            children: [
+                { label: 'About Us', to: '/about-us' },
+                { label: 'How It Works', to: '/how-it-works' },
+                { label: 'Become a Teacher', to: '/become-tutor' },
+                { label: 'FAQs', to: '/faqs' }
+            ]
+        }
     ];
 
     const teacherLinks: NavLinkItem[] = [
@@ -83,21 +77,43 @@ export default function Navbar() {
     ];
 
     const getNavLinks = () => {
-        if (user && isStudentView) return studentLinks;
-        if (user && isTeacherView) return teacherLinks;
-        return publicLinks;
+        if (!user) return [];
+        if (isStudentView) return studentLinks;
+        if (isTeacherView) return teacherLinks;
+        return [];
     };
 
     const currentLinks = getNavLinks();
 
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                setIsVisible(false);
+            } else {
+                setIsVisible(true);
+            }
+
+            setLastScrollY(currentScrollY);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [lastScrollY]);
+
     return (
-        <nav className="sticky top-0 z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800">
+        <nav className={`sticky top-0 z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
             <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                 {/* Logo */}
                 <Link to="/" className="flex items-center gap-2">
                     <img src={logocyan} alt="TeacherDekho" className="h-10 w-auto" />
                     <span className="font-bold text-2xl tracking-tight font-serif text-slate-900 dark:text-slate-100">TeacherDekho</span>
                 </Link>
+
 
                 {/* Desktop Navigation */}
                 <div className="hidden lg:flex items-center gap-8">
@@ -153,15 +169,6 @@ export default function Navbar() {
                             >
                                 <Bell size={20} />
                             </Link>
-                            {isStudentView && (
-                                <Link
-                                    to="/student/saved"
-                                    className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
-                                    title="Saved Teachers"
-                                >
-                                    <Heart size={20} />
-                                </Link>
-                            )}
                             <ProfileDropdown />
                         </div>
                     ) : (

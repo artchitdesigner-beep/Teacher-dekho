@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Search, Plus, BookOpen, GraduationCap, Languages, Star, IndianRupee, Calendar, X } from 'lucide-react';
 import { collection, query, getDocs, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/lib/auth-context';
 import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
-import BookingModal from '@/components/booking/BookingModal';
+import BookingSelectionModal from '@/components/booking/BookingSelectionModal';
+
 import TeacherCard from '@/components/booking/TeacherCard';
 import BatchCard from '@/components/batches/BatchCard';
 import PostRequestPromoCard from '@/components/search/PostRequestPromoCard';
-import PostRequestBanner from '@/components/search/PostRequestBanner';
 import PageHero from '@/components/common/PageHero';
+import { FilterDropdown } from '@/components/search/FilterDropdown';
+import VideoOverlay from '@/components/common/VideoOverlay';
 
 export default function SearchTeachers() {
     const navigate = useNavigate();
@@ -25,9 +27,28 @@ export default function SearchTeachers() {
     const [selectedClass, setSelectedClass] = useState(searchParams.get('class') || '');
     const [selectedLanguage, setSelectedLanguage] = useState(searchParams.get('lang') || '');
     const [minRating, setMinRating] = useState(Number(searchParams.get('rating')) || 0);
+    const [priceRange, setPriceRange] = useState(searchParams.get('price') || 'all');
+    const [availability, setAvailability] = useState(searchParams.get('availability') || 'any');
     const [selectedTeacher, setSelectedTeacher] = useState<any | null>(null);
-    const [showMobileFilters, setShowMobileFilters] = useState(false);
+
     const [activeTab, setActiveTab] = useState<'teachers' | 'batches'>('teachers');
+
+    const [isSticky, setIsSticky] = useState(false);
+    const heroRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (heroRef.current) {
+                const heroBottom = heroRef.current.getBoundingClientRect().bottom;
+                // When the bottom of the hero (minus some offset for the navbar) hits the top
+                // Adjust 80 for navbar height roughly
+                setIsSticky(heroBottom < 80);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     useEffect(() => {
         if (user && userRole === 'student' && location.pathname === '/search') {
@@ -67,12 +88,38 @@ export default function SearchTeachers() {
         const c = searchParams.get('class');
         const l = searchParams.get('lang');
         const r = searchParams.get('rating');
+        const p = searchParams.get('price');
+        const a = searchParams.get('availability');
+
         if (q !== null) setSearchQuery(q);
         if (s !== null) setSelectedSubject(s);
         if (c !== null) setSelectedClass(c);
         if (l !== null) setSelectedLanguage(l);
         if (r !== null) setMinRating(Number(r));
+        if (p !== null) setPriceRange(p);
+        if (a !== null) setAvailability(a);
     }, [searchParams]);
+
+    const updateFilters = (updates: any) => {
+        const newParams = {
+            q: searchQuery,
+            subject: selectedSubject,
+            class: selectedClass,
+            lang: selectedLanguage,
+            rating: minRating.toString(),
+            price: priceRange,
+            availability: availability,
+            tab: activeTab,
+            ...updates
+        };
+        // Remove empty params
+        Object.keys(newParams).forEach(key => {
+            if (newParams[key] === '' || newParams[key] === '0' || newParams[key] === 'All' || newParams[key] === 'all' || newParams[key] === 'any') {
+                delete newParams[key];
+            }
+        });
+        setSearchParams(newParams);
+    };
 
     const handleBook = (teacher: any) => {
         if (!user) {
@@ -87,109 +134,282 @@ export default function SearchTeachers() {
         const matchesSearch = teacherName.toLowerCase().includes(searchQuery.toLowerCase()) ||
             teacher.subjects?.some((s: string) => s.toLowerCase().includes(searchQuery.toLowerCase()));
 
-        // Robust Subject Check (Case-insensitive, handles 'subject' and 'subjects')
+        // Robust Subject Check
         const teacherSubjects = (teacher.subjects || []).map((s: string) => s.toLowerCase());
         if (teacher.subject) teacherSubjects.push(teacher.subject.toLowerCase());
         const matchesSubject = selectedSubject === 'All' || teacherSubjects.includes(selectedSubject.toLowerCase());
 
-        // Robust Class Check (Case-insensitive, handles array/string)
+        // Robust Class Check
         const teacherClasses = Array.isArray(teacher.class) ? teacher.class : [teacher.class];
         const normalizedClasses = teacherClasses.filter(Boolean).map((c: any) => String(c).toLowerCase());
         const matchesClass = !selectedClass || normalizedClasses.includes(selectedClass.toLowerCase());
 
-        // Robust Language Check (Case-insensitive, handles array/string)
+        // Robust Language Check
         const teacherLanguages = Array.isArray(teacher.language) ? teacher.language : [teacher.language];
         const normalizedLanguages = teacherLanguages.filter(Boolean).map((l: any) => String(l).toLowerCase());
         const matchesLanguage = !selectedLanguage || normalizedLanguages.includes(selectedLanguage.toLowerCase());
 
         const matchesRating = (teacher.rating || 0) >= minRating;
 
-        return matchesSearch && matchesSubject && matchesClass && matchesLanguage && matchesRating;
+        // Mock Price Check (since we might not have price data on all teachers yet)
+        const matchesPrice = true;
+
+        // Mock Availability Check
+        const matchesAvailability = true;
+
+        return matchesSearch && matchesSubject && matchesClass && matchesLanguage && matchesRating && matchesPrice && matchesAvailability;
     });
 
-    const subjects = ['All', 'Physics', 'Mathematics', 'Chemistry', 'Biology', 'English', 'Computer Science'];
+    const subjectOptions = [
+        { label: 'All Subjects', value: 'All' },
+        { label: 'Physics', value: 'Physics' },
+        { label: 'Mathematics', value: 'Mathematics' },
+        { label: 'Chemistry', value: 'Chemistry' },
+        { label: 'Biology', value: 'Biology' },
+        { label: 'English', value: 'English' },
+        { label: 'Computer Science', value: 'Computer Science' }
+    ];
+
+    const classOptions = [
+        { label: 'All Classes', value: '' },
+        { label: 'Class 11th', value: '11th' },
+        { label: 'Class 12th', value: '12th' },
+        { label: 'Class 10th', value: '10th' },
+        { label: 'Class 9th', value: '9th' }
+    ];
+
+    const languageOptions = [
+        { label: 'All Languages', value: '' },
+        { label: 'English', value: 'English' },
+        { label: 'Hinglish', value: 'Hinglish' },
+        { label: 'Hindi', value: 'Hindi' },
+        { label: 'Marathi', value: 'Marathi' }
+    ];
+
+    const ratingOptions = [
+        { label: 'Any Rating', value: '0' },
+        { label: '4+ Stars', value: '4' },
+        { label: '3+ Stars', value: '3' }
+    ];
+
+    const priceOptions = [
+        { label: 'Any Price', value: 'all' },
+        { label: 'Under ₹500', value: 'under_500' },
+        { label: '₹500 - ₹1000', value: '500_1000' },
+        { label: 'Above ₹1000', value: 'above_1000' }
+    ];
+
+    const availabilityOptions = [
+        { label: 'Any Time', value: 'any' },
+        { label: 'Weekdays', value: 'weekdays' },
+        { label: 'Weekends', value: 'weekends' },
+        { label: 'Evenings', value: 'evenings' }
+    ];
+
     const isDashboard = location.pathname.startsWith('/student');
 
-    return (
-        <div className={`${isDashboard ? '' : 'max-w-7xl mx-auto px-4 md:px-8'} space-y-8 py-8`}>
-            {/* Header / Search Bar */}
-            <PageHero
-                title="Find your perfect mentor"
-                description="Search from over 2,000+ verified teachers and courses."
-            >
-                <div className="flex flex-col md:flex-row items-center gap-2 bg-white/10 backdrop-blur-md p-2 rounded-2xl border border-white/20 shadow-xl">
-                    <div className="relative flex-grow w-full">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-200" size={20} />
-                        <input
-                            type="text"
-                            placeholder={activeTab === 'teachers' ? "Search for teacher or subject..." : "Search for courses..."}
-                            value={searchQuery}
-                            onChange={(e) => {
-                                setSearchQuery(e.target.value);
-                                setSearchParams({
-                                    q: e.target.value,
-                                    subject: selectedSubject,
-                                    class: selectedClass,
-                                    lang: selectedLanguage,
-                                    rating: minRating.toString(),
-                                    tab: activeTab
-                                });
-                            }}
-                            className="w-full pl-12 pr-4 py-3 bg-transparent border-none focus:ring-0 outline-none transition text-base text-white placeholder:text-cyan-200/70"
-                        />
-                    </div>
+    // Helper to get display label
+    const getDisplayLabel = (options: any[], value: string | number) => {
+        const option = options.find(o => o.value === String(value));
+        return option ? option.label : String(value);
+    };
 
-                    {activeTab === 'teachers' && (
-                        <div className="flex flex-wrap md:flex-nowrap items-center gap-2 w-full md:w-auto">
-                            <select
-                                value={selectedClass}
+    const [isNavbarVisible, setIsNavbarVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                setIsNavbarVisible(false);
+            } else {
+                setIsNavbarVisible(true);
+            }
+
+            setLastScrollY(currentScrollY);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [lastScrollY]);
+
+    const FilterBar = ({ sticky = false }) => (
+        <div className={`
+            ${sticky
+                ? `fixed left-0 right-0 z-40 bg-white dark:bg-slate-900 shadow-md py-3 transition-all duration-300 ease-in-out ${isNavbarVisible ? 'top-[48px]' : 'top-[-32px]'}`
+                : 'w-full py-4'
+            }
+        `}>
+            <div className={`${sticky ? 'max-w-7xl mx-auto px-4 md:px-8' : ''}`}>
+                <div className="flex flex-wrap gap-3 items-center">
+
+                    {/* Small Search Bar - Only visible when sticky */}
+                    {sticky && (
+                        <div className="relative flex-shrink-0 w-64 mr-2 hidden md:block">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                            <input
+                                type="text"
+                                placeholder="Search..."
+                                value={searchQuery}
                                 onChange={(e) => {
-                                    setSelectedClass(e.target.value);
-                                    setSearchParams({
-                                        q: searchQuery,
-                                        subject: selectedSubject,
-                                        class: e.target.value,
-                                        lang: selectedLanguage,
-                                        rating: minRating.toString(),
-                                        tab: activeTab
-                                    });
+                                    setSearchQuery(e.target.value);
+                                    updateFilters({ q: e.target.value });
                                 }}
-                                className="flex-grow md:flex-grow-0 w-full md:w-auto px-4 py-3 bg-white/10 border-none rounded-xl font-medium text-white outline-none cursor-pointer hover:bg-white/20 transition-colors [&>option]:text-slate-900"
-                            >
-                                <option value="">All Classes</option>
-                                <option value="11th">Class 11th</option>
-                                <option value="12th">Class 12th</option>
-                            </select>
-
-                            <select
-                                value={selectedLanguage}
-                                onChange={(e) => {
-                                    setSelectedLanguage(e.target.value);
-                                    setSearchParams({
-                                        q: searchQuery,
-                                        subject: selectedSubject,
-                                        class: selectedClass,
-                                        lang: e.target.value,
-                                        rating: minRating.toString(),
-                                        tab: activeTab
-                                    });
-                                }}
-                                className="flex-grow md:flex-grow-0 w-full md:w-auto px-4 py-3 bg-white/10 border-none rounded-xl font-medium text-white outline-none cursor-pointer hover:bg-white/20 transition-colors [&>option]:text-slate-900"
-                            >
-                                <option value="">All Languages</option>
-                                <option value="English">English</option>
-                                <option value="Hinglish">Hinglish</option>
-                                <option value="Hindi">Hindi</option>
-                                <option value="Marathi">Marathi</option>
-                            </select>
-
-                            <button className="w-full md:w-auto px-8 py-3 bg-white text-cyan-700 font-bold rounded-xl hover:bg-cyan-50 transition-colors shadow-lg">
-                                Search
-                            </button>
+                                className="w-full pl-9 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm focus:ring-2 focus:ring-cyan-500/20 outline-none"
+                            />
                         </div>
                     )}
+
+                    <FilterDropdown
+                        label="Subject"
+                        value={getDisplayLabel(subjectOptions, selectedSubject)}
+                        selectedValue={selectedSubject}
+                        icon={BookOpen}
+                        options={subjectOptions}
+                        onChange={(val) => {
+                            setSelectedSubject(val);
+                            updateFilters({ subject: val });
+                        }}
+                    />
+
+                    <FilterDropdown
+                        label="Class"
+                        value={getDisplayLabel(classOptions, selectedClass)}
+                        selectedValue={selectedClass}
+                        icon={GraduationCap}
+                        options={classOptions}
+                        onChange={(val) => {
+                            setSelectedClass(val);
+                            updateFilters({ class: val });
+                        }}
+                    />
+
+                    <FilterDropdown
+                        label="Language"
+                        value={getDisplayLabel(languageOptions, selectedLanguage)}
+                        selectedValue={selectedLanguage}
+                        icon={Languages}
+                        options={languageOptions}
+                        onChange={(val) => {
+                            setSelectedLanguage(val);
+                            updateFilters({ lang: val });
+                        }}
+                    />
+
+                    <FilterDropdown
+                        label="Rating"
+                        value={getDisplayLabel(ratingOptions, minRating)}
+                        selectedValue={String(minRating)}
+                        icon={Star}
+                        options={ratingOptions}
+                        onChange={(val) => {
+                            setMinRating(Number(val));
+                            updateFilters({ rating: val });
+                        }}
+                    />
+
+                    <FilterDropdown
+                        label="Price"
+                        value={getDisplayLabel(priceOptions, priceRange)}
+                        selectedValue={priceRange}
+                        icon={IndianRupee}
+                        options={priceOptions}
+                        onChange={(val) => {
+                            setPriceRange(val);
+                            updateFilters({ price: val });
+                        }}
+                    />
+
+                    <FilterDropdown
+                        label="Availability"
+                        value={getDisplayLabel(availabilityOptions, availability)}
+                        selectedValue={availability}
+                        icon={Calendar}
+                        options={availabilityOptions}
+                        onChange={(val) => {
+                            setAvailability(val);
+                            updateFilters({ availability: val });
+                        }}
+                    />
+
+                    {/* Clear Filters */}
+                    {(selectedClass || selectedLanguage || minRating > 0 || selectedSubject !== 'All' || priceRange !== 'all' || availability !== 'any') && (
+                        <button
+                            onClick={() => {
+                                setSelectedClass('');
+                                setSelectedLanguage('');
+                                setMinRating(0);
+                                setSelectedSubject('All');
+                                setPriceRange('all');
+                                setAvailability('any');
+                                updateFilters({ class: '', lang: '', rating: '0', subject: 'All', price: 'all', availability: 'any' });
+                            }}
+                            className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50 rounded-xl transition-colors whitespace-nowrap ml-auto"
+                        >
+                            <X size={16} /> Clear
+                        </button>
+                    )}
                 </div>
-            </PageHero>
+            </div>
+        </div>
+    );
+
+    const [playingVideoUrl, setPlayingVideoUrl] = useState<string | null>(null);
+    const [focusedCardId, setFocusedCardId] = useState<string | null>(null);
+
+    const handleSaveTeacher = (teacherId: string) => {
+        // TODO: Implement save functionality
+        console.log('Saving teacher:', teacherId);
+    };
+
+    return (
+        <div className={`${isDashboard ? '' : 'max-w-7xl mx-auto px-4 md:px-8'} space-y-8 pb-8 pt-0`}>
+            {/* Header / Search Bar */}
+            <div ref={heroRef}>
+                <PageHero
+                    title="Find your perfect mentor"
+                    description="Search from over 2,000+ verified teachers and courses."
+                >
+                    <div className="flex flex-col gap-6">
+                        <div className="flex flex-col md:flex-row items-center gap-4">
+                            <div className="relative flex-grow w-full bg-white/10 backdrop-blur-md p-2 rounded-2xl border border-white/20 shadow-xl">
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-200" size={20} />
+                                <input
+                                    type="text"
+                                    placeholder={activeTab === 'teachers' ? "Search for teacher or subject..." : "Search for courses..."}
+                                    value={searchQuery}
+                                    onChange={(e) => {
+                                        setSearchQuery(e.target.value);
+                                        updateFilters({ q: e.target.value });
+                                    }}
+                                    className="w-full pl-12 pr-4 py-3 bg-transparent border-none focus:ring-0 outline-none transition text-base text-white placeholder:text-cyan-200/70"
+                                />
+                            </div>
+
+                            <button
+                                onClick={() => navigate('/student/requests?action=new')}
+                                className="w-full md:w-auto px-6 py-4 bg-white text-cyan-700 font-bold rounded-2xl hover:bg-cyan-50 transition-colors shadow-lg flex items-center justify-center gap-2 whitespace-nowrap"
+                            >
+                                <Plus size={20} />
+                                Post Request
+                            </button>
+                        </div>
+
+                        {/* Filters inside Hero (visible when NOT sticky) */}
+                        {!isSticky && activeTab === 'teachers' && (
+                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <FilterBar sticky={false} />
+                            </div>
+                        )}
+                    </div>
+                </PageHero>
+            </div>
+
+            {/* Sticky Filter Bar (visible when sticky) */}
+            {isSticky && activeTab === 'teachers' && (
+                <FilterBar sticky={true} />
+            )}
 
             {activeTab === 'batches' ? (
                 <div className="space-y-6">
@@ -211,114 +431,9 @@ export default function SearchTeachers() {
                     )}
                 </div>
             ) : (
-                <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Sidebar Filters */}
-                    <div className="w-full lg:w-64 flex-shrink-0">
-                        <button
-                            onClick={() => setShowMobileFilters(!showMobileFilters)}
-                            className="lg:hidden w-full flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 mb-4 font-bold text-slate-900 dark:text-slate-100"
-                        >
-                            <div className="flex items-center gap-2">
-                                <SlidersHorizontal size={20} /> Filters
-                            </div>
-                            <span className="text-cyan-700 text-sm">{showMobileFilters ? 'Hide' : 'Show'}</span>
-                        </button>
-
-                        <div className={`${showMobileFilters ? 'block' : 'hidden'} lg:block bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 sticky top-24 animate-in fade-in slide-in-from-top-2 lg:animate-none`}>
-                            <div className="hidden lg:flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100 mb-6">
-                                <SlidersHorizontal size={20} /> Filters
-                            </div>
-
-                            {/* Subject Filter */}
-                            <div className="mb-8">
-                                <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 mb-4 uppercase tracking-wider">Subject</h4>
-                                <div className="space-y-2">
-                                    {subjects.map(subject => (
-                                        <label key={subject} className="flex items-center gap-3 cursor-pointer group">
-                                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${selectedSubject === subject ? 'bg-cyan-700 border-cyan-700' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 group-hover:border-cyan-400'}`}>
-                                                {selectedSubject === subject && <div className="w-2 h-2 bg-white rounded-full" />}
-                                            </div>
-                                            <input
-                                                type="radio"
-                                                name="subject"
-                                                className="hidden"
-                                                checked={selectedSubject === subject}
-                                                onChange={() => {
-                                                    setSelectedSubject(subject);
-                                                    setSearchParams({
-                                                        q: searchQuery,
-                                                        subject: subject,
-                                                        class: selectedClass,
-                                                        lang: selectedLanguage,
-                                                        rating: minRating.toString(),
-                                                        tab: activeTab
-                                                    });
-                                                    if (window.innerWidth < 1024) setShowMobileFilters(false);
-                                                }}
-                                            />
-                                            <span className={`text-sm ${selectedSubject === subject ? 'text-cyan-700 dark:text-cyan-400 font-medium' : 'text-slate-600 dark:text-slate-400'}`}>
-                                                {subject}
-                                            </span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Price Filter (Mock) */}
-                            <div className="mb-8">
-                                <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 mb-4 uppercase tracking-wider">Hourly Rate</h4>
-                                <div className="space-y-4">
-                                    <div className="h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                        <div className="w-1/2 h-full bg-cyan-700 rounded-full"></div>
-                                    </div>
-                                    <div className="flex justify-between text-[10px] text-slate-500 font-medium">
-                                        <span>₹100</span>
-                                        <span>₹2000+</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Rating Filter */}
-                            <div className="mb-8">
-                                <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 mb-4 uppercase tracking-wider">Rating</h4>
-                                <div className="space-y-2">
-                                    {[4, 3, 2, 0].map(rating => (
-                                        <label key={rating} className="flex items-center gap-3 cursor-pointer group">
-                                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${minRating === rating ? 'bg-cyan-700 border-cyan-700' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 group-hover:border-cyan-400'}`}>
-                                                {minRating === rating && <div className="w-2 h-2 bg-white rounded-full" />}
-                                            </div>
-                                            <input
-                                                type="radio"
-                                                name="rating"
-                                                className="hidden"
-                                                checked={minRating === rating}
-                                                onChange={() => {
-                                                    setMinRating(rating);
-                                                    setSearchParams({
-                                                        q: searchQuery,
-                                                        subject: selectedSubject,
-                                                        class: selectedClass,
-                                                        lang: selectedLanguage,
-                                                        rating: rating.toString(),
-                                                        tab: activeTab
-                                                    });
-                                                    if (window.innerWidth < 1024) setShowMobileFilters(false);
-                                                }}
-                                            />
-                                            <span className={`text-sm ${minRating === rating ? 'text-cyan-700 dark:text-cyan-400 font-medium' : 'text-slate-600 dark:text-slate-400'} flex items-center gap-1`}>
-                                                {rating === 0 ? 'Any Rating' : `${rating}+ Stars`}
-                                            </span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                <div className="flex flex-col gap-8">
                     {/* Main Content: Teacher List */}
                     <div className="flex-grow">
-                        <PostRequestBanner />
-
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="font-bold text-slate-900 dark:text-slate-100">
                                 {filteredTeachers.length} {selectedSubject !== 'All' ? selectedSubject : ''} teachers found
@@ -341,6 +456,10 @@ export default function SearchTeachers() {
                                         key={teacher.id}
                                         teacher={teacher}
                                         onBook={() => handleBook(teacher)}
+                                        onPlayVideo={(url) => setPlayingVideoUrl(url)}
+                                        isFocused={focusedCardId === teacher.id}
+                                        onFocus={() => setFocusedCardId(teacher.id)}
+                                        onSave={() => handleSaveTeacher(teacher.id)}
                                     />
                                 ))}
 
@@ -357,15 +476,20 @@ export default function SearchTeachers() {
                 </div>
             )}
 
+
+
             {selectedTeacher && user && (
-                <BookingModal
+                <BookingSelectionModal
                     teacher={selectedTeacher}
                     studentId={user.uid}
-                    studentName={user.displayName || 'Student'}
                     onClose={() => setSelectedTeacher(null)}
-                    onSuccess={() => {
-                        setSelectedTeacher(null);
-                    }}
+                />
+            )}
+
+            {playingVideoUrl && (
+                <VideoOverlay
+                    videoUrl={playingVideoUrl}
+                    onClose={() => setPlayingVideoUrl(null)}
                 />
             )}
         </div>

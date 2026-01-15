@@ -20,6 +20,7 @@ import SavedTeachers from './pages/student/SavedTeachers';
 import BatchDetails from './pages/student/BatchDetails';
 import Wallet from './pages/student/Wallet';
 import StudentProfile from './pages/student/StudentProfile';
+import BookingCheckout from './pages/student/BookingCheckout';
 
 // Teacher Pages
 import TeacherDashboard from './pages/teacher/TeacherDashboard';
@@ -28,6 +29,7 @@ import TeacherSchedule from './pages/teacher/TeacherSchedule';
 import TeacherProfile from './pages/teacher/TeacherProfile';
 import TeacherBookingDetail from './pages/teacher/TeacherBookingDetail';
 import TeacherAvailability from './pages/teacher/TeacherAvailability';
+import TeacherWallet from './pages/teacher/TeacherWallet';
 import Notifications from './pages/Notifications';
 import NotFound from './pages/NotFound';
 
@@ -66,6 +68,7 @@ function App() {
           <Route path="search" element={<SearchTeachers />} />
           <Route path="batches" element={<SearchTeachers />} />
           <Route path="teacher/:id" element={<TeacherProfilePublic />} />
+          <Route path="booking/checkout" element={<BookingCheckout />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 
@@ -75,6 +78,7 @@ function App() {
           <Route path="requests" element={<TeacherRequests />} />
           <Route path="schedule" element={<TeacherSchedule />} />
           <Route path="availability" element={<TeacherAvailability />} />
+          <Route path="wallet" element={<TeacherWallet />} />
           <Route path="profile" element={<TeacherProfile />} />
           <Route path="bookings/:id" element={<TeacherBookingDetail />} />
           <Route path="notifications" element={<Notifications />} />

@@ -10,7 +10,7 @@ interface PageHeroProps {
 
 export default function PageHero({ title, description, children, className = '' }: PageHeroProps) {
     return (
-        <div className={`bg-gradient-to-br from-cyan-600 to-cyan-800 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl shadow-cyan-200 dark:shadow-none relative overflow-hidden text-center ${className}`}>
+        <div className={`bg-gradient-to-br from-cyan-600 to-cyan-800 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl shadow-cyan-200 dark:shadow-none relative text-center ${className}`}>
             {/* Grid Background */}
             <div className="absolute inset-0">
                 <GridBackground
