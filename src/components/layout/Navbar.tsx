@@ -4,7 +4,7 @@ import { Menu, X, ChevronDown, LogOut, User, LayoutDashboard, Calendar, Bell } f
 import { useAuth } from '@/lib/auth-context';
 import { auth } from '@/lib/firebase';
 import ProfileDropdown from './ProfileDropdown';
-import logocyan from '@/assets/Logo cyan.svg';
+import logoWithBackground from '@/assets/logo with Background.svg';
 import { ModeToggle } from '@/components/mode-toggle';
 
 export default function Navbar() {
@@ -30,12 +30,12 @@ export default function Navbar() {
 
     const studentLinks: NavLinkItem[] = [
         { label: 'Dashboard', to: '/student/dashboard' },
+        { label: 'Batches', to: '/student/batches' },
         {
             label: 'Find Teachers',
             to: '#',
             children: [
                 { label: 'Find Tutors', to: '/student/search' },
-                { label: 'Batches', to: '/student/batches' },
                 { label: 'My Requests', to: '/student/requests' }
             ]
         },
@@ -45,7 +45,7 @@ export default function Navbar() {
             children: [
                 { label: 'My Teachers', to: '/student/saved' },
                 { label: 'My Courses', to: '/student/courses' },
-                { label: 'Recordings', to: '/student/recordings' },
+                { label: 'Your Resources', to: '/student/resources' },
                 { label: 'Wallet', to: '/student/wallet' }
             ]
         },
@@ -58,11 +58,12 @@ export default function Navbar() {
                 { label: 'Become a Teacher', to: '/become-tutor' },
                 { label: 'FAQs', to: '/faqs' }
             ]
-        }
+        },
+        { label: 'Corporate', to: '/corporate' }
     ];
 
     const teacherLinks: NavLinkItem[] = [
-        { label: 'Dashboard', to: '/teacher/dashboard', icon: LayoutDashboard },
+        { label: 'Dashboard', to: '/teacher/calendar', icon: LayoutDashboard },
         {
             label: 'Teaching',
             to: '/teacher/schedule',
@@ -73,14 +74,24 @@ export default function Navbar() {
                 { label: 'Availability', to: '/teacher/availability' }
             ]
         },
+
         { label: 'Profile', to: '/teacher/profile', icon: User },
     ];
 
+    const publicLinks: NavLinkItem[] = [
+        { label: 'Find Tutors', to: '/search' },
+        { label: 'Batches', to: '/search?tab=batches' },
+        { label: 'Corporate', to: '/corporate' },
+        { label: 'How It Works', to: '/how-it-works' },
+        { label: 'About Us', to: '/about-us' },
+        { label: 'Become a Teacher', to: '/become-tutor' },
+    ];
+
     const getNavLinks = () => {
-        if (!user) return [];
+        if (!user) return publicLinks;
         if (isStudentView) return studentLinks;
         if (isTeacherView) return teacherLinks;
-        return [];
+        return publicLinks;
     };
 
     const currentLinks = getNavLinks();
@@ -110,11 +121,9 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                 {/* Logo */}
                 <Link to="/" className="flex items-center gap-2">
-                    <img src={logocyan} alt="TeacherDekho" className="h-10 w-auto" />
+                    <img src={logoWithBackground} alt="TeacherDekho" className="h-10 w-auto rounded-lg" />
                     <span className="font-bold text-2xl tracking-tight font-serif text-slate-900 dark:text-slate-100">TeacherDekho</span>
                 </Link>
-
-
                 {/* Desktop Navigation */}
                 <div className="hidden lg:flex items-center gap-8">
                     {currentLinks.map((link) => (

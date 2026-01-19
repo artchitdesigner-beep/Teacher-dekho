@@ -27,13 +27,21 @@ export default function TeacherProfilePublic() {
     const [showShareToast, setShowShareToast] = useState(false);
 
     useEffect(() => {
+        console.log("TeacherProfilePublic mounted. ID:", id);
         async function fetchTeacher() {
-            if (!id) return;
+            if (!id) {
+                console.error("No ID found in params");
+                return;
+            }
             try {
+                console.log("Fetching teacher with ID:", id);
                 const docRef = doc(db, 'users', id);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
+                    console.log("Teacher data found:", docSnap.data());
                     setTeacher({ uid: docSnap.id, ...docSnap.data() });
+                } else {
+                    console.error("Teacher document does not exist");
                 }
             } catch (error) {
                 console.error("Error fetching teacher:", error);
@@ -80,26 +88,28 @@ export default function TeacherProfilePublic() {
                             {teacher.photoURL ? (
                                 <img src={teacher.photoURL} alt={teacher.name} className="w-full h-full rounded-full object-cover" />
                             ) : (
-                                teacher.name.charAt(0)
+                                (teacher.name || 'T').charAt(0)
                             )}
                         </div>
                         <div className="flex-grow w-full">
                             <div className="flex flex-row justify-between items-start gap-4">
                                 <div className="flex-1 min-w-0">
                                     <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100 flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                                        {teacher.name || 'Teacher'}
+                                        {typeof teacher.name === 'string' ? teacher.name : 'Teacher'}
                                         {teacher.kycStatus === 'verified' && <ShieldCheck size={20} className="text-emerald-500" fill="currentColor" stroke="white" />}
                                     </h1>
-                                    <p className="text-base md:text-lg text-slate-600 dark:text-slate-300 font-medium mb-2">{teacher.subject} Expert • {teacher.experience} Experience</p>
+                                    <p className="text-base md:text-lg text-slate-600 dark:text-slate-300 font-medium mb-2">
+                                        {typeof teacher.subject === 'string' ? teacher.subject : 'Subject'} Expert • {typeof teacher.experience === 'string' || typeof teacher.experience === 'number' ? teacher.experience : '0'} Experience
+                                    </p>
 
                                     <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-slate-500 dark:text-slate-400 mb-4">
                                         <div className="flex items-center gap-1">
-                                            <MapPin size={16} /> {teacher.college || 'Online'}
+                                            <MapPin size={16} /> {typeof teacher.college === 'string' ? teacher.college : 'Online'}
                                         </div>
                                         <div className="flex items-center gap-1 text-amber-500 font-bold">
-                                            <Star size={16} fill="currentColor" /> {teacher.rating || 'New'} ({teacher.reviewCount || 0})
+                                            <Star size={16} fill="currentColor" /> {typeof teacher.rating === 'number' || typeof teacher.rating === 'string' ? teacher.rating : 'New'} ({typeof teacher.reviewCount === 'number' ? teacher.reviewCount : 0})
                                         </div>
-                                        {teacher.joiningDate && teacher.joiningDate.toDate && (
+                                        {teacher.joiningDate && typeof teacher.joiningDate.toDate === 'function' && (
                                             <div className="flex items-center gap-1 text-slate-400 dark:text-slate-500">
                                                 <Calendar size={16} /> Joined {teacher.joiningDate.toDate().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
                                             </div>
@@ -130,16 +140,16 @@ export default function TeacherProfilePublic() {
                             className="w-full h-full object-cover opacity-60"
                         />
                         <div className="absolute bottom-4 left-4 text-white">
-                            <div className="font-bold text-lg">Meet {teacher.name?.split(' ')[0] || 'Teacher'}</div>
+                            <div className="font-bold text-lg">Meet {typeof teacher.name === 'string' ? teacher.name.split(' ')[0] : 'Teacher'}</div>
                             <div className="text-sm opacity-80">Watch introduction video</div>
                         </div>
                     </div>
 
                     {/* About Section */}
                     <section>
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">About {teacher.name?.split(' ')[0] || 'Teacher'}</h2>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">About {typeof teacher.name === 'string' ? teacher.name.split(' ')[0] : 'Teacher'}</h2>
                         <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base md:text-lg">
-                            {teacher.bio}
+                            {typeof teacher.bio === 'string' ? teacher.bio : 'No bio available.'}
                             <br /><br />
                             I believe in a conceptual approach to learning. My teaching methodology focuses on real-world examples and problem-solving techniques that help students not just memorize, but understand the core principles.
                         </p>
@@ -171,44 +181,48 @@ export default function TeacherProfilePublic() {
                     </section>
 
                     {/* Certificates Gallery */}
-                    {teacher.certificates && teacher.certificates.length > 0 && (
+                    {Array.isArray(teacher.certificates) && teacher.certificates.length > 0 && (
                         <section>
                             <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Certificates</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 {teacher.certificates.map((cert: string, index: number) => (
-                                    <div key={index} className="aspect-[4/3] bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 cursor-pointer hover:shadow-md transition-shadow">
-                                        <img src={cert} alt={`Certificate ${index + 1}`} className="w-full h-full object-cover" />
-                                    </div>
+                                    typeof cert === 'string' ? (
+                                        <div key={index} className="aspect-[4/3] bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 cursor-pointer hover:shadow-md transition-shadow">
+                                            <img src={cert} alt={`Certificate ${index + 1}`} className="w-full h-full object-cover" />
+                                        </div>
+                                    ) : null
                                 ))}
                             </div>
                         </section>
                     )}
 
                     {/* Public Resources */}
-                    {teacher.resources && teacher.resources.length > 0 && (
+                    {Array.isArray(teacher.resources) && teacher.resources.length > 0 && (
                         <section>
                             <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Free Resources</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {teacher.resources.map((resource: any, index: number) => (
-                                    <a
-                                        key={index}
-                                        href={resource.url}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="flex gap-4 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-cyan-200 dark:hover:border-cyan-800 hover:shadow-md transition-all group"
-                                    >
-                                        <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden shrink-0 relative">
-                                            <img src={resource.thumbnail} alt={resource.title} className="w-full h-full object-cover" />
-                                            <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
-                                                {resource.type === 'video' ? <PlayCircle size={24} className="text-white drop-shadow-md" /> : <FileText size={24} className="text-white drop-shadow-md" />}
+                                    resource && typeof resource === 'object' ? (
+                                        <a
+                                            key={index}
+                                            href={resource.url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="flex gap-4 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-cyan-200 dark:hover:border-cyan-800 hover:shadow-md transition-all group"
+                                        >
+                                            <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden shrink-0 relative">
+                                                <img src={resource.thumbnail} alt={resource.title || 'Resource'} className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
+                                                    {resource.type === 'video' ? <PlayCircle size={24} className="text-white drop-shadow-md" /> : <FileText size={24} className="text-white drop-shadow-md" />}
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="min-w-0">
-                                            <h3 className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors line-clamp-1">{resource.title}</h3>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 capitalize mb-2">{resource.type}</p>
-                                            <span className="text-xs font-bold text-cyan-700 dark:text-cyan-400">View Resource &rarr;</span>
-                                        </div>
-                                    </a>
+                                            <div className="min-w-0">
+                                                <h3 className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors line-clamp-1">{resource.title || 'Untitled'}</h3>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400 capitalize mb-2">{resource.type || 'Resource'}</p>
+                                                <span className="text-xs font-bold text-cyan-700 dark:text-cyan-400">View Resource &rarr;</span>
+                                            </div>
+                                        </a>
+                                    ) : null
                                 ))}
                             </div>
                         </section>
@@ -219,7 +233,7 @@ export default function TeacherProfilePublic() {
                         <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Student Reviews</h2>
 
                         {/* Rating Breakdown */}
-                        {teacher.ratingBreakdown && (
+                        {teacher.ratingBreakdown && typeof teacher.ratingBreakdown === 'object' && (
                             <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl mb-6">
                                 <div className="flex items-center gap-4 mb-6">
                                     <div className="text-center">
@@ -235,8 +249,8 @@ export default function TeacherProfilePublic() {
                                     </div>
                                     <div className="flex-1 space-y-2">
                                         {[5, 4, 3, 2, 1].map((star) => {
-                                            const count = teacher.ratingBreakdown[star] || 0;
-                                            const total = Object.values(teacher.ratingBreakdown).reduce((a: any, b: any) => a + b, 0) as number;
+                                            const count = teacher.ratingBreakdown?.[star] || 0;
+                                            const total = Object.values(teacher.ratingBreakdown).reduce((a: any, b: any) => Number(a) + Number(b), 0) as number;
                                             const percentage = total > 0 ? (count / total) * 100 : 0;
                                             return (
                                                 <div key={star} className="flex items-center gap-3 text-xs">
@@ -262,7 +276,7 @@ export default function TeacherProfilePublic() {
                                         </div>
                                         <span className="text-sm font-bold text-slate-900 dark:text-slate-100">Excellent Teacher!</span>
                                     </div>
-                                    <p className="text-slate-600 dark:text-slate-300 mb-3">"Explains concepts very clearly. Highly recommended for anyone struggling with {teacher.subject}."</p>
+                                    <p className="text-slate-600 dark:text-slate-300 mb-3">"Explains concepts very clearly. Highly recommended for anyone struggling with {typeof teacher.subject === 'string' ? teacher.subject : 'this subject'}."</p>
                                     <div className="text-sm text-slate-400 dark:text-slate-500">- Student Name</div>
                                 </div>
                             ))}
@@ -270,26 +284,26 @@ export default function TeacherProfilePublic() {
                     </section>
 
                     {/* Social Links (Moved to Bottom) */}
-                    {teacher.socialLinks && (
+                    {teacher.socialLinks && typeof teacher.socialLinks === 'object' && (
                         <section className="pt-4 border-t border-slate-100 dark:border-slate-800">
-                            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">Connect with {teacher.name?.split(' ')[0] || 'Teacher'}</h2>
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">Connect with {typeof teacher.name === 'string' ? teacher.name.split(' ')[0] : 'Teacher'}</h2>
                             <div className="flex items-center gap-4">
-                                {teacher.socialLinks.linkedin && (
+                                {teacher.socialLinks?.linkedin && typeof teacher.socialLinks.linkedin === 'string' && (
                                     <a href={teacher.socialLinks.linkedin} target="_blank" rel="noreferrer" className="p-3 bg-[#0077b5] text-white rounded-full hover:opacity-90 transition-opacity shadow-lg shadow-[#0077b5]/20">
                                         <Linkedin size={20} />
                                     </a>
                                 )}
-                                {teacher.socialLinks.twitter && (
+                                {teacher.socialLinks?.twitter && typeof teacher.socialLinks.twitter === 'string' && (
                                     <a href={teacher.socialLinks.twitter} target="_blank" rel="noreferrer" className="p-3 bg-[#1DA1F2] text-white rounded-full hover:opacity-90 transition-opacity shadow-lg shadow-[#1DA1F2]/20">
                                         <Twitter size={20} />
                                     </a>
                                 )}
-                                {teacher.socialLinks.youtube && (
+                                {teacher.socialLinks?.youtube && typeof teacher.socialLinks.youtube === 'string' && (
                                     <a href={teacher.socialLinks.youtube} target="_blank" rel="noreferrer" className="p-3 bg-[#FF0000] text-white rounded-full hover:opacity-90 transition-opacity shadow-lg shadow-[#FF0000]/20">
                                         <Youtube size={20} />
                                     </a>
                                 )}
-                                {teacher.socialLinks.website && (
+                                {teacher.socialLinks?.website && typeof teacher.socialLinks.website === 'string' && (
                                     <a href={teacher.socialLinks.website} target="_blank" rel="noreferrer" className="p-3 bg-cyan-700 text-white rounded-full hover:bg-cyan-800 transition-colors shadow-lg shadow-cyan-700/20">
                                         <Globe size={20} />
                                     </a>
@@ -301,10 +315,12 @@ export default function TeacherProfilePublic() {
 
                 {/* Right Column: Booking Card */}
                 <div className="lg:col-span-1">
-                    <div className="lg:sticky lg:top-24 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-xl shadow-slate-200/50 dark:shadow-none">
+                    <div className="lg:sticky lg:top-24 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-xl shadow-slate-200/50 dark:shadow-none max-h-[80vh] overflow-y-auto custom-scrollbar">
                         <div className="flex justify-between items-end mb-6">
                             <div>
-                                <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">₹{teacher.hourlyRate}</div>
+                                <div className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">
+                                    ₹{typeof teacher.hourlyRate === 'number' || typeof teacher.hourlyRate === 'string' ? teacher.hourlyRate : '0'}
+                                </div>
                                 <div className="text-slate-500 dark:text-slate-400 text-sm">per hour</div>
                             </div>
                             <div className="flex items-center gap-1 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold">
@@ -335,13 +351,13 @@ export default function TeacherProfilePublic() {
                                 Book Class
                             </button>
 
-                            <div className="flex gap-3">
+                            <div className="flex flex-col gap-3">
                                 <button
                                     onClick={() => setIsSaved(!isSaved)}
-                                    className={`flex-1 py-3 rounded-xl font-medium transition-all border flex items-center justify-center gap-2 ${isSaved ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+                                    className={`w-full py-3 rounded-xl font-medium transition-all border flex items-center justify-center gap-2 ${isSaved ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-900/30 text-rose-600 dark:text-rose-400' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
                                 >
                                     <Heart size={18} fill={isSaved ? "currentColor" : "none"} />
-                                    {isSaved ? 'Saved' : 'Save'}
+                                    {isSaved ? 'Tutor Saved' : 'Save My Tutor'}
                                 </button>
                                 <button
                                     onClick={() => {
@@ -349,10 +365,10 @@ export default function TeacherProfilePublic() {
                                         setShowShareToast(true);
                                         setTimeout(() => setShowShareToast(false), 2000);
                                     }}
-                                    className="flex-1 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2"
+                                    className="w-full py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2"
                                 >
                                     <Share2 size={18} />
-                                    Share
+                                    Share Tutor
                                 </button>
                             </div>
                         </div>

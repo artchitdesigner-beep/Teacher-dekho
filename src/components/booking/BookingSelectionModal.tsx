@@ -49,8 +49,9 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
     const [step, setStep] = useState<1 | 2>(1);
     const [courseTopic, setCourseTopic] = useState('');
     const [courseDescription, setCourseDescription] = useState('');
-    const [members, setMembers] = useState<string[]>([]);
-    const [newMember, setNewMember] = useState('');
+    const [members, setMembers] = useState<{ name: string; phone: string }[]>([]);
+    const [newMemberName, setNewMemberName] = useState('');
+    const [newMemberPhone, setNewMemberPhone] = useState('');
 
     const [paymentMode, setPaymentMode] = useState<'monthly' | 'full'>('monthly');
     const [selectedPlan, setSelectedPlan] = useState<string>('gold');
@@ -93,9 +94,10 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
     const dates = getDates();
 
     const handleAddMember = () => {
-        if (newMember && !members.includes(newMember)) {
-            setMembers([...members, newMember]);
-            setNewMember('');
+        if (newMemberName && newMemberPhone) {
+            setMembers([...members, { name: newMemberName, phone: newMemberPhone }]);
+            setNewMemberName('');
+            setNewMemberPhone('');
         }
     };
 
@@ -290,7 +292,7 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
                             {/* Schedule Selection */}
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="font-bold text-slate-900 dark:text-slate-100">Select Date & Time</h3>
+                                    <h3 className="font-bold text-slate-900 dark:text-slate-100">Select Starting Date and Time</h3>
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={() => setWeekOffset(prev => Math.max(0, prev - 1))}
@@ -470,39 +472,51 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
                                     />
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold text-slate-900 dark:text-slate-100">Add Friends (Group Study)</label>
-                                    <p className="text-xs text-slate-500 mb-2">Add friends to your group and get 5% discount for each member!</p>
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-slate-900 dark:text-slate-100">Add Friends (Group Study)</label>
+                                        <p className="text-xs text-slate-500 mb-2">Add friends to your group and get 5% discount for each member!</p>
 
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="email"
-                                            value={newMember}
-                                            onChange={(e) => setNewMember(e.target.value)}
-                                            onKeyDown={(e) => e.key === 'Enter' && handleAddMember()}
-                                            placeholder="Friend's Email Address"
-                                            className="flex-1 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none"
-                                        />
-                                        <button
-                                            onClick={handleAddMember}
-                                            className="px-4 py-2 bg-slate-900 dark:bg-slate-700 text-white rounded-xl font-bold hover:opacity-90 transition-opacity"
-                                        >
-                                            Add
-                                        </button>
-                                    </div>
-
-                                    {members.length > 0 && (
-                                        <div className="flex flex-wrap gap-2 mt-3">
-                                            {members.map((member, idx) => (
-                                                <div key={idx} className="flex items-center gap-2 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 px-3 py-1.5 rounded-lg text-sm font-medium border border-cyan-100 dark:border-cyan-800">
-                                                    {member}
-                                                    <button onClick={() => handleRemoveMember(idx)} className="hover:text-red-500 transition-colors">
-                                                        <X size={14} />
-                                                    </button>
-                                                </div>
-                                            ))}
+                                        <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
+                                            <input
+                                                type="text"
+                                                value={newMemberName}
+                                                onChange={(e) => setNewMemberName(e.target.value)}
+                                                placeholder="Friend's Name"
+                                                className="sm:col-span-2 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none"
+                                            />
+                                            <input
+                                                type="tel"
+                                                value={newMemberPhone}
+                                                onChange={(e) => setNewMemberPhone(e.target.value)}
+                                                placeholder="Phone Number"
+                                                className="sm:col-span-2 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none"
+                                            />
+                                            <button
+                                                onClick={handleAddMember}
+                                                disabled={!newMemberName || !newMemberPhone}
+                                                className="sm:col-span-1 px-4 py-2 bg-slate-900 dark:bg-slate-700 text-white rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                Add
+                                            </button>
                                         </div>
-                                    )}
+
+                                        {members.length > 0 && (
+                                            <div className="flex flex-col gap-2 mt-3">
+                                                {members.map((member, idx) => (
+                                                    <div key={idx} className="flex items-center justify-between bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 px-4 py-2 rounded-lg text-sm font-medium border border-cyan-100 dark:border-cyan-800">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-bold">{member.name}</span>
+                                                            <span className="text-xs opacity-70">({member.phone})</span>
+                                                        </div>
+                                                        <button onClick={() => handleRemoveMember(idx)} className="hover:text-red-500 transition-colors p-1">
+                                                            <X size={16} />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -36,8 +36,8 @@ export default function TeacherWallet() {
     return (
         <div className="space-y-8 pb-20">
             <div>
-                <h1 className="text-3xl font-serif font-bold text-slate-900">My Wallet</h1>
-                <p className="text-slate-500">Manage your earnings and withdrawals.</p>
+                <h1 className="text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">My Wallet</h1>
+                <p className="text-slate-500 dark:text-slate-400">Manage your earnings and withdrawals.</p>
             </div>
 
             {/* Stats Cards */}
@@ -55,27 +55,27 @@ export default function TeacherWallet() {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+                <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="p-2 bg-amber-50 rounded-xl">
+                        <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
                             <Clock size={24} className="text-amber-500" />
                         </div>
-                        <span className="font-medium text-slate-500">Pending Clearance</span>
+                        <span className="font-medium text-slate-500 dark:text-slate-400">Pending Clearance</span>
                     </div>
-                    <div className="text-4xl font-bold text-slate-900 mb-2">₹3,500</div>
+                    <div className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">₹3,500</div>
                     <div className="text-sm text-slate-400">
                         Will be available in 2-3 days
                     </div>
                 </div>
 
-                <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+                <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-100 dark:border-slate-800 shadow-sm">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="p-2 bg-emerald-50 rounded-xl">
+                        <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl">
                             <DollarSign size={24} className="text-emerald-500" />
                         </div>
-                        <span className="font-medium text-slate-500">Total Earnings</span>
+                        <span className="font-medium text-slate-500 dark:text-slate-400">Total Earnings</span>
                     </div>
-                    <div className="text-4xl font-bold text-slate-900 mb-2">₹45,000</div>
+                    <div className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">₹45,000</div>
                     <div className="text-sm text-slate-400">
                         Lifetime earnings
                     </div>
@@ -85,21 +85,21 @@ export default function TeacherWallet() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Transaction History */}
                 <div className="lg:col-span-2 space-y-6">
-                    <h2 className="text-xl font-bold text-slate-900">Transaction History</h2>
-                    <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden">
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Transaction History</h2>
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden">
                         {MOCK_TRANSACTIONS.map((tx, i) => (
-                            <div key={tx.id} className={`p-5 flex items-center justify-between hover:bg-slate-50 transition-colors ${i !== MOCK_TRANSACTIONS.length - 1 ? 'border-b border-slate-100' : ''}`}>
+                            <div key={tx.id} className={`p-5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${i !== MOCK_TRANSACTIONS.length - 1 ? 'border-b border-slate-100 dark:border-slate-800' : ''}`}>
                                 <div className="flex items-center gap-4">
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'credit' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'credit' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
                                         }`}>
                                         {tx.type === 'credit' ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
                                     </div>
                                     <div>
-                                        <div className="font-bold text-slate-900">{tx.description}</div>
-                                        <div className="text-xs text-slate-500">{tx.date} • <span className="capitalize">{tx.status}</span></div>
+                                        <div className="font-bold text-slate-900 dark:text-slate-100">{tx.description}</div>
+                                        <div className="text-xs text-slate-500 dark:text-slate-400">{tx.date} • <span className="capitalize">{tx.status}</span></div>
                                     </div>
                                 </div>
-                                <div className={`font-bold ${tx.type === 'credit' ? 'text-emerald-600' : 'text-slate-900'}`}>
+                                <div className={`font-bold ${tx.type === 'credit' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100'}`}>
                                     {tx.type === 'credit' ? '+' : '-'}₹{tx.amount}
                                 </div>
                             </div>
@@ -109,18 +109,18 @@ export default function TeacherWallet() {
 
                 {/* Withdraw Section */}
                 <div className="space-y-6">
-                    <h2 className="text-xl font-bold text-slate-900">Withdraw Funds</h2>
-                    <div className="bg-white rounded-3xl border border-slate-100 p-6 space-y-6">
-                        <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3">
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Withdraw Funds</h2>
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 space-y-6">
+                        <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 flex items-center gap-3">
                             <CreditCard className="text-slate-400" />
                             <div>
-                                <div className="text-xs text-slate-500 font-bold uppercase">Linked Account</div>
-                                <div className="font-bold text-slate-900">HDFC Bank •••• 4582</div>
+                                <div className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase">Linked Account</div>
+                                <div className="font-bold text-slate-900 dark:text-slate-100">HDFC Bank •••• 4582</div>
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-slate-700">Amount to Withdraw</label>
+                            <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Amount to Withdraw</label>
                             <div className="relative">
                                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₹</span>
                                 <input
@@ -128,7 +128,7 @@ export default function TeacherWallet() {
                                     value={withdrawAmount}
                                     onChange={(e) => setWithdrawAmount(e.target.value)}
                                     placeholder="0.00"
-                                    className="w-full pl-8 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 focus:ring-2 focus:ring-cyan-500 outline-none"
+                                    className="w-full pl-8 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-cyan-500 outline-none"
                                 />
                             </div>
                         </div>

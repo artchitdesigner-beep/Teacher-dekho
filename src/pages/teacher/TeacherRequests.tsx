@@ -90,8 +90,8 @@ export default function TeacherRequests() {
     return (
         <div className="space-y-8">
             <div>
-                <h1 className="text-3xl font-serif font-bold text-slate-900">Open Requests</h1>
-                <p className="text-slate-500">Find students looking for help in your subject.</p>
+                <h1 className="text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">Open Requests</h1>
+                <p className="text-slate-500 dark:text-slate-400">Find students looking for help in your subject.</p>
             </div>
 
             {/* Filters */}
@@ -103,7 +103,7 @@ export default function TeacherRequests() {
                         placeholder="Search requests..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none transition"
+                        className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
                     />
                 </div>
                 <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ export default function TeacherRequests() {
                     <select
                         value={selectedSubject}
                         onChange={(e) => setSelectedSubject(e.target.value)}
-                        className="px-4 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-700 outline-none cursor-pointer focus:ring-2 focus:ring-cyan-500"
+                        className="px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold text-slate-700 dark:text-slate-300 outline-none cursor-pointer focus:ring-2 focus:ring-cyan-500"
                     >
                         {subjects.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
@@ -120,32 +120,32 @@ export default function TeacherRequests() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredRequests.length === 0 ? (
-                    <div className="col-span-full text-center py-12 bg-white rounded-3xl border border-slate-100">
-                        <CheckCircle className="mx-auto text-slate-300 mb-3" size={32} />
-                        <p className="text-slate-500">No open requests at the moment.</p>
+                    <div className="col-span-full text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800">
+                        <CheckCircle className="mx-auto text-slate-300 dark:text-slate-600 mb-3" size={32} />
+                        <p className="text-slate-500 dark:text-slate-400">No open requests at the moment.</p>
                     </div>
                 ) : (
                     filteredRequests.map(req => (
-                        <div key={req.id} className="bg-white p-6 rounded-3xl border border-slate-100 hover:shadow-lg transition-all">
+                        <div key={req.id} className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 hover:shadow-lg transition-all">
                             <div className="flex items-start justify-between mb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-cyan-100 text-cyan-700 rounded-full flex items-center justify-center">
+                                    <div className="w-10 h-10 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 rounded-full flex items-center justify-center">
                                         <User size={20} />
                                     </div>
                                     <div>
-                                        <div className="font-bold text-slate-900">{req.studentName}</div>
-                                        <div className="text-xs text-slate-500">{req.createdAt.toDate().toLocaleDateString()}</div>
+                                        <div className="font-bold text-slate-900 dark:text-slate-100">{req.studentName}</div>
+                                        <div className="text-xs text-slate-500 dark:text-slate-400">{req.createdAt.toDate().toLocaleDateString()}</div>
                                     </div>
                                 </div>
                                 {req.budget && (
-                                    <div className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-lg text-sm font-bold">
+                                    <div className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 px-3 py-1 rounded-lg text-sm font-bold">
                                         ₹{req.budget}/hr
                                     </div>
                                 )}
                             </div>
 
-                            <h3 className="text-lg font-bold text-slate-900 mb-2">{req.topic}</h3>
-                            <p className="text-slate-500 text-sm mb-6">{req.description}</p>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">{req.topic}</h3>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">{req.description}</p>
 
                             <button
                                 onClick={() => openAcceptModal(req.id)}
@@ -161,15 +161,15 @@ export default function TeacherRequests() {
             {/* Remark Modal */}
             {remarkModal.isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200 border border-slate-100 dark:border-slate-800">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-xl font-bold text-slate-900">Accept Request</h3>
-                            <button onClick={() => setRemarkModal({ isOpen: false, reqId: null })} className="p-2 hover:bg-slate-100 rounded-full">
-                                <X size={20} className="text-slate-500" />
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Accept Request</h3>
+                            <button onClick={() => setRemarkModal({ isOpen: false, reqId: null })} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+                                <X size={20} className="text-slate-500 dark:text-slate-400" />
                             </button>
                         </div>
 
-                        <p className="text-slate-500 text-sm mb-4">
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">
                             Add a note for the student (e.g., "I can help you with this. I am available from 5 PM.").
                         </p>
 
@@ -177,13 +177,13 @@ export default function TeacherRequests() {
                             value={remarkText}
                             onChange={(e) => setRemarkText(e.target.value)}
                             placeholder="Write your remark here..."
-                            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none resize-none h-32 mb-6"
+                            className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none resize-none h-32 mb-6 text-slate-900 dark:text-slate-100"
                         ></textarea>
 
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setRemarkModal({ isOpen: false, reqId: null })}
-                                className="flex-1 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+                                className="flex-1 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                             >
                                 Cancel
                             </button>

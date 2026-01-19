@@ -392,19 +392,20 @@ export default function SearchTeachers() {
                                 className="w-full md:w-auto px-6 py-4 bg-white text-cyan-700 font-bold rounded-2xl hover:bg-cyan-50 transition-colors shadow-lg flex items-center justify-center gap-2 whitespace-nowrap"
                             >
                                 <Plus size={20} />
-                                Post Request
+                                Create Your Own Batch
                             </button>
                         </div>
 
-                        {/* Filters inside Hero (visible when NOT sticky) */}
-                        {!isSticky && activeTab === 'teachers' && (
-                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <FilterBar sticky={false} />
-                            </div>
-                        )}
                     </div>
                 </PageHero>
             </div>
+
+            {/* Filters (visible when NOT sticky) - Moved outside Hero */}
+            {!isSticky && activeTab === 'teachers' && (
+                <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+                    <FilterBar sticky={false} />
+                </div>
+            )}
 
             {/* Sticky Filter Bar (visible when sticky) */}
             {isSticky && activeTab === 'teachers' && (
@@ -412,23 +413,58 @@ export default function SearchTeachers() {
             )}
 
             {activeTab === 'batches' ? (
-                <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-serif font-bold text-slate-900 dark:text-slate-100">Available Batches</h2>
+                <div className="space-y-12">
+                    {/* Running Batches */}
+                    <div>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Running Batches
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {batches
+                                .filter(b => {
+                                    const isRunning = b.startDate?.seconds * 1000 <= Date.now();
+                                    return isRunning && (b.title || b.name)?.toLowerCase().includes(searchQuery.toLowerCase());
+                                })
+                                .map(batch => (
+                                    <BatchCard
+                                        key={batch.id}
+                                        batch={batch}
+                                    />
+                                ))}
+                            {batches.filter(b => b.startDate?.seconds * 1000 <= Date.now()).length === 0 && (
+                                <div className="col-span-full text-center py-8 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+                                    No running batches found.
+                                </div>
+                            )}
+                        </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {batches
-                            .filter(b => b.title?.toLowerCase().includes(searchQuery.toLowerCase()))
-                            .map(batch => (
-                                <BatchCard
-                                    key={batch.id}
-                                    batch={batch}
-                                />
-                            ))}
+
+                    {/* Upcoming Batches */}
+                    <div>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+                            <Calendar size={20} className="text-cyan-600" />
+                            Upcoming Batches
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {batches
+                                .filter(b => {
+                                    const isUpcoming = b.startDate?.seconds * 1000 > Date.now();
+                                    return isUpcoming && (b.title || b.name)?.toLowerCase().includes(searchQuery.toLowerCase());
+                                })
+                                .map(batch => (
+                                    <BatchCard
+                                        key={batch.id}
+                                        batch={batch}
+                                    />
+                                ))}
+                            {batches.filter(b => b.startDate?.seconds * 1000 > Date.now()).length === 0 && (
+                                <div className="col-span-full text-center py-8 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+                                    No upcoming batches found.
+                                </div>
+                            )}
+                        </div>
                     </div>
-                    {batches.length === 0 && (
-                        <div className="text-center py-20 text-slate-500 dark:text-slate-400">No batches found.</div>
-                    )}
                 </div>
             ) : (
                 <div className="flex flex-col gap-8">

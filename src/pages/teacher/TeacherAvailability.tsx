@@ -295,6 +295,25 @@ export default function TeacherAvailability() {
                     {/* Right: Select Days & Apply */}
                     <div className="space-y-4">
                         <h3 className="font-bold text-slate-700 dark:text-slate-300">2. Apply to Days</h3>
+
+                        {/* Quick Patterns */}
+                        <div className="flex flex-wrap gap-2 mb-2">
+                            {[
+                                { label: 'MWF', days: ['Mon', 'Wed', 'Fri'] },
+                                { label: 'TTS', days: ['Tue', 'Thu', 'Sat'] },
+                                { label: 'Mon-Sat', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] },
+                                { label: 'All Days', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+                            ].map(pattern => (
+                                <button
+                                    key={pattern.label}
+                                    onClick={() => setSelectedMasterDays(pattern.days)}
+                                    className="px-3 py-1 text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors"
+                                >
+                                    {pattern.label}
+                                </button>
+                            ))}
+                        </div>
+
                         <div className="flex flex-wrap gap-2">
                             {DAYS.map(day => (
                                 <button

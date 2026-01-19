@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ChevronLeft, CreditCard, Shield, Calendar, Clock, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, CreditCard, Shield, Calendar, Clock, CheckCircle2, Wallet } from 'lucide-react';
 
 export default function BookingCheckout() {
     const location = useLocation();
@@ -99,14 +99,20 @@ export default function BookingCheckout() {
                                 <div className="text-xs font-bold text-slate-500 uppercase mb-2">Group Members</div>
                                 {members && members.length > 0 ? (
                                     <div className="space-y-2">
-                                        <div className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-                                            <div className="w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 flex items-center justify-center text-xs font-bold">You</div>
-                                            <span>(Host)</span>
+                                        <div className="flex items-center justify-between gap-2 text-sm text-slate-700 dark:text-slate-300 w-full">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 flex items-center justify-center text-xs font-bold">You</div>
+                                                <span>(Host)</span>
+                                            </div>
+                                            <span className="text-[10px] font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Pending</span>
                                         </div>
-                                        {members.map((member: string, idx: number) => (
-                                            <div key={idx} className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-                                                <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center text-xs font-bold">{idx + 1}</div>
-                                                <span>{member}</span>
+                                        {members.map((member: { name: string; phone: string }, idx: number) => (
+                                            <div key={idx} className="flex items-center justify-between gap-2 text-sm text-slate-700 dark:text-slate-300 w-full">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center text-xs font-bold">{idx + 1}</div>
+                                                    <span>{member.name} <span className="text-xs text-slate-400">({member.phone})</span></span>
+                                                </div>
+                                                <span className="text-[10px] font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Pending</span>
                                             </div>
                                         ))}
                                     </div>
@@ -161,15 +167,37 @@ export default function BookingCheckout() {
                                     </span>
                                 </div>
 
-                                <button
-                                    onClick={handlePayment}
-                                    disabled={loading}
-                                    className="w-full py-3.5 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-800 transition-all shadow-lg shadow-cyan-700/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4"
-                                >
-                                    {loading ? 'Processing...' : (
-                                        <>Pay Now <CreditCard size={18} /></>
-                                    )}
-                                </button>
+                                <div className="space-y-3 mt-4">
+                                    <button
+                                        onClick={handlePayment}
+                                        disabled={loading}
+                                        className="w-full py-3.5 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-800 transition-all shadow-lg shadow-cyan-700/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    >
+                                        {loading ? 'Processing...' : (
+                                            <>Continue without Pay <span className="text-xs font-normal bg-white/20 text-white px-2 py-0.5 rounded-full">Pay Later</span></>
+                                        )}
+                                    </button>
+
+                                    <button
+                                        onClick={handlePayment}
+                                        disabled={loading}
+                                        className="w-full py-3.5 bg-slate-900 dark:bg-slate-700 text-white font-bold rounded-xl hover:bg-slate-800 dark:hover:bg-slate-600 transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    >
+                                        {loading ? 'Processing...' : (
+                                            <>Pay with Wallet <Wallet size={18} /></>
+                                        )}
+                                    </button>
+
+                                    <button
+                                        onClick={handlePayment}
+                                        disabled={loading}
+                                        className="w-full py-3.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    >
+                                        {loading ? 'Processing...' : (
+                                            <>Pay Now <CreditCard size={18} /></>
+                                        )}
+                                    </button>
+                                </div>
 
                                 <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-400">
                                     <Shield size={12} />

@@ -105,9 +105,19 @@ export default function ProfileDropdown() {
 
                             <button
                                 className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors"
-                                onClick={() => {
+                                onClick={async () => {
                                     setIsProfileOpen(false);
-                                    navigate(isStudentView ? '/teacher/dashboard' : '/student/dashboard');
+                                    try {
+                                        const { doc, updateDoc } = await import('firebase/firestore');
+                                        const { db } = await import('@/lib/firebase');
+                                        const newRole = isStudentView ? 'teacher' : 'student';
+                                        await updateDoc(doc(db, 'users', user.uid), { role: newRole });
+                                        window.location.reload();
+                                    } catch (e) {
+                                        console.error('Error switching role:', e);
+                                        // Fallback to just navigation if update fails (though likely won't work for menu)
+                                        navigate(isStudentView ? '/teacher/dashboard' : '/student/dashboard');
+                                    }
                                 }}
                             >
                                 <ArrowLeftRight size={18} /> Switch to {isStudentView ? 'Teacher' : 'Student'}

@@ -68,3 +68,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 dark:bg-slate-700 rounded-full;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    @apply bg-cyan-700 dark:bg-cyan-600;
+  }
+}

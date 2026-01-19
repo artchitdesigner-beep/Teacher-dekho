@@ -1,5 +1,6 @@
 import { Outlet, Navigate } from 'react-router-dom';
 import Navbar from './Navbar';
+import Footer from './Footer';
 import { useAuth } from '@/lib/auth-context';
 import { Loader2 } from 'lucide-react';
 
@@ -44,6 +45,7 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
                     <Outlet />
                 </div>
             </main>
+            <Footer />
         </div>
     );
 }

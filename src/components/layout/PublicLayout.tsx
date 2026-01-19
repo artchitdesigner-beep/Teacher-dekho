@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
-import logocyan from '@/assets/Logo cyan.svg';
+import logoteal from '@/assets/Logo teal.svg';
 
 export default function PublicLayout() {
     return (
@@ -15,7 +15,7 @@ export default function PublicLayout() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
                         <div>
                             <div className="flex items-center gap-2 mb-6">
-                                <img src={logocyan} alt="TeacherDekho" className="h-8 w-auto" />
+                                <img src={logoteal} alt="TeacherDekho" className="h-8 w-auto" />
                                 <span className="font-bold text-xl font-serif text-slate-900 dark:text-slate-100">TeacherDekho</span>
                             </div>
                             <p className="text-slate-500 text-sm leading-relaxed">

@@ -5,9 +5,11 @@ import AboutUs from './pages/AboutUs';
 import Onboarding from './pages/Onboarding';
 import Login from './pages/Login';
 import BecomeTutor from './pages/BecomeTutor';
+import Corporate from './pages/Corporate';
 import DashboardLayout from './components/layout/DashboardLayout';
 import PublicRoute from './components/layout/PublicRoute';
 import PublicLayout from './components/layout/PublicLayout';
+import TeacherLayout from './components/layout/TeacherLayout';
 
 // Student Pages
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -21,17 +23,23 @@ import BatchDetails from './pages/student/BatchDetails';
 import Wallet from './pages/student/Wallet';
 import StudentProfile from './pages/student/StudentProfile';
 import BookingCheckout from './pages/student/BookingCheckout';
+import StudentResources from './pages/student/StudentResources';
+import FAQ from './pages/FAQ';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 
 // Teacher Pages
-import TeacherDashboard from './pages/teacher/TeacherDashboard';
+import TeacherStudents from './pages/teacher/TeacherStudents';
 import TeacherRequests from './pages/teacher/TeacherRequests';
 import TeacherSchedule from './pages/teacher/TeacherSchedule';
+import TeacherCalendar from './pages/teacher/TeacherCalendar';
 import TeacherProfile from './pages/teacher/TeacherProfile';
 import TeacherBookingDetail from './pages/teacher/TeacherBookingDetail';
 import TeacherAvailability from './pages/teacher/TeacherAvailability';
 import TeacherWallet from './pages/teacher/TeacherWallet';
 import Notifications from './pages/Notifications';
 import NotFound from './pages/NotFound';
+import SeedData from './pages/SeedData';
 
 function App() {
   return (
@@ -43,9 +51,13 @@ function App() {
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/search" element={<SearchTeachers />} />
+          <Route path="/corporate" element={<Corporate />} />
           <Route path="/become-tutor" element={<BecomeTutor />} />
           <Route path="/batch/:id" element={<BatchDetails />} />
           <Route path="/teacher/:id" element={<TeacherProfilePublic />} />
+          <Route path="/faqs" element={<FAQ />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
         </Route>
 
         {/* Auth Routes - Redirects to dashboard if logged in */}
@@ -69,12 +81,14 @@ function App() {
           <Route path="batches" element={<SearchTeachers />} />
           <Route path="teacher/:id" element={<TeacherProfilePublic />} />
           <Route path="booking/checkout" element={<BookingCheckout />} />
+          <Route path="resources" element={<StudentResources />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
 
         {/* Teacher Routes */}
-        <Route path="/teacher" element={<DashboardLayout role="teacher" />}>
-          <Route path="dashboard" element={<TeacherDashboard />} />
+        <Route path="/teacher" element={<TeacherLayout />}>
+          <Route path="calendar" element={<TeacherCalendar />} />
+          <Route path="students" element={<TeacherStudents />} />
           <Route path="requests" element={<TeacherRequests />} />
           <Route path="schedule" element={<TeacherSchedule />} />
           <Route path="availability" element={<TeacherAvailability />} />
@@ -86,6 +100,7 @@ function App() {
         </Route>
 
         {/* Catch all */}
+        <Route path="/seed" element={<SeedData />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
