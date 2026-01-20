@@ -4,6 +4,7 @@ import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import DownloadAppSection from '@/components/landing/DownloadAppSection';
 
 interface Session {
     id: string;
@@ -180,6 +181,10 @@ export default function TeacherCalendar() {
                 <div className="grid grid-cols-7">
                     {renderCalendarDays()}
                 </div>
+            </div>
+
+            <div className="mt-12">
+                <DownloadAppSection />
             </div>
         </div>
     );

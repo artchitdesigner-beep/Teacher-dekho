@@ -23,10 +23,10 @@ export const FilterBox: React.FC<FilterBoxProps> = ({
         <button
             onClick={onClick}
             className={`
-        flex items-center justify-between gap-3 
+        w-full flex items-center justify-between gap-3 
         px-4 py-3 bg-white dark:bg-slate-800 
         border rounded-xl transition-all duration-200
-        text-left min-w-[160px]
+        text-left min-w-[135px]
         ${active
                     ? 'border-cyan-500 ring-1 ring-cyan-500 shadow-md'
                     : 'border-slate-200 dark:border-slate-700 hover:border-cyan-300 hover:shadow-sm'

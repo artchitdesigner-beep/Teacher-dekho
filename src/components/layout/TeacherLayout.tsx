@@ -12,13 +12,14 @@ import {
     LogOut,
     Menu,
     X,
-    Bell
+    Bell,
+    BookOpen // Added
 } from 'lucide-react';
 import ProfileDropdown from './ProfileDropdown';
 import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import logoWithBackground from '@/assets/logo with Background.svg';
-import DownloadAppSection from '@/components/landing/DownloadAppSection';
+
 
 export default function TeacherLayout() {
     const location = useLocation();
@@ -28,13 +29,14 @@ export default function TeacherLayout() {
     const menuItems = [
         { icon: Calendar, label: 'Dashboard', path: '/teacher/calendar' },
         { icon: Activity, label: 'Set Availability', path: '/teacher/availability' },
+        { icon: BookOpen, label: 'Batches', path: '/teacher/batches' }, // Added Batches
         { icon: Users, label: 'My Students', path: '/teacher/students' },
         { icon: MessageSquare, label: 'Requests', path: '/teacher/requests' },
-        { icon: BarChart2, label: 'Reports', path: '/teacher/wallet' }, // Wallet as Reports
+        { icon: BarChart2, label: 'Reports', path: '/teacher/reports' },
         { icon: Settings, label: 'Settings', path: '/teacher/profile' },
-        { icon: Layers, label: 'Integrations', path: '#' },
-        { icon: Briefcase, label: 'Back office', path: '#' },
-        { icon: CreditCard, label: 'Expenses', path: '#' },
+        { icon: Layers, label: 'Integrations', path: '/teacher/integrations' },
+        { icon: Briefcase, label: 'Back office', path: '/teacher/back-office' },
+        { icon: CreditCard, label: 'Expenses', path: '/teacher/expenses' },
     ];
 
     const isActive = (path: string) => location.pathname === path;
@@ -87,7 +89,10 @@ export default function TeacherLayout() {
                 {/* Bottom Actions */}
                 <div className="p-6 border-t border-slate-700">
                     <button
-                        onClick={() => logout()}
+                        onClick={() => {
+                            logout();
+                            window.location.href = '/';
+                        }}
                         className="flex items-center gap-3 text-slate-400 hover:text-white transition-colors text-sm font-medium w-full"
                     >
                         <LogOut size={18} />
@@ -121,9 +126,7 @@ export default function TeacherLayout() {
                 <main className="flex-1 p-4 md:p-8 overflow-y-auto">
                     <div className="max-w-6xl mx-auto">
                         <Outlet />
-                        <div className="mt-12">
-                            <DownloadAppSection />
-                        </div>
+
                     </div>
                 </main>
             </div>

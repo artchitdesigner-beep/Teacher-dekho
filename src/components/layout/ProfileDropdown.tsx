@@ -112,11 +112,16 @@ export default function ProfileDropdown() {
                                         const { db } = await import('@/lib/firebase');
                                         const newRole = isStudentView ? 'teacher' : 'student';
                                         await updateDoc(doc(db, 'users', user.uid), { role: newRole });
-                                        window.location.reload();
+                                        // Redirect to the correct dashboard based on new role
+                                        if (newRole === 'teacher') {
+                                            window.location.href = '/teacher/calendar';
+                                        } else {
+                                            window.location.href = '/student/dashboard';
+                                        }
                                     } catch (e) {
                                         console.error('Error switching role:', e);
-                                        // Fallback to just navigation if update fails (though likely won't work for menu)
-                                        navigate(isStudentView ? '/teacher/dashboard' : '/student/dashboard');
+                                        // Fallback navigation
+                                        navigate(isStudentView ? '/teacher/calendar' : '/student/dashboard');
                                     }
                                 }}
                             >
@@ -130,6 +135,7 @@ export default function ProfileDropdown() {
                                 onClick={() => {
                                     setIsProfileOpen(false);
                                     logout();
+                                    window.location.href = '/';
                                 }}
                             >
                                 <LogOut size={18} /> Log out

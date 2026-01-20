@@ -242,7 +242,7 @@ export default function SearchTeachers() {
             }
         `}>
             <div className={`${sticky ? 'max-w-7xl mx-auto px-4 md:px-8' : ''}`}>
-                <div className="flex flex-wrap gap-3 items-center">
+                <div className="grid grid-cols-2 md:flex md:flex-wrap gap-3 items-center">
 
                     {/* Small Search Bar - Only visible when sticky */}
                     {sticky && (

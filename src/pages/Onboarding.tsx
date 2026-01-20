@@ -85,7 +85,11 @@ export default function Onboarding() {
             }
 
             console.log('Signup Complete!');
-            navigate('/');
+            if (role === 'teacher') {
+                navigate('/teacher/dashboard');
+            } else {
+                navigate('/student/dashboard');
+            }
         } catch (err: any) {
             console.error('Signup Error:', err);
             setError(err.message || 'Failed to create account');

@@ -21,9 +21,31 @@ export default function Login() {
         setLoading(true);
 
         try {
-            await signInWithEmailAndPassword(auth, formData.email, formData.password);
+            const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
             console.log('Login successful');
-            navigate('/');
+
+            // Fetch user role to redirect correctly
+            try {
+                const { doc, getDoc } = await import('firebase/firestore');
+                const { db } = await import('@/lib/firebase');
+                const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+
+                if (userDoc.exists()) {
+                    const role = userDoc.data().role;
+                    if (role === 'teacher') {
+                        navigate('/teacher/dashboard');
+                    } else {
+                        navigate('/student/dashboard');
+                    }
+                } else {
+                    // Fallback if no user doc found (shouldn't happen ideally)
+                    navigate('/');
+                }
+            } catch (roleError) {
+                console.error('Error fetching role:', roleError);
+                navigate('/');
+            }
+
         } catch (err: any) {
             console.error('Login Error:', err);
             setError('Invalid email or password');

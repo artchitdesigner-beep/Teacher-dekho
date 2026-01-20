@@ -30,7 +30,12 @@ import TermsOfService from './pages/TermsOfService';
 
 // Teacher Pages
 import TeacherStudents from './pages/teacher/TeacherStudents';
+import TeacherBatches from './pages/teacher/TeacherBatches';
+import TeacherReports from './pages/teacher/TeacherReports'; // Added import
 import TeacherRequests from './pages/teacher/TeacherRequests';
+import TeacherIntegrations from './pages/teacher/TeacherIntegrations';
+import TeacherBackOffice from './pages/teacher/TeacherBackOffice';
+import TeacherExpenses from './pages/teacher/TeacherExpenses';
 import TeacherSchedule from './pages/teacher/TeacherSchedule';
 import TeacherCalendar from './pages/teacher/TeacherCalendar';
 import TeacherProfile from './pages/teacher/TeacherProfile';
@@ -89,7 +94,12 @@ function App() {
         <Route path="/teacher" element={<TeacherLayout />}>
           <Route path="calendar" element={<TeacherCalendar />} />
           <Route path="students" element={<TeacherStudents />} />
+          <Route path="batches" element={<TeacherBatches />} />
+          <Route path="reports" element={<TeacherReports />} />
           <Route path="requests" element={<TeacherRequests />} />
+          <Route path="integrations" element={<TeacherIntegrations />} />
+          <Route path="back-office" element={<TeacherBackOffice />} />
+          <Route path="expenses" element={<TeacherExpenses />} />
           <Route path="schedule" element={<TeacherSchedule />} />
           <Route path="availability" element={<TeacherAvailability />} />
           <Route path="wallet" element={<TeacherWallet />} />
