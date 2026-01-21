@@ -110,6 +110,8 @@ export default function TeacherBatches() {
                                             {[
                                                 { label: 'MWF', days: ['Mon', 'Wed', 'Fri'] },
                                                 { label: 'TTS', days: ['Tue', 'Thu', 'Sat'] },
+                                                { label: 'Mon-Sat', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] },
+                                                { label: 'All Days', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
                                             ].map(pattern => (
                                                 <button
                                                     key={pattern.label}

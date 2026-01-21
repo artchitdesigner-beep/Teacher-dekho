@@ -1,10 +1,13 @@
-import { useState } from 'react';
-import { Search, TrendingUp, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, TrendingUp, X, Image, PlayCircle, Play, Star } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import { collection, query, where, limit, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import ServiceCards from '@/components/landing/ServiceCards';
 import BannerCarousel from '@/components/landing/BannerCarousel';
 import FeaturedBatches from '@/components/landing/FeaturedBatches';
 import DownloadAppSection from '@/components/landing/DownloadAppSection';
+import TeacherCard from '@/components/booking/TeacherCard';
 
 // Icons
 import PhysicsIcon from '@/assets/icons for landing page/physics.webp';
@@ -17,6 +20,36 @@ import CSIcon from '@/assets/icons for landing page/Computer Science.webp';
 export default function StudentDashboard() {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
+    const [topTeachers, setTopTeachers] = useState<any[]>([]);
+    const [loadingTeachers, setLoadingTeachers] = useState(true);
+
+    useEffect(() => {
+        const fetchTopTeachers = async () => {
+            try {
+                const q = query(
+                    collection(db, 'users'),
+                    where('role', '==', 'teacher'),
+                    limit(10) // Fetch a few more to filter/sort client-side
+                );
+                const snap = await getDocs(q);
+                const teachers = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // Sort client-side to handle missing rating
+                const sortedTeachers = teachers.sort((a: any, b: any) => {
+                    const ratingA = a.rating || 0;
+                    const ratingB = b.rating || 0;
+                    return ratingB - ratingA;
+                }).slice(0, 4);
+
+                setTopTeachers(sortedTeachers);
+            } catch (error) {
+                console.error('Error fetching top teachers:', error);
+            } finally {
+                setLoadingTeachers(false);
+            }
+        };
+        fetchTopTeachers();
+    }, []);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
     const suggestions = [
@@ -132,6 +165,106 @@ export default function StudentDashboard() {
                             <div className="font-bold text-slate-700 dark:text-slate-300 text-sm text-center">{subject.name}</div>
                         </Link>
                     ))}
+                </div>
+            </section>
+
+            {/* Image Gallery */}
+            <section className="mb-12">
+                <div className="flex items-end justify-between mb-6">
+                    <div>
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                            <Image size={24} className="text-cyan-600" />
+                            Campus Gallery
+                        </h2>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Glimpses of our vibrant learning community.</p>
+                    </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {[1, 2, 3, 4].map((item) => (
+                        <div key={item} className="aspect-video bg-slate-200 dark:bg-slate-800 rounded-xl overflow-hidden relative group cursor-pointer">
+                            <img
+                                src={`https://source.unsplash.com/random/800x600?classroom,education&sig=${item}`}
+                                alt="Gallery"
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span className="text-white font-bold border border-white px-4 py-2 rounded-lg">View</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Educational Videos */}
+            <section className="mb-12">
+                <div className="flex items-end justify-between mb-6">
+                    <div>
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                            <PlayCircle size={24} className="text-red-600" />
+                            Free Learning Resources
+                        </h2>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Watch curated video lessons from top mentors.</p>
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[
+                        { title: 'Calculus Fundamentals', duration: '45:20', views: '1.2k', thumb: 'https://img.youtube.com/vi/WuRT9M9YJ9Q/maxresdefault.jpg' },
+                        { title: 'Organic Chemistry Basics', duration: '32:15', views: '850', thumb: 'https://img.youtube.com/vi/PpkE9zFjV5A/maxresdefault.jpg' },
+                        { title: 'Physics: Laws of Motion', duration: '55:00', views: '2.5k', thumb: 'https://img.youtube.com/vi/kKKM8Y-u7ds/maxresdefault.jpg' }
+                    ].map((video, idx) => (
+                        <div key={idx} className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 hover:shadow-lg transition-all group cursor-pointer">
+                            <div className="aspect-video relative">
+                                <img src={video.thumb} alt={video.title} className="w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition-colors">
+                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/50 text-white group-hover:scale-110 transition-transform">
+                                        <Play size={20} fill="currentColor" />
+                                    </div>
+                                </div>
+                                <span className="absolute bottom-2 right-2 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded">{video.duration}</span>
+                            </div>
+                            <div className="p-4">
+                                <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-1 line-clamp-1">{video.title}</h3>
+                                <div className="text-xs text-slate-500 dark:text-slate-400">{video.views} views • 2 days ago</div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Popular Teachers for You */}
+            <section className="mb-12">
+                <div className="flex items-end justify-between mb-6">
+                    <div>
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                            <Star size={24} className="text-amber-500" />
+                            Top Rated Teachers
+                        </h2>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Highly recommended mentors in your subjects.</p>
+                    </div>
+                    <Link to="/search" className="text-cyan-700 font-bold text-sm hover:underline">View All</Link>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {loadingTeachers ? (
+                        [1, 2, 3, 4].map(i => (
+                            <div key={i} className="h-[300px] bg-white dark:bg-slate-900 rounded-3xl animate-pulse border border-slate-100 dark:border-slate-800" />
+                        ))
+                    ) : (
+                        topTeachers.map(teacher => (
+                            <TeacherCard
+                                key={teacher.id}
+                                teacher={teacher}
+                                layout="vertical"
+                                onBook={() => { }} // Placeholder or navigate to profile
+                                onSave={() => { }} // Placeholder
+                            />
+                        ))
+                    )}
+                    {/* Fallback if no teachers found */}
+                    {!loadingTeachers && topTeachers.length === 0 && (
+                        <div className="col-span-full text-center py-8 text-slate-500">
+                            No top rated teachers found at the moment.
+                        </div>
+                    )}
                 </div>
             </section>
 

@@ -43,7 +43,7 @@ export default function Navbar() {
             label: 'My Account',
             to: '#',
             children: [
-                { label: 'My Teachers', to: '/student/saved' },
+                { label: 'My Teachers', to: '/student/teachers' },
                 { label: 'My Courses', to: '/student/courses' },
                 { label: 'Your Resources', to: '/student/resources' },
                 { label: 'Wallet', to: '/student/wallet' }

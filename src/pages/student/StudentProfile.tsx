@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { Mail, Phone, MapPin, Shield, Trash2, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Shield, Trash2, RefreshCw, CheckCircle, AlertCircle, GraduationCap, BookOpen, School as SchoolIcon, Edit2, Camera, Save } from 'lucide-react';
 import { clearAllData, seedTeachers, seedBatches } from '@/lib/seed';
 
 export default function StudentProfile() {
@@ -8,6 +8,35 @@ export default function StudentProfile() {
     const [isClearing, setIsClearing] = useState(false);
     const [isSeeding, setIsSeeding] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [profileImage, setProfileImage] = useState<string | null>(null);
+    const [formData, setFormData] = useState({
+        name: user?.displayName || 'Student Name',
+        phone: '+91 98765 43210',
+        location: 'Mumbai, Maharashtra',
+        class: '12th Grade',
+        stream: 'Science (PCM)',
+        school: 'Delhi Public School, R.K. Puram'
+    });
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProfileImage(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleSaveProfile = () => {
+        // Here you would typically send the data to the backend
+        setIsEditing(false);
+        setMessage({ type: 'success', text: 'Profile updated successfully!' });
+        setTimeout(() => setMessage(null), 3000);
+    };
 
     const handleClearData = async () => {
         if (!confirm('Are you sure you want to clear all data? This cannot be undone.')) return;
@@ -57,23 +86,84 @@ export default function StudentProfile() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Profile Card */}
                 <div className="md:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden">
-                    <div className="h-32 bg-gradient-to-r from-cyan-500 to-violet-600"></div>
+                    <div className="h-32 bg-gradient-to-r from-cyan-500 to-violet-600 relative">
+                        {isEditing && (
+                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                <button className="bg-white/20 backdrop-blur-md border border-white/30 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-white/30 transition-colors flex items-center gap-2">
+                                    <Camera size={16} /> Change Cover
+                                </button>
+                            </div>
+                        )}
+                    </div>
                     <div className="px-8 pb-8">
-                        <div className="relative -mt-12 mb-6">
-                            <div className="w-24 h-24 bg-white dark:bg-slate-900 rounded-2xl p-1 shadow-lg inline-block">
-                                <div className="w-full h-full bg-cyan-100 dark:bg-cyan-900/20 rounded-xl flex items-center justify-center text-3xl font-bold text-cyan-700 dark:text-cyan-400">
-                                    {user?.displayName?.[0] || 'U'}
+                        <div className="relative -mt-12 mb-6 flex justify-between items-end">
+                            <div className="relative group">
+                                <div className="w-24 h-24 bg-white dark:bg-slate-900 rounded-2xl p-1 shadow-lg inline-block">
+                                    <div className="w-full h-full bg-cyan-100 dark:bg-cyan-900/20 rounded-xl flex items-center justify-center text-3xl font-bold text-cyan-700 dark:text-cyan-400 overflow-hidden relative">
+                                        {profileImage ? (
+                                            <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                                        ) : (
+                                            user?.displayName?.[0] || 'U'
+                                        )}
+                                    </div>
                                 </div>
+                                {isEditing && (
+                                    <label className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-2xl cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Camera className="text-white" size={24} />
+                                        <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                                    </label>
+                                )}
+                            </div>
+                            <div className="mb-2">
+                                {!isEditing ? (
+                                    <button
+                                        onClick={() => setIsEditing(true)}
+                                        className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
+                                    >
+                                        <Edit2 size={16} /> Edit Profile
+                                    </button>
+                                ) : (
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => setIsEditing(false)}
+                                            className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={handleSaveProfile}
+                                            className="px-4 py-2 bg-cyan-700 text-white font-bold rounded-xl text-sm hover:bg-cyan-800 transition-colors flex items-center gap-2"
+                                        >
+                                            <Save size={16} /> Save
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
                         <div className="space-y-6">
                             <div>
-                                <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{user?.displayName || 'Student Name'}</h2>
-                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400 capitalize">
-                                    <Shield size={12} />
-                                    {userRole} Account
-                                </span>
+                                <div className="flex items-center gap-3 mb-1">
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            className="text-2xl font-bold text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 w-full max-w-md focus:ring-2 focus:ring-cyan-500 outline-none"
+                                        />
+                                    ) : (
+                                        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{formData.name}</h2>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400 capitalize">
+                                        <Shield size={12} />
+                                        {userRole} Account
+                                    </span>
+                                    <span className="text-xs font-mono text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                                        ID: {user?.uid?.slice(0, 8).toUpperCase() || 'STU-123456'}
+                                    </span>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -87,13 +177,78 @@ export default function StudentProfile() {
                                     <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm mb-1">
                                         <Phone size={16} /> Phone
                                     </div>
-                                    <div className="font-medium text-slate-900 dark:text-slate-100">+91 98765 43210</div>
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                            className="font-medium text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 w-full focus:ring-2 focus:ring-cyan-500 outline-none"
+                                        />
+                                    ) : (
+                                        <div className="font-medium text-slate-900 dark:text-slate-100">{formData.phone}</div>
+                                    )}
                                 </div>
                                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl sm:col-span-2">
                                     <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm mb-1">
                                         <MapPin size={16} /> Location
                                     </div>
-                                    <div className="font-medium text-slate-900 dark:text-slate-100">Mumbai, Maharashtra</div>
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            value={formData.location}
+                                            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                                            className="font-medium text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 w-full focus:ring-2 focus:ring-cyan-500 outline-none"
+                                        />
+                                    ) : (
+                                        <div className="font-medium text-slate-900 dark:text-slate-100">{formData.location}</div>
+                                    )}
+                                </div>
+
+                                {/* New Fields */}
+                                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm mb-1">
+                                        <GraduationCap size={16} /> Class
+                                    </div>
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            value={formData.class}
+                                            onChange={(e) => setFormData({ ...formData, class: e.target.value })}
+                                            className="font-medium text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 w-full focus:ring-2 focus:ring-cyan-500 outline-none"
+                                        />
+                                    ) : (
+                                        <div className="font-medium text-slate-900 dark:text-slate-100">{formData.class}</div>
+                                    )}
+                                </div>
+                                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm mb-1">
+                                        <BookOpen size={16} /> Stream
+                                    </div>
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            value={formData.stream}
+                                            onChange={(e) => setFormData({ ...formData, stream: e.target.value })}
+                                            className="font-medium text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 w-full focus:ring-2 focus:ring-cyan-500 outline-none"
+                                        />
+                                    ) : (
+                                        <div className="font-medium text-slate-900 dark:text-slate-100">{formData.stream}</div>
+                                    )}
+                                </div>
+                                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl sm:col-span-2">
+                                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm mb-1">
+                                        <SchoolIcon size={16} /> School
+                                    </div>
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            value={formData.school}
+                                            onChange={(e) => setFormData({ ...formData, school: e.target.value })}
+                                            className="font-medium text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 w-full focus:ring-2 focus:ring-cyan-500 outline-none"
+                                        />
+                                    ) : (
+                                        <div className="font-medium text-slate-900 dark:text-slate-100">{formData.school}</div>
+                                    )}
                                 </div>
                             </div>
                         </div>

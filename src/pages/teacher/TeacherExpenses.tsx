@@ -5,12 +5,12 @@ export default function TeacherExpenses() {
     const [hasApplied, setHasApplied] = useState(false);
 
     const studioItems = [
-        { id: 1, name: 'Interactive V-Panel', icon: MonitorPlay, desc: '75" 4K Touch Display for immersive teaching' },
-        { id: 2, name: '4K PTZ Camera', icon: Camera, desc: 'Ultra-HD camera with auto-tracking' },
-        { id: 3, name: 'Professional Mic', icon: Mic, desc: 'Studio-grade condenser microphone' },
-        { id: 4, name: 'Audio Monitor', icon: Speaker, desc: 'High-fidelity clamp-on speakers' },
-        { id: 5, name: 'Workstation PC', icon: Cpu, desc: 'i9 Processor, 32GB RAM, RTX 4060' },
-        { id: 6, name: 'Studio Lighting', icon: Lightbulb, desc: 'Softbox kit with color temp control' }
+        { id: 1, name: 'Interactive V-Panel', icon: MonitorPlay, desc: '75" 4K Touch Display for immersive teaching', price: '₹1,50,000' },
+        { id: 2, name: '4K PTZ Camera', icon: Camera, desc: 'Ultra-HD camera with auto-tracking', price: '₹45,000' },
+        { id: 3, name: 'Professional Mic', icon: Mic, desc: 'Studio-grade condenser microphone', price: '₹12,000' },
+        { id: 4, name: 'Audio Monitor', icon: Speaker, desc: 'High-fidelity clamp-on speakers', price: '₹8,500' },
+        { id: 5, name: 'Workstation PC', icon: Cpu, desc: 'i9 Processor, 32GB RAM, RTX 4060', price: '₹1,20,000' },
+        { id: 6, name: 'Studio Lighting', icon: Lightbulb, desc: 'Softbox kit with color temp control', price: '₹15,000' }
     ];
 
     const handleApply = () => {
@@ -62,7 +62,8 @@ export default function TeacherExpenses() {
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-lg">{item.name}</h3>
-                                    <p className="text-xs text-slate-300">{item.desc}</p>
+                                    <p className="text-xs text-slate-300 mb-1">{item.desc}</p>
+                                    <div className="text-sm font-bold text-cyan-300">{item.price}</div>
                                 </div>
                             </div>
                         ))}

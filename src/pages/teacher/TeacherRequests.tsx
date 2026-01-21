@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, updateDoc, doc, Timestamp, orderBy } from 'firebase/firestore';
-import { Loader2, User, CheckCircle, Search, SlidersHorizontal, X } from 'lucide-react';
+import { Loader2, User, CheckCircle, Search, SlidersHorizontal, X, Star } from 'lucide-react';
 
 interface Request {
     id: string;
@@ -10,6 +10,8 @@ interface Request {
     topic: string;
     description: string;
     budget: string;
+    preferredTeacherId?: string;
+    preferredTeacherName?: string;
     createdAt: Timestamp;
 }
 
@@ -33,6 +35,7 @@ export default function TeacherRequests() {
     }, []);
 
     async function fetchRequests() {
+        if (!user) return;
         try {
             const q = query(
                 collection(db, 'open_requests'),
@@ -40,7 +43,14 @@ export default function TeacherRequests() {
                 orderBy('createdAt', 'desc')
             );
             const snap = await getDocs(q);
-            setRequests(snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Request)));
+            const allRequests = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Request));
+
+            // Filter requests: Show if no preferred teacher OR preferred teacher is me
+            const relevantRequests = allRequests.filter(req =>
+                !req.preferredTeacherId || req.preferredTeacherId === user.uid
+            );
+
+            setRequests(relevantRequests);
         } catch (error) {
             console.error('Error fetching requests:', error);
         } finally {
@@ -143,6 +153,13 @@ export default function TeacherRequests() {
                                     </div>
                                 )}
                             </div>
+
+                            {req.preferredTeacherId === user?.uid && (
+                                <div className="mb-4 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2">
+                                    <Star size={16} fill="currentColor" />
+                                    Direct Request for You
+                                </div>
+                            )}
 
                             <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">{req.topic}</h3>
                             <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">{req.description}</p>

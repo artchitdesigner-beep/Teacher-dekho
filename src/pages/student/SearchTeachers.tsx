@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, Plus, BookOpen, GraduationCap, Languages, Star, IndianRupee, Calendar, X } from 'lucide-react';
-import { collection, query, getDocs, where } from 'firebase/firestore';
+import { collection, query, getDocs, where, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/lib/auth-context';
 import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
@@ -12,6 +12,7 @@ import PostRequestPromoCard from '@/components/search/PostRequestPromoCard';
 import PageHero from '@/components/common/PageHero';
 import { FilterDropdown } from '@/components/search/FilterDropdown';
 import VideoOverlay from '@/components/common/VideoOverlay';
+import CreateBatchRequestModal from '@/components/batches/CreateBatchRequestModal';
 
 export default function SearchTeachers() {
     const navigate = useNavigate();
@@ -32,6 +33,7 @@ export default function SearchTeachers() {
     const [selectedTeacher, setSelectedTeacher] = useState<any | null>(null);
 
     const [activeTab, setActiveTab] = useState<'teachers' | 'batches'>('teachers');
+    const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
 
     const [isSticky, setIsSticky] = useState(false);
     const heroRef = useRef<HTMLDivElement>(null);
@@ -358,9 +360,48 @@ export default function SearchTeachers() {
     const [playingVideoUrl, setPlayingVideoUrl] = useState<string | null>(null);
     const [focusedCardId, setFocusedCardId] = useState<string | null>(null);
 
-    const handleSaveTeacher = (teacherId: string) => {
-        // TODO: Implement save functionality
-        console.log('Saving teacher:', teacherId);
+    const [savedTeacherIds, setSavedTeacherIds] = useState<string[]>([]);
+
+    useEffect(() => {
+        const fetchSavedTeachers = async () => {
+            if (!user) return;
+            try {
+                const savedSnap = await getDocs(collection(db, 'users', user.uid, 'saved_teachers'));
+                setSavedTeacherIds(savedSnap.docs.map(doc => doc.id));
+            } catch (error) {
+                console.error('Error fetching saved teachers:', error);
+            }
+        };
+        fetchSavedTeachers();
+    }, [user]);
+
+    const handleSaveTeacher = async (teacherId: string) => {
+        if (!user) {
+            alert('Please login to save teachers');
+            return;
+        }
+
+        const isSaved = savedTeacherIds.includes(teacherId);
+        const newSavedIds = isSaved
+            ? savedTeacherIds.filter(id => id !== teacherId)
+            : [...savedTeacherIds, teacherId];
+
+        setSavedTeacherIds(newSavedIds); // Optimistic update
+
+        try {
+            const docRef = doc(db, 'users', user.uid, 'saved_teachers', teacherId);
+            if (isSaved) {
+                await deleteDoc(docRef);
+            } else {
+                await setDoc(docRef, {
+                    savedAt: new Date()
+                });
+            }
+        } catch (error) {
+            console.error('Error saving teacher:', error);
+            // Revert on error
+            setSavedTeacherIds(savedTeacherIds);
+        }
     };
 
     return (
@@ -387,147 +428,173 @@ export default function SearchTeachers() {
                                 />
                             </div>
 
-                            <button
-                                onClick={() => navigate('/student/requests?action=new')}
-                                className="w-full md:w-auto px-6 py-4 bg-white text-cyan-700 font-bold rounded-2xl hover:bg-cyan-50 transition-colors shadow-lg flex items-center justify-center gap-2 whitespace-nowrap"
-                            >
-                                <Plus size={20} />
-                                Create Your Own Batch
-                            </button>
+                            <div className="flex flex-col items-center gap-2 w-full md:w-auto flex-shrink-0">
+                                {activeTab === 'batches' ? (
+                                    <button
+                                        onClick={() => setIsBatchModalOpen(true)}
+                                        className="w-full md:w-auto px-6 py-4 bg-white text-cyan-700 font-bold rounded-2xl hover:bg-cyan-50 transition-colors shadow-lg flex items-center justify-center gap-2 whitespace-nowrap"
+                                    >
+                                        <Plus size={20} />
+                                        Create Own Batch
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => navigate('/student/requests?action=new')}
+                                        className="w-full md:w-auto px-6 py-4 bg-white text-cyan-700 font-bold rounded-2xl hover:bg-cyan-50 transition-colors shadow-lg flex items-center justify-center gap-2 whitespace-nowrap"
+                                    >
+                                        <Plus size={20} />
+                                        Open Request
+                                    </button>
+                                )}
+                            </div>
                         </div>
-
                     </div>
                 </PageHero>
             </div>
 
             {/* Filters (visible when NOT sticky) - Moved outside Hero */}
-            {!isSticky && activeTab === 'teachers' && (
-                <div className="animate-in fade-in slide-in-from-top-4 duration-500">
-                    <FilterBar sticky={false} />
-                </div>
-            )}
+            {
+                !isSticky && activeTab === 'teachers' && (
+                    <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+                        <FilterBar sticky={false} />
+                    </div>
+                )
+            }
 
             {/* Sticky Filter Bar (visible when sticky) */}
-            {isSticky && activeTab === 'teachers' && (
-                <FilterBar sticky={true} />
-            )}
+            {
+                isSticky && activeTab === 'teachers' && (
+                    <FilterBar sticky={true} />
+                )
+            }
 
-            {activeTab === 'batches' ? (
-                <div className="space-y-12">
-                    {/* Running Batches */}
-                    <div>
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            Running Batches
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {batches
-                                .filter(b => {
-                                    const isRunning = b.startDate?.seconds * 1000 <= Date.now();
-                                    return isRunning && (b.title || b.name)?.toLowerCase().includes(searchQuery.toLowerCase());
-                                })
-                                .map(batch => (
-                                    <BatchCard
-                                        key={batch.id}
-                                        batch={batch}
-                                    />
-                                ))}
-                            {batches.filter(b => b.startDate?.seconds * 1000 <= Date.now()).length === 0 && (
-                                <div className="col-span-full text-center py-8 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
-                                    No running batches found.
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Upcoming Batches */}
-                    <div>
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
-                            <Calendar size={20} className="text-cyan-600" />
-                            Upcoming Batches
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {batches
-                                .filter(b => {
-                                    const isUpcoming = b.startDate?.seconds * 1000 > Date.now();
-                                    return isUpcoming && (b.title || b.name)?.toLowerCase().includes(searchQuery.toLowerCase());
-                                })
-                                .map(batch => (
-                                    <BatchCard
-                                        key={batch.id}
-                                        batch={batch}
-                                    />
-                                ))}
-                            {batches.filter(b => b.startDate?.seconds * 1000 > Date.now()).length === 0 && (
-                                <div className="col-span-full text-center py-8 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
-                                    No upcoming batches found.
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            ) : (
-                <div className="flex flex-col gap-8">
-                    {/* Main Content: Teacher List */}
-                    <div className="flex-grow">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="font-bold text-slate-900 dark:text-slate-100">
-                                {filteredTeachers.length} {selectedSubject !== 'All' ? selectedSubject : ''} teachers found
+            {
+                activeTab === 'batches' ? (
+                    <div className="space-y-12">
+                        {/* Running Batches */}
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Running Batches
                             </h2>
-                            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                                Sort by: <span className="font-medium text-slate-900 dark:text-slate-100">Best Match</span>
-                            </div>
-                        </div>
-
-                        {loading ? (
-                            <div className="space-y-4">
-                                {[1, 2, 3].map(i => (
-                                    <div key={i} className="h-48 bg-white dark:bg-slate-900 rounded-2xl animate-pulse border border-slate-100 dark:border-slate-800" />
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="space-y-4">
-                                {filteredTeachers.map(teacher => (
-                                    <TeacherCard
-                                        key={teacher.id}
-                                        teacher={teacher}
-                                        onBook={() => handleBook(teacher)}
-                                        onPlayVideo={(url) => setPlayingVideoUrl(url)}
-                                        isFocused={focusedCardId === teacher.id}
-                                        onFocus={() => setFocusedCardId(teacher.id)}
-                                        onSave={() => handleSaveTeacher(teacher.id)}
-                                    />
-                                ))}
-
-                                {filteredTeachers.length > 0 && <PostRequestPromoCard />}
-
-                                {filteredTeachers.length === 0 && (
-                                    <div className="py-10">
-                                        <PostRequestPromoCard />
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {batches
+                                    .filter(b => {
+                                        const isRunning = b.startDate?.seconds * 1000 <= Date.now();
+                                        return isRunning && (b.title || b.name)?.toLowerCase().includes(searchQuery.toLowerCase());
+                                    })
+                                    .map(batch => (
+                                        <BatchCard
+                                            key={batch.id}
+                                            batch={batch}
+                                        />
+                                    ))}
+                                {batches.filter(b => b.startDate?.seconds * 1000 <= Date.now()).length === 0 && (
+                                    <div className="col-span-full text-center py-8 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+                                        No running batches found.
                                     </div>
                                 )}
                             </div>
-                        )}
+                        </div>
+
+                        {/* Upcoming Batches */}
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+                                <Calendar size={20} className="text-cyan-600" />
+                                Upcoming Batches
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {batches
+                                    .filter(b => {
+                                        const isUpcoming = b.startDate?.seconds * 1000 > Date.now();
+                                        return isUpcoming && (b.title || b.name)?.toLowerCase().includes(searchQuery.toLowerCase());
+                                    })
+                                    .map(batch => (
+                                        <BatchCard
+                                            key={batch.id}
+                                            batch={batch}
+                                        />
+                                    ))}
+                                {batches.filter(b => b.startDate?.seconds * 1000 > Date.now()).length === 0 && (
+                                    <div className="col-span-full text-center py-8 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+                                        No upcoming batches found.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
-                </div>
-            )}
+                ) : (
+                    <div className="flex flex-col gap-8">
+                        {/* Main Content: Teacher List */}
+                        <div className="flex-grow">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="font-bold text-slate-900 dark:text-slate-100">
+                                    {filteredTeachers.length} {selectedSubject !== 'All' ? selectedSubject : ''} teachers found
+                                </h2>
+                                <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                                    Sort by: <span className="font-medium text-slate-900 dark:text-slate-100">Best Match</span>
+                                </div>
+                            </div>
+
+                            {loading ? (
+                                <div className="space-y-4">
+                                    {[1, 2, 3].map(i => (
+                                        <div key={i} className="h-48 bg-white dark:bg-slate-900 rounded-2xl animate-pulse border border-slate-100 dark:border-slate-800" />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {filteredTeachers.map(teacher => (
+                                        <TeacherCard
+                                            key={teacher.id}
+                                            teacher={teacher}
+                                            onBook={() => handleBook(teacher)}
+                                            onPlayVideo={(url) => setPlayingVideoUrl(url)}
+                                            isFocused={focusedCardId === teacher.id}
+                                            onFocus={() => setFocusedCardId(teacher.id)}
+                                            onSave={() => handleSaveTeacher(teacher.id)}
+                                        />
+                                    ))}
+
+                                    {filteredTeachers.length > 0 && <PostRequestPromoCard />}
+
+                                    {filteredTeachers.length === 0 && (
+                                        <div className="py-10">
+                                            <PostRequestPromoCard />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )
+            }
 
 
 
-            {selectedTeacher && user && (
-                <BookingSelectionModal
-                    teacher={selectedTeacher}
-                    studentId={user.uid}
-                    onClose={() => setSelectedTeacher(null)}
-                />
-            )}
+            {
+                selectedTeacher && user && (
+                    <BookingSelectionModal
+                        teacher={selectedTeacher}
+                        studentId={user.uid}
+                        onClose={() => setSelectedTeacher(null)}
+                    />
+                )
+            }
 
-            {playingVideoUrl && (
-                <VideoOverlay
-                    videoUrl={playingVideoUrl}
-                    onClose={() => setPlayingVideoUrl(null)}
-                />
-            )}
-        </div>
+            {
+                playingVideoUrl && (
+                    <VideoOverlay
+                        videoUrl={playingVideoUrl}
+                        onClose={() => setPlayingVideoUrl(null)}
+                    />
+                )
+            }
+            {/* Batch Request Modal */}
+            <CreateBatchRequestModal
+                isOpen={isBatchModalOpen}
+                onClose={() => setIsBatchModalOpen(false)}
+            />
+        </div >
     );
 }

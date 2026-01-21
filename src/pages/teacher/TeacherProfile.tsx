@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs, deleteDoc, Timestamp } from 'firebase/firestore';
-import { Loader2, Save, AlertCircle, CheckCircle, Database, Trash2 } from 'lucide-react';
+import { Loader2, Save, AlertCircle, CheckCircle, Database, Trash2, Clock, Zap } from 'lucide-react';
 
 export default function TeacherProfile() {
     const { user } = useAuth();
@@ -18,7 +18,12 @@ export default function TeacherProfile() {
         videoIntroUrl: '',
         college: '',
         experience: '',
-        kycStatus: 'pending'
+        kycStatus: 'pending',
+        aadhar: '',
+        pan: '',
+        bankName: '',
+        accountNumber: '',
+        ifsc: ''
     });
 
     useEffect(() => {
@@ -37,7 +42,12 @@ export default function TeacherProfile() {
                         videoIntroUrl: data.videoIntroUrl || '',
                         college: data.college || '',
                         experience: data.experience || '',
-                        kycStatus: data.kycStatus || 'pending'
+                        kycStatus: data.kycStatus || 'pending',
+                        aadhar: data.aadhar || '',
+                        pan: data.pan || '',
+                        bankName: data.bankName || '',
+                        accountNumber: data.accountNumber || '',
+                        ifsc: data.ifsc || ''
                     });
                 }
             } catch (error) {
@@ -65,7 +75,12 @@ export default function TeacherProfile() {
                 bio: formData.bio,
                 videoIntroUrl: formData.videoIntroUrl,
                 college: formData.college,
-                experience: formData.experience
+                experience: formData.experience,
+                aadhar: formData.aadhar,
+                pan: formData.pan,
+                bankName: formData.bankName,
+                accountNumber: formData.accountNumber,
+                ifsc: formData.ifsc
             });
 
             // Also update the public 'teachers' collection if it exists
@@ -211,6 +226,37 @@ export default function TeacherProfile() {
                     </div>
                 </div>
 
+                {/* Stats Section */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                        <div className="w-12 h-12 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 rounded-xl flex items-center justify-center">
+                            <Clock size={24} />
+                        </div>
+                        <div>
+                            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">120+ Hrs</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">Time Saved on Admin</div>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                        <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-xl flex items-center justify-center">
+                            <CheckCircle size={24} />
+                        </div>
+                        <div>
+                            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">98%</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">Profile Completion</div>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                        <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-xl flex items-center justify-center">
+                            <Zap size={24} />
+                        </div>
+                        <div>
+                            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">Super</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">Teacher Status</div>
+                        </div>
+                    </div>
+                </div>
+
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {message && (
                         <div className={`p-4 rounded-xl text-sm font-medium ${message.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400'
@@ -300,6 +346,68 @@ export default function TeacherProfile() {
                             onChange={e => setFormData({ ...formData, bio: e.target.value })}
                             className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition resize-none text-slate-900 dark:text-slate-100"
                         />
+                    </div>
+
+                    <div className="border-t border-slate-100 dark:border-slate-800 pt-6">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">Government IDs</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Aadhar Number</label>
+                                <input
+                                    type="text"
+                                    placeholder="XXXX-XXXX-XXXX"
+                                    value={formData.aadhar}
+                                    onChange={e => setFormData({ ...formData, aadhar: e.target.value })}
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">PAN Number</label>
+                                <input
+                                    type="text"
+                                    placeholder="ABCDE1234F"
+                                    value={formData.pan}
+                                    onChange={e => setFormData({ ...formData, pan: e.target.value })}
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="border-t border-slate-100 dark:border-slate-800 pt-6">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">Bank Information</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Bank Name</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. HDFC Bank"
+                                    value={formData.bankName}
+                                    onChange={e => setFormData({ ...formData, bankName: e.target.value })}
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Account Number</label>
+                                <input
+                                    type="text"
+                                    placeholder="XXXXXXXXXXXX"
+                                    value={formData.accountNumber}
+                                    onChange={e => setFormData({ ...formData, accountNumber: e.target.value })}
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">IFSC Code</label>
+                                <input
+                                    type="text"
+                                    placeholder="HDFC0001234"
+                                    value={formData.ifsc}
+                                    onChange={e => setFormData({ ...formData, ifsc: e.target.value })}
+                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     <div className="pt-4">

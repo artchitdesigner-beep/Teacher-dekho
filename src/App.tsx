@@ -18,7 +18,7 @@ import TeacherProfilePublic from './pages/student/TeacherProfilePublic';
 import MyCourses from './pages/student/MyCourses';
 import MyRequests from './pages/student/MyRequests';
 import BookingDetail from './pages/student/BookingDetail';
-import SavedTeachers from './pages/student/SavedTeachers';
+import MyTeachers from './pages/student/MyTeachers';
 import BatchDetails from './pages/student/BatchDetails';
 import Wallet from './pages/student/Wallet';
 import StudentProfile from './pages/student/StudentProfile';
@@ -77,7 +77,8 @@ function App() {
           <Route path="courses" element={<MyCourses />} />
           <Route path="courses/:id" element={<BookingDetail />} />
           <Route path="requests" element={<MyRequests />} />
-          <Route path="saved" element={<SavedTeachers />} />
+          <Route path="requests" element={<MyRequests />} />
+          <Route path="teachers" element={<MyTeachers />} />
           <Route path="wallet" element={<Wallet />} />
           <Route path="profile" element={<StudentProfile />} />
           <Route path="batch/:id" element={<BatchDetails />} />

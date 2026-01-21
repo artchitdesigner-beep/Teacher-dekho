@@ -10,6 +10,7 @@ interface TeacherCardProps {
     isFocused?: boolean;
     onFocus?: () => void;
     onSave?: () => void;
+    isSaved?: boolean;
 }
 
 export default function TeacherCard({
@@ -19,7 +20,8 @@ export default function TeacherCard({
     layout = 'horizontal',
     isFocused = false,
     onFocus,
-    onSave
+    onSave,
+    isSaved = false
 }: TeacherCardProps) {
     const { userRole } = useAuth();
     const profilePath = userRole === 'student' ? `/student/teacher/${teacher.id}` : `/teacher/${teacher.id}`;
@@ -77,9 +79,9 @@ export default function TeacherCard({
                                 onSave && onSave();
                             }}
                             className="absolute top-0 right-0 p-2 rounded-full bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
-                            title="Save Teacher"
+                            title={isSaved ? "Unsave Teacher" : "Save Teacher"}
                         >
-                            <Heart size={20} />
+                            <Heart size={20} className={isSaved ? "fill-red-500 text-red-500" : ""} />
                         </button>
 
                         <div className={`${isVertical ? '' : 'md:hidden'} text-right`}>

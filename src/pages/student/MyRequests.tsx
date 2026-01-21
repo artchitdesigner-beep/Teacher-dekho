@@ -15,11 +15,14 @@ interface Request {
     timeSlot: string;
     status: 'open' | 'accepted' | 'closed';
     createdAt: Timestamp;
+    preferredTeacherId?: string;
+    preferredTeacherName?: string;
 }
 
 export default function MyRequests() {
     const { user } = useAuth();
     const [requests, setRequests] = useState<Request[]>([]);
+    const [teachers, setTeachers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -42,12 +45,27 @@ export default function MyRequests() {
         budget: '500',
         subject: '',
         course: '',
-        timeSlot: ''
+        timeSlot: '',
+        preferredTeacherId: '',
+        preferredTeacherName: ''
     });
 
     useEffect(() => {
-        if (user) fetchRequests();
+        if (user) {
+            fetchRequests();
+            fetchTeachers();
+        }
     }, [user]);
+
+    async function fetchTeachers() {
+        try {
+            const q = query(collection(db, 'users'), where('role', '==', 'teacher'));
+            const snap = await getDocs(q);
+            setTeachers(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        } catch (error) {
+            console.error('Error fetching teachers:', error);
+        }
+    }
 
     async function fetchRequests() {
         if (!user) return;
@@ -82,6 +100,8 @@ export default function MyRequests() {
                 subject: formData.subject,
                 course: formData.course,
                 timeSlot: formData.timeSlot,
+                preferredTeacherId: formData.preferredTeacherId || null,
+                preferredTeacherName: formData.preferredTeacherName || null,
                 status: 'open',
                 updatedAt: Timestamp.now()
             };
@@ -95,7 +115,16 @@ export default function MyRequests() {
                 });
             }
 
-            setFormData({ topic: '', description: '', budget: '500', subject: '', course: '', timeSlot: '' });
+            setFormData({
+                topic: '',
+                description: '',
+                budget: '500',
+                subject: '',
+                course: '',
+                timeSlot: '',
+                preferredTeacherId: '',
+                preferredTeacherName: ''
+            });
             setShowForm(false);
             setEditingId(null);
             fetchRequests(); // Refresh list
@@ -113,7 +142,9 @@ export default function MyRequests() {
             budget: req.budget,
             subject: req.subject,
             course: req.course,
-            timeSlot: req.timeSlot
+            timeSlot: req.timeSlot,
+            preferredTeacherId: req.preferredTeacherId || '',
+            preferredTeacherName: req.preferredTeacherName || ''
         });
         setEditingId(req.id);
         setShowForm(true);
@@ -150,7 +181,16 @@ export default function MyRequests() {
                     onClick={() => {
                         if (showForm && editingId) {
                             setEditingId(null);
-                            setFormData({ topic: '', description: '', budget: '500', subject: '', course: '', timeSlot: '' });
+                            setFormData({
+                                topic: '',
+                                description: '',
+                                budget: '500',
+                                subject: '',
+                                course: '',
+                                timeSlot: '',
+                                preferredTeacherId: '',
+                                preferredTeacherName: ''
+                            });
                         } else {
                             setShowForm(!showForm);
                         }
@@ -261,6 +301,29 @@ export default function MyRequests() {
                         </div>
 
                         <div>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Preferred Teacher (Optional)</label>
+                            <select
+                                value={formData.preferredTeacherId}
+                                onChange={e => {
+                                    const teacher = teachers.find(t => t.id === e.target.value);
+                                    setFormData({
+                                        ...formData,
+                                        preferredTeacherId: e.target.value,
+                                        preferredTeacherName: teacher ? teacher.name : ''
+                                    });
+                                }}
+                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none text-sm dark:text-white"
+                            >
+                                <option value="">Any Teacher</option>
+                                {teachers.map(teacher => (
+                                    <option key={teacher.id} value={teacher.id}>
+                                        {teacher.name} ({teacher.subject})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
                             <div className="flex justify-between mb-2">
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Budget: ₹{formData.budget}/hr</label>
                             </div>
@@ -307,8 +370,9 @@ export default function MyRequests() {
                             </button>
                         </div>
                     </form>
-                </div>
-            )}
+                </div >
+            )
+            }
 
             <div className="grid grid-cols-1 gap-4">
                 {filteredRequests.length === 0 ? (
@@ -368,6 +432,6 @@ export default function MyRequests() {
                     ))
                 )}
             </div>
-        </div>
+        </div >
     );
 }

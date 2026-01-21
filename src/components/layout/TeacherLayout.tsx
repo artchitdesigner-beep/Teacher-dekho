@@ -27,11 +27,11 @@ export default function TeacherLayout() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const menuItems = [
-        { icon: Calendar, label: 'Dashboard', path: '/teacher/calendar' },
+        { icon: Calendar, label: 'Calendar', path: '/teacher/calendar' },
         { icon: Activity, label: 'Set Availability', path: '/teacher/availability' },
         { icon: BookOpen, label: 'Batches', path: '/teacher/batches' }, // Added Batches
         { icon: Users, label: 'My Students', path: '/teacher/students' },
-        { icon: MessageSquare, label: 'Requests', path: '/teacher/requests' },
+        { icon: MessageSquare, label: 'Open Requests', path: '/teacher/requests' },
         { icon: BarChart2, label: 'Reports', path: '/teacher/reports' },
         { icon: Settings, label: 'Settings', path: '/teacher/profile' },
         { icon: Layers, label: 'Integrations', path: '/teacher/integrations' },
