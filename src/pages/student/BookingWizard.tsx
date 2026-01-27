@@ -47,6 +47,8 @@ export default function BookingWizard() {
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
     const [courseTopic, setCourseTopic] = useState('');
+    const [subject, setSubject] = useState('');
+    const [grade, setGrade] = useState('');
     const [groupMembers, setGroupMembers] = useState('');
 
     // Schedule State
@@ -60,6 +62,10 @@ export default function BookingWizard() {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     setTeacher(docSnap.data());
+                    // Pre-fill subject if available from teacher profile
+                    if (docSnap.data().subject) {
+                        setSubject(docSnap.data().subject);
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching teacher:', error);
@@ -269,13 +275,39 @@ export default function BookingWizard() {
                         </div>
 
                         <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-100 dark:border-slate-800 space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-900 dark:text-slate-100">Subject</label>
+                                    <input
+                                        type="text"
+                                        value={subject}
+                                        onChange={(e) => setSubject(e.target.value)}
+                                        placeholder="e.g. Physics"
+                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-900 dark:text-slate-100">Grade / Class</label>
+                                    <select
+                                        value={grade}
+                                        onChange={(e) => setGrade(e.target.value)}
+                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none"
+                                    >
+                                        <option value="">Select Grade</option>
+                                        {['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12', 'College', 'Other'].map(g => (
+                                            <option key={g} value={g}>{g}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-slate-900 dark:text-slate-100">Topic / Course Name</label>
                                 <input
                                     type="text"
                                     value={courseTopic}
                                     onChange={(e) => setCourseTopic(e.target.value)}
-                                    placeholder="e.g. Class 12 Physics - Thermodynamics"
+                                    placeholder="e.g. Thermodynamics"
                                     className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none"
                                 />
                             </div>
@@ -338,7 +370,11 @@ export default function BookingWizard() {
                                         <div className="text-sm text-slate-500 flex items-center gap-1"><Clock size={14} /> Time</div>
                                         <div className="font-bold text-slate-900 dark:text-slate-100">{selectedSlot}</div>
                                     </div>
-                                    <div className="space-y-1 col-span-2">
+                                    <div className="space-y-1">
+                                        <div className="text-sm text-slate-500 flex items-center gap-1"><BookOpen size={14} /> Subject</div>
+                                        <div className="font-bold text-slate-900 dark:text-slate-100">{subject} ({grade})</div>
+                                    </div>
+                                    <div className="space-y-1">
                                         <div className="text-sm text-slate-500 flex items-center gap-1"><BookOpen size={14} /> Topic</div>
                                         <div className="font-bold text-slate-900 dark:text-slate-100">{courseTopic}</div>
                                     </div>
@@ -369,7 +405,7 @@ export default function BookingWizard() {
                         onClick={currentStep === STEPS.length - 1 ? () => alert('Proceed to Payment Gateway') : handleNext}
                         disabled={
                             (currentStep === 1 && (!selectedDate || !selectedSlot)) ||
-                            (currentStep === 2 && !courseTopic)
+                            (currentStep === 2 && (!courseTopic || !subject || !grade))
                         }
                         className="px-8 py-3 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all shadow-lg shadow-cyan-700/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >

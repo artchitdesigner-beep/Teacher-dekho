@@ -53,6 +53,8 @@ export default function BookingModal({
 
     const [formData, setFormData] = useState({
         topic: '',
+        subject: '',
+        grade: '',
         date: initialDate,
         time: initialTime,
         description: '',
@@ -135,7 +137,11 @@ export default function BookingModal({
 
     const handleNext = () => {
         if (step === 1 && !selectedPlan) return;
-        if (step === 2 && !formData.topic) return alert("Please enter a topic.");
+        if (step === 2) {
+            if (!formData.subject) return alert("Please enter a subject.");
+            if (!formData.grade) return alert("Please select a grade/class.");
+            if (!formData.topic) return alert("Please enter a topic.");
+        }
 
         if (step === 3) {
             if (!formData.date || !formData.time) return alert("Please select date and time.");
@@ -164,6 +170,8 @@ export default function BookingModal({
                 teacherId: teacher.uid || (teacher as any).id,
                 studentId: studentId,
                 studentName: studentName,
+                subject: formData.subject,
+                grade: formData.grade,
                 topic: formData.topic,
                 description: formData.description,
                 scheduledAt: Timestamp.fromDate(scheduledAt),
@@ -277,6 +285,34 @@ export default function BookingModal({
                             <div className="text-center mb-8">
                                 <h2 className="text-2xl font-serif font-bold text-slate-900 mb-2">Course Details</h2>
                                 <p className="text-slate-500">Tell us what you want to learn.</p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Subject</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        placeholder="e.g. Physics"
+                                        value={formData.subject}
+                                        onChange={e => setFormData({ ...formData, subject: e.target.value })}
+                                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition font-medium"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Grade / Class</label>
+                                    <select
+                                        required
+                                        value={formData.grade}
+                                        onChange={e => setFormData({ ...formData, grade: e.target.value })}
+                                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition font-medium"
+                                    >
+                                        <option value="">Select Grade</option>
+                                        {['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12', 'College', 'Other'].map(g => (
+                                            <option key={g} value={g}>{g}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
 
                             <div>
@@ -487,6 +523,10 @@ export default function BookingModal({
                                         <div className="flex justify-between items-center pb-4 border-b border-slate-200">
                                             <span className="text-slate-500">Plan</span>
                                             <span className="font-bold text-cyan-700">{currentPlan.name} ({currentPlan.sessions} sessions)</span>
+                                        </div>
+                                        <div className="flex justify-between items-center pb-4 border-b border-slate-200">
+                                            <span className="text-slate-500">Subject</span>
+                                            <span className="font-bold text-slate-900">{formData.subject} ({formData.grade})</span>
                                         </div>
                                         <div className="flex justify-between items-center pb-4 border-b border-slate-200">
                                             <span className="text-slate-500">Topic</span>

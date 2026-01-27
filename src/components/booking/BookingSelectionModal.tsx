@@ -48,6 +48,8 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
     const navigate = useNavigate();
     const [step, setStep] = useState<1 | 2>(1);
     const [courseTopic, setCourseTopic] = useState('');
+    const [subject, setSubject] = useState('');
+    const [grade, setGrade] = useState('');
     const [courseDescription, setCourseDescription] = useState('');
     const [members, setMembers] = useState<{ name: string; phone: string }[]>([]);
     const [newMemberName, setNewMemberName] = useState('');
@@ -111,7 +113,7 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
                 setStep(2);
             }
         } else {
-            if (!courseTopic) return;
+            if (!courseTopic || !subject || !grade) return;
 
             const planDetails = PLANS.find(p => p.id === selectedPlan);
 
@@ -124,6 +126,8 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
                     date: selectedDate?.toISOString(),
                     slot: selectedSlot,
                     courseTopic,
+                    subject,
+                    grade,
                     courseDescription,
                     members
                 }
@@ -450,6 +454,35 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
                     ) : (
                         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                             <div className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-slate-900 dark:text-slate-100">Subject <span className="text-red-500">*</span></label>
+                                        <select
+                                            value={subject}
+                                            onChange={(e) => setSubject(e.target.value)}
+                                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none"
+                                        >
+                                            <option value="">Select Subject</option>
+                                            {['Physics', 'Chemistry', 'Mathematics', 'Biology', 'English', 'Computer Science', 'History', 'Geography', 'Economics', 'Other'].map(s => (
+                                                <option key={s} value={s}>{s}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-slate-900 dark:text-slate-100">Grade / Class <span className="text-red-500">*</span></label>
+                                        <select
+                                            value={grade}
+                                            onChange={(e) => setGrade(e.target.value)}
+                                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none"
+                                        >
+                                            <option value="">Select Grade</option>
+                                            {['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12', 'College', 'Other'].map(g => (
+                                                <option key={g} value={g}>{g}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
                                 <div className="space-y-2">
                                     <label className="text-sm font-bold text-slate-900 dark:text-slate-100">Course Title <span className="text-red-500">*</span></label>
                                     <input
@@ -458,7 +491,6 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
                                         onChange={(e) => setCourseTopic(e.target.value)}
                                         placeholder="e.g. Physics for Class 12th"
                                         className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none"
-                                        autoFocus
                                     />
                                 </div>
 
@@ -527,7 +559,7 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
                 <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
                     <button
                         onClick={handleContinue}
-                        disabled={step === 1 ? (!selectedDate || !selectedSlot) : (!courseTopic)}
+                        disabled={step === 1 ? (!selectedDate || !selectedSlot) : (!courseTopic || !subject || !grade)}
                         className="w-full py-3.5 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-800 transition-all shadow-lg shadow-cyan-700/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         {step === 1 ? 'Next Step' : 'Proceed to Checkout'} <ArrowRight size={18} />
