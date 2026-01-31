@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, Timestamp, doc, updateDoc } from 'firebase/firestore';
-import { Clock, Gift, X } from 'lucide-react';
+import { collection, query, where, getDocs, getDoc, Timestamp, doc, updateDoc } from 'firebase/firestore';
+import { Clock, Gift, X, AlertCircle, CheckCircle, Info, ArrowRight, LayoutDashboard, PenTool, UploadCloud } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ReferralModal from '@/components/common/ReferralModal';
 
 interface Session {
     id: string;
@@ -24,14 +25,26 @@ interface Booking {
     teacherRemark?: string;
 }
 
-import ReferralModal from '@/components/common/ReferralModal';
-
 export default function TeacherDashboard() {
     const { user } = useAuth();
     const [upcomingClasses, setUpcomingClasses] = useState<Booking[]>([]);
     const [pendingRequests, setPendingRequests] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(true);
     const [showReferralModal, setShowReferralModal] = useState(false);
+    const [profileStatus, setProfileStatus] = useState({ kycStatus: 'pending', hasBankInfo: false });
+    const [selectedDate, setSelectedDate] = useState(new Date());
+
+    // Get current week dates
+    const getWeekDates = (date: Date) => {
+        const start = new Date(date);
+        start.setDate(date.getDate() - date.getDay());
+        return Array.from({ length: 7 }, (_, i) => {
+            const d = new Date(start);
+            d.setDate(start.getDate() + i);
+            return d;
+        });
+    };
+    const weekDates = getWeekDates(new Date());
 
     // Remark Modal State
     const [remarkModal, setRemarkModal] = useState<{ isOpen: boolean, bookingId: string | null, action: 'active' | 'rejected' | null }>({
@@ -69,6 +82,17 @@ export default function TeacherDashboard() {
                 const pending = sortedAll
                     .filter(b => b.status === 'pending')
                     .slice(0, 3);
+
+                // Fetch Profile Status
+                const profileRef = doc(db, 'users', user.uid);
+                const profileSnap = await getDoc(profileRef);
+                if (profileSnap.exists()) {
+                    const data = profileSnap.data();
+                    setProfileStatus({
+                        kycStatus: data.kycStatus || 'pending',
+                        hasBankInfo: !!(data.bankName && data.accountNumber && data.ifsc)
+                    });
+                }
 
                 setUpcomingClasses(upcoming);
                 setPendingRequests(pending);
@@ -121,14 +145,19 @@ export default function TeacherDashboard() {
 
     return (
         <div className="space-y-8">
-            <div>
-                <h1 className="text-3xl font-serif font-bold text-slate-900">Dashboard</h1>
-                <p className="text-slate-500">Welcome back, {user?.displayName}</p>
+            <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-cyan-100 rounded-2xl flex items-center justify-center text-cyan-700">
+                    <LayoutDashboard size={24} />
+                </div>
+                <div>
+                    <h1 className="text-3xl font-serif font-bold text-slate-900">Dashboard</h1>
+                    <p className="text-slate-500">Welcome back, {user?.displayName}</p>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 {/* Stats Cards */}
-                <Link to="/teacher/wallet" className="bg-cyan-700 text-white p-6 rounded-3xl shadow-lg shadow-cyan-200 hover:scale-[1.02] transition-transform cursor-pointer">
+                <Link to="/teacher/wallet" className="bg-cyan-700 text-white p-6 rounded-3xl shadow-lg shadow-cyan-200 hover:scale-[1.02] transition-transform cursor-pointer text-left">
                     <div className="text-cyan-200 text-sm font-medium mb-1">Total Earnings</div>
                     <div className="text-3xl font-bold">₹12,500</div>
                     <div className="mt-4 text-xs bg-cyan-500/50 inline-block px-2 py-1 rounded-lg">
@@ -137,132 +166,275 @@ export default function TeacherDashboard() {
                 </Link>
                 <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
                     <div className="text-slate-500 text-sm font-medium mb-1">Active Students</div>
-                    <div className="text-3xl font-bold text-slate-900">4</div>
+                    <div className="text-3xl font-bold text-slate-900 font-mono">4</div>
+                    <div className="mt-4 flex items-center gap-1 text-xs text-emerald-600 font-bold">
+                        <CheckCircle size={12} /> Active
+                    </div>
                 </div>
-                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm sm:col-span-2 lg:col-span-1">
+                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
                     <div className="text-slate-500 text-sm font-medium mb-1">Hours Taught</div>
                     <div className="text-3xl font-bold text-slate-900">24h</div>
                 </div>
+                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                    <div className="text-slate-500 text-sm font-medium mb-1">Average Rating</div>
+                    <div className="text-3xl font-bold text-slate-900">4.9</div>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Active Courses */}
-                <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-slate-900">Active Courses</h2>
-                        <Link to="/teacher/schedule" className="text-cyan-700 text-sm font-bold hover:underline">View All</Link>
+            {/* Important section */}
+            <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/50 rounded-3xl p-6">
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-amber-100 dark:bg-amber-900/40 rounded-xl text-amber-700 dark:text-amber-400">
+                        <Info size={20} />
+                    </div>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Important for You</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {profileStatus.kycStatus !== 'verified' && (
+                        <Link to="/teacher/profile" className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-2xl border border-amber-200 dark:border-amber-900 group hover:border-amber-400 transition-colors">
+                            <div className="flex items-center gap-3">
+                                <AlertCircle className="text-amber-600" size={20} />
+                                <div>
+                                    <div className="font-bold text-slate-900 dark:text-slate-100">Complete KYC</div>
+                                    <div className="text-xs text-slate-500">Your profile is missing verification</div>
+                                </div>
+                            </div>
+                            <ArrowRight size={16} className="text-amber-400 group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    )}
+                    {!profileStatus.hasBankInfo && (
+                        <Link to="/teacher/profile" className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-2xl border border-amber-200 dark:border-amber-900 group hover:border-amber-400 transition-colors">
+                            <div className="flex items-center gap-3">
+                                <AlertCircle className="text-amber-600" size={20} />
+                                <div>
+                                    <div className="font-bold text-slate-900 dark:text-slate-100">Bank Details Missing</div>
+                                    <div className="text-xs text-slate-500">Add info to receive payments</div>
+                                </div>
+                            </div>
+                            <ArrowRight size={16} className="text-amber-400 group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    )}
+                    {pendingRequests.length > 0 && (
+                        <Link to="/teacher/requests" className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-2xl border border-cyan-200 dark:border-cyan-900 group hover:border-cyan-400 transition-colors">
+                            <div className="flex items-center gap-3">
+                                <Clock className="text-cyan-600" size={20} />
+                                <div>
+                                    <div className="font-bold text-slate-900 dark:text-slate-100">{pendingRequests.length} New Requests</div>
+                                    <div className="text-xs text-slate-500">Approval pending</div>
+                                </div>
+                            </div>
+                            <ArrowRight size={16} className="text-cyan-400 group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    )}
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left side: Quick actions */}
+                <div className="lg:col-span-1 space-y-8">
+                    <div className="space-y-4">
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Quick Actions</h2>
+                        <div className="grid grid-cols-2 gap-4">
+                            <Link to="/teacher/batches" className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-cyan-500 transition-all text-center group">
+                                <div className="w-10 h-10 bg-cyan-50 dark:bg-cyan-950 rounded-xl flex items-center justify-center mx-auto mb-2 text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white transition-all">
+                                    <PenTool size={20} />
+                                </div>
+                                <div className="text-xs font-bold text-slate-700 dark:text-slate-300">Create Batch</div>
+                            </Link>
+                            <Link to="/teacher/uploads" className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-cyan-500 transition-all text-center group">
+                                <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-950 rounded-xl flex items-center justify-center mx-auto mb-2 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                    <UploadCloud size={20} />
+                                </div>
+                                <div className="text-xs font-bold text-slate-700 dark:text-slate-300">Upload Notes</div>
+                            </Link>
+                        </div>
                     </div>
 
-                    <div className="space-y-4">
-                        {upcomingClasses.length === 0 ? (
-                            <div className="p-8 bg-white rounded-3xl border border-dashed border-slate-200 text-center">
-                                <p className="text-slate-400">No active courses found.</p>
-                            </div>
-                        ) : (
-                            upcomingClasses.map(booking => {
-                                const completedSessions = booking.sessions?.filter(s => s.status === 'completed').length || 0;
-                                const nextSession = booking.sessions?.find(s => s.status === 'confirmed' && s.scheduledAt.toMillis() > Date.now());
+                    {/* Weekly Calendar */}
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 shadow-sm">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Your Schedule</h2>
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+                        </div>
+                        <div className="grid grid-cols-7 gap-2 mb-6">
+                            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
+                                <div key={i} className="text-center text-[10px] font-bold text-slate-400 uppercase">{day}</div>
+                            ))}
+                            {weekDates.map((date, i) => {
+                                const isSelected = selectedDate.toDateString() === date.toDateString();
+                                const isToday = new Date().toDateString() === date.toDateString();
+                                const hasClasses = upcomingClasses.some(b =>
+                                    b.sessions?.some(s => s.scheduledAt.toDate().toDateString() === date.toDateString())
+                                );
 
                                 return (
-                                    <Link
-                                        key={booking.id}
-                                        to={`/teacher/bookings/${booking.id}`}
-                                        className="block p-5 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group"
+                                    <button
+                                        key={i}
+                                        onClick={() => setSelectedDate(date)}
+                                        className={`
+                                            flex flex-col items-center justify-center py-2 rounded-xl transition-all relative
+                                            ${isSelected ? 'bg-cyan-700 text-white shadow-lg shadow-cyan-200 dark:shadow-none' : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'}
+                                            ${isToday && !isSelected ? 'text-cyan-700 font-bold' : ''}
+                                        `}
                                     >
+                                        <span className="text-xs">{date.getDate()}</span>
+                                        {hasClasses && (
+                                            <span className={`w-1 h-1 rounded-full mt-1 ${isSelected ? 'bg-white' : 'bg-cyan-500'}`}></span>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Selected Date Classes */}
+                        <div className="space-y-3">
+                            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sessions on {selectedDate.toLocaleDateString([], { day: 'numeric', month: 'short' })}</h3>
+                            {(() => {
+                                const dayClasses = upcomingClasses.flatMap(b =>
+                                    (b.sessions || [])
+                                        .filter(s => s.scheduledAt.toDate().toDateString() === selectedDate.toDateString())
+                                        .map(s => ({ ...s, topic: b.topic, studentName: b.studentName }))
+                                );
+
+                                if (dayClasses.length === 0) {
+                                    return <p className="text-xs text-slate-400 italic py-2">No classes scheduled.</p>;
+                                }
+
+                                return dayClasses.map((s, i) => (
+                                    <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                                        <div className="w-8 h-8 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg flex items-center justify-center text-cyan-700 dark:text-cyan-400 text-[10px] font-bold">
+                                            {s.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">{s.topic}</div>
+                                            <div className="text-[10px] text-slate-500 truncate">{s.studentName}</div>
+                                        </div>
+                                    </div>
+                                ));
+                            })()}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Main section: Active Courses */}
+                <div className="lg:col-span-2 space-y-8">
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-xl font-bold text-slate-900">Active Courses</h2>
+                            <Link to="/teacher/schedule" className="text-cyan-700 text-sm font-bold hover:underline">View All</Link>
+                        </div>
+
+                        <div className="space-y-4">
+                            {upcomingClasses.length === 0 ? (
+                                <div className="p-8 bg-white rounded-3xl border border-dashed border-slate-200 text-center">
+                                    <p className="text-slate-400">No active courses found.</p>
+                                </div>
+                            ) : (
+                                upcomingClasses.map(booking => {
+                                    const completedSessions = booking.sessions?.filter(s => s.status === 'completed').length || 0;
+                                    const nextSession = booking.sessions?.find(s => s.status === 'confirmed' && s.scheduledAt.toMillis() > Date.now());
+
+                                    return (
+                                        <Link
+                                            key={booking.id}
+                                            to={`/teacher/bookings/${booking.id}`}
+                                            className="block p-5 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group text-left"
+                                        >
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div>
+                                                    <h3 className="font-bold text-slate-900 group-hover:text-cyan-700 transition-colors">{booking.topic}</h3>
+                                                    <p className="text-xs text-slate-500">Student: {booking.studentName}</p>
+                                                </div>
+                                                <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase ${booking.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                                                    }`}>
+                                                    {booking.status}
+                                                </span>
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
+                                                    <span>Progress</span>
+                                                    <span>{completedSessions}/{booking.totalSessions} Sessions</span>
+                                                </div>
+                                                <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full bg-cyan-700 rounded-full transition-all duration-500"
+                                                        style={{ width: `${(completedSessions / booking.totalSessions) * 100}%` }}
+                                                    ></div>
+                                                </div>
+                                                {nextSession && (
+                                                    <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 p-2 rounded-lg">
+                                                        <Clock size={14} className="text-cyan-500" />
+                                                        Next: {nextSession.scheduledAt.toDate().toLocaleDateString()} at {nextSession.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </Link>
+                                    );
+                                })
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Pending Approvals */}
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-xl font-bold text-slate-900">New Requests</h2>
+                            <Link to="/teacher/requests" className="text-cyan-700 text-sm font-bold hover:underline">View All</Link>
+                        </div>
+
+                        <div className="space-y-4">
+                            {pendingRequests.length === 0 ? (
+                                <div className="p-8 bg-white rounded-3xl border border-dashed border-slate-200 text-center">
+                                    <p className="text-slate-400">No pending requests.</p>
+                                </div>
+                            ) : (
+                                pendingRequests.map(booking => (
+                                    <div key={booking.id} className="p-5 bg-white rounded-2xl border border-slate-100 shadow-sm text-left">
                                         <div className="flex justify-between items-start mb-4">
                                             <div>
-                                                <h3 className="font-bold text-slate-900 group-hover:text-cyan-700 transition-colors">{booking.topic}</h3>
-                                                <p className="text-xs text-slate-500">Student: {booking.studentName}</p>
+                                                <h3 className="font-bold text-slate-900">{booking.topic}</h3>
+                                                <p className="text-xs text-slate-500">From: {booking.studentName}</p>
                                             </div>
-                                            <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase ${booking.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-                                                }`}>
-                                                {booking.status}
-                                            </span>
+                                            <div className="text-right">
+                                                <div className="text-[10px] font-bold text-slate-400 uppercase mb-1">Requested On</div>
+                                                <div className="text-xs font-bold text-slate-900">{booking.createdAt.toDate().toLocaleDateString()}</div>
+                                            </div>
                                         </div>
 
-                                        <div className="space-y-3">
-                                            <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
-                                                <span>Progress</span>
-                                                <span>{completedSessions}/{booking.totalSessions} Sessions</span>
-                                            </div>
-                                            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                                <div
-                                                    className="h-full bg-cyan-700 rounded-full transition-all duration-500"
-                                                    style={{ width: `${(completedSessions / booking.totalSessions) * 100}%` }}
-                                                ></div>
-                                            </div>
-                                            {nextSession && (
-                                                <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 p-2 rounded-lg">
-                                                    <Clock size={14} className="text-cyan-500" />
-                                                    Next: {nextSession.scheduledAt.toDate().toLocaleDateString()} at {nextSession.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </Link>
-                                );
-                            })
-                        )}
-                    </div>
-                </div>
-
-                {/* Pending Approvals */}
-                <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-slate-900">New Requests</h2>
-                        <Link to="/teacher/requests" className="text-cyan-700 text-sm font-bold hover:underline">View All</Link>
-                    </div>
-
-                    <div className="space-y-4">
-                        {pendingRequests.length === 0 ? (
-                            <div className="p-8 bg-white rounded-3xl border border-dashed border-slate-200 text-center">
-                                <p className="text-slate-400">No pending requests.</p>
-                            </div>
-                        ) : (
-                            pendingRequests.map(booking => (
-                                <div key={booking.id} className="p-5 bg-white rounded-2xl border border-slate-100 shadow-sm">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div>
-                                            <h3 className="font-bold text-slate-900">{booking.topic}</h3>
-                                            <p className="text-xs text-slate-500">From: {booking.studentName}</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-[10px] font-bold text-slate-400 uppercase mb-1">Requested On</div>
-                                            <div className="text-xs font-bold text-slate-900">{booking.createdAt.toDate().toLocaleDateString()}</div>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={(e) => { e.preventDefault(); openRemarkModal(booking.id, 'active'); }}
+                                                className="flex-1 py-2 bg-cyan-700 text-white text-xs font-bold rounded-xl hover:bg-cyan-700 transition-all"
+                                            >
+                                                Approve
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.preventDefault(); openRemarkModal(booking.id, 'rejected'); }}
+                                                className="flex-1 py-2 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all"
+                                            >
+                                                Decline
+                                            </button>
                                         </div>
                                     </div>
-
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => openRemarkModal(booking.id, 'active')}
-                                            className="flex-1 py-2 bg-cyan-700 text-white text-xs font-bold rounded-xl hover:bg-cyan-700 transition-all"
-                                        >
-                                            Approve
-                                        </button>
-                                        <button
-                                            onClick={() => openRemarkModal(booking.id, 'rejected')}
-                                            className="flex-1 py-2 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all"
-                                        >
-                                            Decline
-                                        </button>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </div>
-
-                {/* Refer & Earn Card */}
-                <div className="bg-gradient-to-br from-violet-600 to-cyan-700 rounded-3xl p-6 text-white relative overflow-hidden group cursor-pointer" onClick={() => setShowReferralModal(true)}>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-white/20 transition-all"></div>
-                    <div className="relative z-10">
-                        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-4 backdrop-blur-sm">
-                            <Gift size={20} className="text-white" />
+                                ))
+                            )}
                         </div>
-                        <h4 className="font-bold text-lg mb-1">Refer & Earn Bonus</h4>
-                        <p className="text-cyan-100 text-sm mb-4">Invite other teachers to Teacher Dekho and earn a joining bonus.</p>
-                        <button className="px-4 py-2 bg-white text-cyan-700 font-bold rounded-lg text-xs hover:bg-cyan-50 transition-colors">
-                            Invite Teachers
-                        </button>
+                    </div>
+
+                    {/* Refer & Earn Card */}
+                    <div className="bg-gradient-to-br from-violet-600 to-cyan-700 rounded-3xl p-6 text-white relative overflow-hidden group cursor-pointer text-left" onClick={() => setShowReferralModal(true)}>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-white/20 transition-all"></div>
+                        <div className="relative z-10">
+                            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-4 backdrop-blur-sm">
+                                <Gift size={20} className="text-white" />
+                            </div>
+                            <h4 className="font-bold text-lg mb-1">Refer & Earn Bonus</h4>
+                            <p className="text-cyan-100 text-sm mb-4">Invite other teachers to Teacher Dekho and earn a joining bonus.</p>
+                            <button className="px-4 py-2 bg-white text-cyan-700 font-bold rounded-lg text-xs hover:bg-cyan-50 transition-colors">
+                                Invite Teachers
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

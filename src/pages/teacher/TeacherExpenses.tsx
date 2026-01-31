@@ -21,8 +21,8 @@ export default function TeacherExpenses() {
     return (
         <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
             <div>
-                <h1 className="text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">Expenses & Assets</h1>
-                <p className="text-slate-500 dark:text-slate-400">Manage your company-provided assets and expense claims.</p>
+                <h1 className="text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">Studio Setup</h1>
+                <p className="text-slate-500 dark:text-slate-400">Manage your company-provided assets and studio hardwares.</p>
             </div>
 
             {/* Studio Setup Application Card */}

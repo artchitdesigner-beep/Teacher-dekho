@@ -1,17 +1,21 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Plus, Calendar, Users, Clock, BookOpen, MoreVertical } from 'lucide-react';
 
 export default function TeacherBatches() {
     const [activeTab, setActiveTab] = useState<'create' | 'running' | 'upcoming'>('running');
 
     // Dummy data for visualization
-    const runningBatches = [
-        { id: '1', name: 'Physics Mechanics', students: 12, time: '10:00 AM', days: 'Mon, Wed, Fri', progress: 45 },
-        { id: '2', name: 'Organic Chemistry', students: 8, time: '04:00 PM', days: 'Tue, Thu', progress: 20 },
+    // Dummy data for visualization with types
+    const runningClasses = [
+        { id: '1', name: 'Physics Mechanics', type: 'batch', students: 12, time: '10:00 AM', days: 'Mon, Wed, Fri', progress: 45 },
+        { id: '2', name: 'Organic Chemistry', type: 'batch', students: 8, time: '04:00 PM', days: 'Tue, Thu', progress: 20 },
+        { id: '3', name: 'Math - Calculus (Aarav)', type: 'personal', students: 1, time: '02:00 PM', days: 'Mon, Thu', progress: 60 },
     ];
 
-    const upcomingBatches = [
-        { id: '3', name: 'Calculus Crash Course', startDate: '2025-02-01', registered: 5, maxStudents: 20, time: '06:00 PM' },
+    const upcomingClasses = [
+        { id: '4', name: 'JEE Mains Prep', type: 'batch', startDate: '2025-02-01', registered: 5, maxStudents: 20, time: '06:00 PM' },
+        { id: '5', name: 'Physics - Mechanics (Vivaan)', type: 'personal', startDate: '2025-02-05', registered: 1, maxStudents: 1, time: '05:00 PM' },
     ];
 
     return (
@@ -23,15 +27,6 @@ export default function TeacherBatches() {
                 </div>
                 <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
                     <button
-                        onClick={() => setActiveTab('create')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'create'
-                            ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400'
-                            : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
-                            }`}
-                    >
-                        <Plus size={16} /> Create New
-                    </button>
-                    <button
                         onClick={() => setActiveTab('running')}
                         className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'running'
                             ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400'
@@ -39,6 +34,15 @@ export default function TeacherBatches() {
                             }`}
                     >
                         Running
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('create')}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'create'
+                            ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400'
+                            : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
+                            }`}
+                    >
+                        <Plus size={16} /> Create New
                     </button>
                     <button
                         onClick={() => setActiveTab('upcoming')}
@@ -155,15 +159,21 @@ export default function TeacherBatches() {
 
             {activeTab === 'running' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in slide-in-from-bottom-4 duration-500">
-                    {runningBatches.map(batch => (
+                    {runningClasses.map(batch => (
                         <div key={batch.id} className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center">
-                                        <BookOpen size={24} />
+                                    <div className={`w-12 h-12 ${batch.type === 'batch' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600' : 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600'} rounded-2xl flex items-center justify-center`}>
+                                        {batch.type === 'batch' ? <BookOpen size={24} /> : <Users size={24} />}
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-slate-900 dark:text-slate-100">{batch.name}</h3>
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="font-bold text-slate-900 dark:text-slate-100">{batch.name}</h3>
+                                            <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase ${batch.type === 'batch' ? 'bg-emerald-100 text-emerald-700' : 'bg-purple-100 text-purple-700'
+                                                }`}>
+                                                {batch.type}
+                                            </span>
+                                        </div>
                                         <p className="text-xs text-slate-500">ID: #{batch.id}</p>
                                     </div>
                                 </div>
@@ -192,9 +202,12 @@ export default function TeacherBatches() {
                                 <button className="flex-1 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                                     Attendance
                                 </button>
-                                <button className="flex-1 py-2 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400 font-bold rounded-xl text-sm hover:bg-cyan-100 dark:hover:bg-cyan-900/40 transition-colors">
+                                <Link
+                                    to={`/teacher/batches/${batch.id}`}
+                                    className="flex-1 py-2 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400 font-bold rounded-xl text-sm hover:bg-cyan-100 dark:hover:bg-cyan-900/40 transition-colors flex items-center justify-center"
+                                >
                                     Manage
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     ))}
@@ -203,15 +216,19 @@ export default function TeacherBatches() {
 
             {activeTab === 'upcoming' && (
                 <div className="space-y-4 animate-in slide-in-from-bottom-4 duration-500">
-                    {upcomingBatches.map(batch => (
+                    {upcomingClasses.map(batch => (
                         <div key={batch.id} className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center gap-6">
-                            <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center flex-shrink-0">
-                                <Calendar size={32} />
+                            <div className={`w-16 h-16 ${batch.type === 'batch' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600' : 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600'} rounded-2xl flex items-center justify-center flex-shrink-0`}>
+                                {batch.type === 'batch' ? <Calendar size={32} /> : <Clock size={32} />}
                             </div>
                             <div className="flex-1">
                                 <div className="flex flex-wrap items-center gap-3 mb-2">
                                     <h3 className="font-bold text-xl text-slate-900 dark:text-slate-100">{batch.name}</h3>
-                                    <span className="px-3 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 text-xs font-bold rounded-full">
+                                    <span className={`px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase ${batch.type === 'batch' ? 'bg-amber-50 text-amber-700' : 'bg-purple-50 text-purple-700'
+                                        }`}>
+                                        {batch.type}
+                                    </span>
+                                    <span className="px-3 py-1 bg-slate-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-400 text-xs font-bold rounded-full border border-slate-100 dark:border-slate-800">
                                         Starts {new Date(batch.startDate).toLocaleDateString()}
                                     </span>
                                 </div>

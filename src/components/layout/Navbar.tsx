@@ -28,42 +28,39 @@ export default function Navbar() {
         children?: { label: string; to: string; }[];
     }
 
-    const studentLinks: NavLinkItem[] = [
+    const studentPrimaryLinks: NavLinkItem[] = [
         { label: 'Dashboard', to: '/student/dashboard' },
         { label: 'Batches', to: '/student/batches' },
+        { label: 'Find Tutors', to: '/student/search' },
+        { label: 'My Courses', to: '/student/courses' },
+    ];
+
+    const studentSecondaryLinks: NavLinkItem[] = [
         {
-            label: 'Find Teachers',
-            to: '#',
-            children: [
-                { label: 'Find Tutors', to: '/student/search' },
-                { label: 'My Requests', to: '/student/requests' }
-            ]
-        },
-        {
-            label: 'My Account',
+            label: 'My Learning',
             to: '#',
             children: [
                 { label: 'My Teachers', to: '/student/teachers' },
-                { label: 'My Courses', to: '/student/courses' },
+                { label: 'My Requests', to: '/student/requests' },
                 { label: 'Your Resources', to: '/student/resources' },
                 { label: 'Wallet', to: '/student/wallet' }
             ]
         },
         {
-            label: 'How It Works',
+            label: 'More',
             to: '#',
             children: [
+                { label: 'Corporate', to: '/corporate' },
                 { label: 'About Us', to: '/about-us' },
                 { label: 'How It Works', to: '/how-it-works' },
-                { label: 'Become a Teacher', to: '/become-tutor' },
-                { label: 'FAQs', to: '/faqs' }
+                { label: 'FAQs', to: '/faqs' },
+                { label: 'Become a Teacher', to: '/become-tutor' }
             ]
-        },
-        { label: 'Corporate', to: '/corporate' }
+        }
     ];
 
     const teacherLinks: NavLinkItem[] = [
-        { label: 'Dashboard', to: '/teacher/calendar', icon: LayoutDashboard },
+        { label: 'Dashboard', to: '/teacher/dashboard', icon: LayoutDashboard },
         {
             label: 'Teaching',
             to: '/teacher/schedule',
@@ -88,13 +85,13 @@ export default function Navbar() {
     ];
 
     const getNavLinks = () => {
-        if (!user) return publicLinks;
-        if (isStudentView) return studentLinks;
-        if (isTeacherView) return teacherLinks;
-        return publicLinks;
+        if (!user) return { primary: publicLinks, secondary: [] };
+        if (isStudentView) return { primary: studentPrimaryLinks, secondary: studentSecondaryLinks };
+        if (isTeacherView) return { primary: teacherLinks, secondary: [] };
+        return { primary: publicLinks, secondary: [] };
     };
 
-    const currentLinks = getNavLinks();
+    const { primary: primaryLinks, secondary: secondaryLinks } = getNavLinks();
 
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
@@ -120,22 +117,25 @@ export default function Navbar() {
         <nav className={`sticky top-0 z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
             <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                 {/* Logo */}
-                <Link to="/" className="flex items-center gap-2">
-                    <img src={logoWithBackground} alt="TeacherDekho" className="h-10 w-auto rounded-lg" />
-                    <span className="font-bold text-2xl tracking-tight font-serif text-slate-900 dark:text-slate-100">TeacherDekho</span>
-                </Link>
-                {/* Desktop Navigation */}
-                <div className="hidden lg:flex items-center gap-8">
-                    {currentLinks.map((link) => (
+                <div className="flex-1 flex items-center">
+                    <Link to="/" className="flex items-center gap-2">
+                        <img src={logoWithBackground} alt="TeacherDekho" className="h-10 w-auto rounded-lg" />
+                        <span className="font-bold text-2xl tracking-tight font-serif text-slate-900 dark:text-slate-100">TeacherDekho</span>
+                    </Link>
+                </div>
+
+                {/* Desktop Primary Navigation */}
+                <div className="hidden lg:flex items-center gap-6">
+                    {primaryLinks.map((link) => (
                         <div key={link.label} className="relative group">
                             {link.children ? (
                                 <>
-                                    <button className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors rounded-lg group-hover:bg-slate-50 dark:group-hover:bg-slate-800">
+                                    <button className="flex items-center gap-1 px-3 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors rounded-lg group-hover:bg-slate-50 dark:group-hover:bg-slate-800">
                                         {link.icon && <link.icon size={16} className="mr-1" />}
                                         {link.label}
                                         <ChevronDown size={14} className="opacity-50 group-hover:rotate-180 transition-transform duration-200" />
                                     </button>
-                                    <div className="absolute top-full left-0 pt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 z-50">
+                                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 z-50">
                                         <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 p-2 overflow-hidden">
                                             {link.children.map(child => (
                                                 <Link
@@ -153,7 +153,7 @@ export default function Navbar() {
                                 <NavLink
                                     to={link.to}
                                     className={({ isActive }) => `
-                                        flex items-center gap-1 px-3 py-2 text-sm font-medium transition-all duration-200 rounded-lg
+                                        flex items-center gap-1 px-3 py-2 text-sm font-semibold transition-all duration-200 rounded-lg
                                         ${isActive
                                             ? 'text-cyan-700 bg-cyan-50/50 dark:bg-cyan-900/20'
                                             : 'text-slate-600 dark:text-slate-300 hover:text-cyan-700 hover:bg-slate-50 dark:hover:bg-slate-800'}
@@ -167,8 +167,48 @@ export default function Navbar() {
                     ))}
                 </div>
 
-                {/* Auth Buttons / Profile Dropdown */}
-                <div className="hidden lg:flex items-center gap-4">
+                {/* Right Side: Secondary Nav + Auth */}
+                <div className="flex-1 hidden lg:flex items-center justify-end gap-6">
+                    {/* Secondary Navigation (Dropdowns) */}
+                    <div className="flex items-center gap-2 border-r border-slate-100 dark:border-slate-800 pr-6 mr-2">
+                        {secondaryLinks.map((link) => (
+                            <div key={link.label} className="relative group">
+                                {link.children ? (
+                                    <>
+                                        <button className="flex items-center gap-1 px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors rounded-lg group-hover:bg-slate-50 dark:group-hover:bg-slate-800">
+                                            {link.label}
+                                            <ChevronDown size={12} className="opacity-50 group-hover:rotate-180 transition-transform duration-200" />
+                                        </button>
+                                        <div className="absolute top-full right-0 pt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 z-50">
+                                            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 p-2 overflow-hidden text-left">
+                                                {link.children.map(child => (
+                                                    <Link
+                                                        key={child.label}
+                                                        to={child.to}
+                                                        className="block px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-700 dark:hover:text-cyan-400 rounded-lg transition-colors capitalize tracking-normal"
+                                                    >
+                                                        {child.label}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <NavLink
+                                        to={link.to}
+                                        className={({ isActive }) => `
+                                            text-[11px] font-bold uppercase tracking-wider transition-all duration-200
+                                            ${isActive
+                                                ? 'text-cyan-700'
+                                                : 'text-slate-400 dark:text-slate-500 hover:text-cyan-700 dark:hover:text-cyan-400'}
+                                        `}
+                                    >
+                                        {link.label}
+                                    </NavLink>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                     {user ? (
                         <div className="flex items-center gap-4">
                             <Link
@@ -181,7 +221,7 @@ export default function Navbar() {
                             <ProfileDropdown />
                         </div>
                     ) : (
-                        <>
+                        <div className="flex items-center gap-4">
                             <Link to="/login" className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-cyan-700 transition-colors">
                                 Log in
                             </Link>
@@ -191,7 +231,7 @@ export default function Navbar() {
                             >
                                 Sign up
                             </Link>
-                        </>
+                        </div>
                     )}
                 </div>
 
@@ -211,11 +251,12 @@ export default function Navbar() {
                         <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Theme</span>
                         <ModeToggle />
                     </div>
-                    {currentLinks.map((link) => (
+                    {/* Mobile Menu Links */}
+                    {[...primaryLinks, ...secondaryLinks].map((link) => (
                         <div key={link.label}>
                             {link.children ? (
                                 <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-base font-medium text-slate-900 dark:text-slate-100 py-2">
+                                    <div className="flex items-center gap-2 text-base font-bold text-slate-900 dark:text-slate-100 py-2">
                                         {link.icon && <link.icon size={18} />}
                                         {link.label}
                                     </div>
@@ -225,7 +266,7 @@ export default function Navbar() {
                                                 key={child.label}
                                                 to={child.to}
                                                 onClick={() => setIsMenuOpen(false)}
-                                                className="block py-1 text-sm text-slate-600 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400"
+                                                className="block py-1 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400"
                                             >
                                                 {child.label}
                                             </Link>
@@ -237,7 +278,7 @@ export default function Navbar() {
                                     to={link.to}
                                     onClick={() => setIsMenuOpen(false)}
                                     className={({ isActive }) => `
-                                        flex items-center gap-2 py-2 text-base font-medium transition-colors
+                                        flex items-center gap-2 py-2 text-base font-bold transition-colors
                                         ${isActive ? 'text-cyan-700' : 'text-slate-600 dark:text-slate-300'}
                                     `}
                                 >

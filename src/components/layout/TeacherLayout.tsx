@@ -1,19 +1,19 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import {
-    Calendar,
+    LayoutDashboard,
     Users,
     MessageSquare,
     BarChart2,
-    Settings,
-    Layers,
+    UserCircle,
+    UploadCloud,
     Briefcase,
-    CreditCard,
+    PenTool,
     Activity,
     LogOut,
     Menu,
     X,
     Bell,
-    BookOpen // Added
+    BookOpen
 } from 'lucide-react';
 import ProfileDropdown from './ProfileDropdown';
 import { useState } from 'react';
@@ -27,22 +27,22 @@ export default function TeacherLayout() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const menuItems = [
-        { icon: Calendar, label: 'Calendar', path: '/teacher/calendar' },
+        { icon: LayoutDashboard, label: 'Dashboard', path: '/teacher/dashboard' },
         { icon: Activity, label: 'Set Availability', path: '/teacher/availability' },
-        { icon: BookOpen, label: 'Batches', path: '/teacher/batches' }, // Added Batches
+        { icon: BookOpen, label: 'Batches', path: '/teacher/batches' },
         { icon: Users, label: 'My Students', path: '/teacher/students' },
         { icon: MessageSquare, label: 'Open Requests', path: '/teacher/requests' },
         { icon: BarChart2, label: 'Reports', path: '/teacher/reports' },
-        { icon: Settings, label: 'Settings', path: '/teacher/profile' },
-        { icon: Layers, label: 'Integrations', path: '/teacher/integrations' },
+        { icon: UserCircle, label: 'My Profile', path: '/teacher/profile' },
+        { icon: UploadCloud, label: 'Resources', path: '/teacher/uploads' },
         { icon: Briefcase, label: 'Back office', path: '/teacher/back-office' },
-        { icon: CreditCard, label: 'Expenses', path: '/teacher/expenses' },
+        { icon: PenTool, label: 'Studio Setup', path: '/teacher/setup' },
     ];
 
     const isActive = (path: string) => location.pathname === path;
 
     return (
-        <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
+        <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950">
             {/* Sidebar */}
             <aside className={`
                 fixed inset-y-0 left-0 z-50 w-64 bg-[#1e293b] text-white transition-transform duration-300 ease-in-out

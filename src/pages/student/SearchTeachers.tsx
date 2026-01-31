@@ -74,7 +74,16 @@ export default function SearchTeachers() {
                 setTeachers(teachersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
                 const batchesSnap = await getDocs(collection(db, 'batches'));
-                setBatches(batchesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                const batchesData = batchesSnap.docs.map(doc => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,
+                        ...data,
+                        startDate: data.startDate?.toDate ? data.startDate.toDate().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : data.startDate,
+                        rawStartDate: data.startDate // Preserve for filtering
+                    };
+                });
+                setBatches(batchesData);
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -428,6 +437,8 @@ export default function SearchTeachers() {
                                 />
                             </div>
 
+                            <span className="font-bold text-white/50">OR</span>
+
                             <div className="flex flex-col items-center gap-2 w-full md:w-auto flex-shrink-0">
                                 {activeTab === 'batches' ? (
                                     <button
@@ -480,7 +491,7 @@ export default function SearchTeachers() {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {batches
                                     .filter(b => {
-                                        const isRunning = b.startDate?.seconds * 1000 <= Date.now();
+                                        const isRunning = b.rawStartDate?.seconds * 1000 <= Date.now();
                                         return isRunning && (b.title || b.name)?.toLowerCase().includes(searchQuery.toLowerCase());
                                     })
                                     .map(batch => (
@@ -489,7 +500,7 @@ export default function SearchTeachers() {
                                             batch={batch}
                                         />
                                     ))}
-                                {batches.filter(b => b.startDate?.seconds * 1000 <= Date.now()).length === 0 && (
+                                {batches.filter(b => b.rawStartDate?.seconds * 1000 <= Date.now()).length === 0 && (
                                     <div className="col-span-full text-center py-8 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
                                         No running batches found.
                                     </div>
@@ -506,7 +517,7 @@ export default function SearchTeachers() {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {batches
                                     .filter(b => {
-                                        const isUpcoming = b.startDate?.seconds * 1000 > Date.now();
+                                        const isUpcoming = b.rawStartDate?.seconds * 1000 > Date.now();
                                         return isUpcoming && (b.title || b.name)?.toLowerCase().includes(searchQuery.toLowerCase());
                                     })
                                     .map(batch => (
@@ -515,7 +526,7 @@ export default function SearchTeachers() {
                                             batch={batch}
                                         />
                                     ))}
-                                {batches.filter(b => b.startDate?.seconds * 1000 > Date.now()).length === 0 && (
+                                {batches.filter(b => b.rawStartDate?.seconds * 1000 > Date.now()).length === 0 && (
                                     <div className="col-span-full text-center py-8 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
                                         No upcoming batches found.
                                     </div>

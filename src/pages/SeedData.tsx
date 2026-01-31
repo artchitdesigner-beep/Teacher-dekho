@@ -17,17 +17,35 @@ export default function SeedData() {
             const q = query(usersRef, where('email', '==', 'Harsh@harsh.com'));
             const querySnapshot = await getDocs(q);
 
+            let teacherId: string;
+            let teacherName: string;
+
             if (querySnapshot.empty) {
-                setStatus('User Harsh@harsh.com not found!');
-                setLoading(false);
-                return;
+                setStatus('User Harsh@harsh.com not found. Creating mock teacher...');
+
+                // Create Mock Teacher
+                const newTeacherRef = await addDoc(collection(db, 'users'), {
+                    name: "Harsh Tutor",
+                    email: "Harsh@harsh.com",
+                    role: "teacher",
+                    bio: "Experienced Physics and Math tutor with 5+ years of experience.",
+                    subjects: ["Physics", "Mathematics"],
+                    rating: 4.8,
+                    experience: "5 years",
+                    hourlyRate: 500,
+                    createdAt: Timestamp.now(),
+                    photoURL: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&q=80&w=150&h=150"
+                });
+
+                teacherId = newTeacherRef.id;
+                teacherName = "Harsh Tutor";
+                setStatus(`Created mock teacher: ${teacherName}. Seeding data...`);
+            } else {
+                const teacherDoc = querySnapshot.docs[0];
+                teacherId = teacherDoc.id;
+                teacherName = teacherDoc.data().name || 'Harsh';
+                setStatus(`Found user: ${teacherName} (${teacherId}). Seeding data...`);
             }
-
-            const teacherDoc = querySnapshot.docs[0];
-            const teacherId = teacherDoc.id;
-            const teacherName = teacherDoc.data().name || 'Harsh';
-
-            setStatus(`Found user: ${teacherName} (${teacherId}). Seeding data...`);
 
             // 2. Seed Students (Bookings)
             const bookingsRef = collection(db, 'bookings');
@@ -41,6 +59,29 @@ export default function SeedData() {
             ];
 
             for (const student of demoStudents) {
+                const totalSessions = 10;
+                const sessions = [];
+
+                // Add some completed sessions
+                for (let i = 0; i < 3; i++) {
+                    sessions.push({
+                        id: 'sess_' + Math.random().toString(36).substr(2, 9),
+                        scheduledAt: Timestamp.fromDate(new Date(Date.now() - (i + 1) * 86400000)), // Past
+                        status: 'completed',
+                        isDemo: false
+                    });
+                }
+
+                // Add some confirmed/upcoming sessions
+                for (let i = 0; i < 2; i++) {
+                    sessions.push({
+                        id: 'sess_up_' + Math.random().toString(36).substr(2, 9),
+                        scheduledAt: Timestamp.fromDate(new Date(Date.now() + (i + 1) * 86400000)), // Future
+                        status: 'confirmed',
+                        isDemo: false
+                    });
+                }
+
                 await addDoc(bookingsRef, {
                     teacherId: teacherId,
                     teacherName: teacherName,
@@ -48,8 +89,10 @@ export default function SeedData() {
                     studentName: student.name,
                     studentEmail: student.email,
                     topic: student.topic,
-                    status: 'confirmed',
-                    scheduledAt: Timestamp.fromDate(new Date(Date.now() + Math.random() * 1000000000)), // Future date
+                    status: 'active',
+                    totalSessions: totalSessions,
+                    sessions: sessions,
+                    scheduledAt: sessions[3].scheduledAt, // Use the first upcoming session as the main schedule
                     createdAt: Timestamp.now(),
                     amount: 500
                 });
@@ -58,22 +101,28 @@ export default function SeedData() {
             // 3. Seed Batches
             const batchesRef = collection(db, 'batches');
             const demoBatches = [
-                { name: 'Class 12 Physics Crash Course', subject: 'Physics', students: 12 },
-                { name: 'JEE Mains Math Prep', subject: 'Mathematics', students: 8 },
-                { name: 'NEET Chemistry Foundation', subject: 'Chemistry', students: 15 },
+                { name: 'Class 12 Physics Crash Course', subject: 'Physics', students: 12, class: '12', image: 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&q=80&w=400&h=300' },
+                { name: 'JEE Mains Math Prep', subject: 'Mathematics', students: 8, class: '12+', image: 'https://images.unsplash.com/photo-1596495578065-6e0763fa1178?auto=format&fit=crop&q=80&w=400&h=300' },
+                { name: 'NEET Chemistry Foundation', subject: 'Chemistry', students: 15, class: '11', image: 'https://images.unsplash.com/photo-1587620962725-abab7fe55159?auto=format&fit=crop&q=80&w=400&h=300' },
             ];
 
-            for (const batch of demoBatches) {
+            for (const [index, batch] of demoBatches.entries()) {
                 await addDoc(batchesRef, {
                     teacherId: teacherId,
+                    teacherName: teacherName, // Denormalized for easy display
                     name: batch.name,
+                    title: batch.name, // Handle both name/title
                     subject: batch.subject,
+                    class: batch.class || '12',
                     description: 'Intensive course for upcoming exams.',
-                    startDate: Timestamp.fromDate(new Date()),
+                    startDate: index === 0 ? Timestamp.fromDate(new Date(Date.now() - 86400000)) : Timestamp.fromDate(new Date(Date.now() + 86400000)), // First is active, others upcoming
                     status: 'active',
                     enrolledCount: batch.students,
+                    studentCount: batch.students,
                     maxStudents: 20,
                     price: 4999,
+                    rating: 4.8,
+                    image: batch.image || 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&q=80&w=400&h=300',
                     createdAt: Timestamp.now()
                 });
             }
@@ -100,8 +149,8 @@ export default function SeedData() {
 
             {status && (
                 <div className={`p-3 rounded-lg text-sm font-medium mb-4 ${status.includes('Error') || status.includes('not found')
-                        ? 'bg-red-50 text-red-600'
-                        : 'bg-emerald-50 text-emerald-600'
+                    ? 'bg-red-50 text-red-600'
+                    : 'bg-emerald-50 text-emerald-600'
                     }`}>
                     {status}
                 </div>

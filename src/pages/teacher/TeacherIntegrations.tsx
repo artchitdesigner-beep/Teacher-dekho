@@ -38,7 +38,7 @@ export default function TeacherIntegrations() {
     return (
         <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
             <div>
-                <h1 className="text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">Integrations</h1>
+                <h1 className="text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">Learning Resources</h1>
                 <p className="text-slate-500 dark:text-slate-400">Share resources and resolve student doubts.</p>
             </div>
 

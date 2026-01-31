@@ -37,11 +37,12 @@ import TeacherIntegrations from './pages/teacher/TeacherIntegrations';
 import TeacherBackOffice from './pages/teacher/TeacherBackOffice';
 import TeacherExpenses from './pages/teacher/TeacherExpenses';
 import TeacherSchedule from './pages/teacher/TeacherSchedule';
-import TeacherCalendar from './pages/teacher/TeacherCalendar';
+import TeacherDashboard from './pages/teacher/TeacherDashboard';
 import TeacherProfile from './pages/teacher/TeacherProfile';
 import TeacherBookingDetail from './pages/teacher/TeacherBookingDetail';
 import TeacherAvailability from './pages/teacher/TeacherAvailability';
 import TeacherWallet from './pages/teacher/TeacherWallet';
+import TeacherClassManage from './pages/teacher/TeacherClassManage';
 import Notifications from './pages/Notifications';
 import NotFound from './pages/NotFound';
 import SeedData from './pages/SeedData';
@@ -93,18 +94,20 @@ function App() {
 
         {/* Teacher Routes */}
         <Route path="/teacher" element={<TeacherLayout />}>
-          <Route path="calendar" element={<TeacherCalendar />} />
+          <Route path="dashboard" element={<TeacherDashboard />} />
           <Route path="students" element={<TeacherStudents />} />
           <Route path="batches" element={<TeacherBatches />} />
           <Route path="reports" element={<TeacherReports />} />
           <Route path="requests" element={<TeacherRequests />} />
-          <Route path="integrations" element={<TeacherIntegrations />} />
+          <Route path="uploads" element={<TeacherIntegrations />} />
           <Route path="back-office" element={<TeacherBackOffice />} />
           <Route path="expenses" element={<TeacherExpenses />} />
+          <Route path="setup" element={<TeacherExpenses />} />
           <Route path="schedule" element={<TeacherSchedule />} />
           <Route path="availability" element={<TeacherAvailability />} />
           <Route path="wallet" element={<TeacherWallet />} />
           <Route path="profile" element={<TeacherProfile />} />
+          <Route path="batches/:id" element={<TeacherClassManage />} />
           <Route path="bookings/:id" element={<TeacherBookingDetail />} />
           <Route path="notifications" element={<Notifications />} />
           <Route index element={<Navigate to="dashboard" replace />} />

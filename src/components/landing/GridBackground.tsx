@@ -23,20 +23,20 @@ const GridBackground = ({
 
     // Configuration
     const config = {
-        gridSize: 32,               // Size of the square blocks
+        gridSize: 40,               // Size of the square blocks
         lineColor: lineColor || [203, 213, 225], // Slate-300
         blockColor: blockColor || [59, 130, 246], // Blue-500
         dotColor: dotColor || [99, 102, 241],   // cyan-500
         maxOpacity: maxOpacity !== undefined ? maxOpacity : 0.1, // Grid line opacity
-        maskRadius: 550,            // Size of the spotlight effect
+        maskRadius: 280,            // Size of the spotlight effect
 
         // Dot settings
         dotRadius: 2,
 
         // Block settings
-        symbolSize: 14,
+        symbolSize: 12,
         // Increased base density to ensure center is populated
-        blockDensity: 0.4,
+        blockDensity: 0.15,
         blockPulseSpeed: 0.8,
 
         // Movement settings

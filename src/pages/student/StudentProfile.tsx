@@ -1,10 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { Mail, Phone, MapPin, Shield, Trash2, RefreshCw, CheckCircle, AlertCircle, GraduationCap, BookOpen, School as SchoolIcon, Edit2, Camera, Save } from 'lucide-react';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { Mail, Phone, MapPin, Shield, Trash2, RefreshCw, CheckCircle, AlertCircle, GraduationCap, BookOpen, School as SchoolIcon, Edit2, Camera, Save, Loader2 } from 'lucide-react';
 import { clearAllData, seedTeachers, seedBatches } from '@/lib/seed';
 
 export default function StudentProfile() {
     const { user, userRole } = useAuth();
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
     const [isClearing, setIsClearing] = useState(false);
     const [isSeeding, setIsSeeding] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
@@ -12,13 +16,40 @@ export default function StudentProfile() {
     const [isEditing, setIsEditing] = useState(false);
     const [profileImage, setProfileImage] = useState<string | null>(null);
     const [formData, setFormData] = useState({
-        name: user?.displayName || 'Student Name',
-        phone: '+91 98765 43210',
-        location: 'Mumbai, Maharashtra',
-        class: '12th Grade',
-        stream: 'Science (PCM)',
-        school: 'Delhi Public School, R.K. Puram'
+        name: '',
+        phone: '',
+        location: '',
+        grade: '',
+        stream: '',
+        school: ''
     });
+
+    useEffect(() => {
+        async function fetchProfile() {
+            if (!user) return;
+            try {
+                const docRef = doc(db, 'users', user.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    setFormData({
+                        name: data.name || user.displayName || '',
+                        phone: data.phone || '',
+                        location: data.location || '',
+                        grade: data.grade || '',
+                        stream: data.stream || '',
+                        school: data.school || ''
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+                setMessage({ type: 'error', text: 'Failed to load profile' });
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchProfile();
+    }, [user]);
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -31,11 +62,29 @@ export default function StudentProfile() {
         }
     };
 
-    const handleSaveProfile = () => {
-        // Here you would typically send the data to the backend
-        setIsEditing(false);
-        setMessage({ type: 'success', text: 'Profile updated successfully!' });
-        setTimeout(() => setMessage(null), 3000);
+    const handleSaveProfile = async () => {
+        if (!user) return;
+        setSaving(true);
+        setMessage(null);
+        try {
+            const docRef = doc(db, 'users', user.uid);
+            await updateDoc(docRef, {
+                name: formData.name,
+                phone: formData.phone,
+                location: formData.location,
+                grade: formData.grade,
+                stream: formData.stream,
+                school: formData.school
+            });
+            setIsEditing(false);
+            setMessage({ type: 'success', text: 'Profile updated successfully!' });
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            setMessage({ type: 'error', text: 'Failed to update profile' });
+        } finally {
+            setSaving(false);
+            setTimeout(() => setMessage(null), 3000);
+        }
     };
 
     const handleClearData = async () => {
@@ -75,6 +124,15 @@ export default function StudentProfile() {
             setIsSeeding(false);
         }
     };
+
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+                <Loader2 className="w-8 h-8 text-cyan-700 animate-spin" />
+                <p className="text-slate-500 animate-pulse">Loading your profile...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-4xl mx-auto space-y-8">
@@ -132,9 +190,11 @@ export default function StudentProfile() {
                                         </button>
                                         <button
                                             onClick={handleSaveProfile}
-                                            className="px-4 py-2 bg-cyan-700 text-white font-bold rounded-xl text-sm hover:bg-cyan-800 transition-colors flex items-center gap-2"
+                                            disabled={saving}
+                                            className="px-4 py-2 bg-cyan-700 text-white font-bold rounded-xl text-sm hover:bg-cyan-800 transition-colors flex items-center gap-2 disabled:opacity-50"
                                         >
-                                            <Save size={16} /> Save
+                                            {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                                            Save
                                         </button>
                                     </div>
                                 )}
@@ -212,12 +272,12 @@ export default function StudentProfile() {
                                     {isEditing ? (
                                         <input
                                             type="text"
-                                            value={formData.class}
-                                            onChange={(e) => setFormData({ ...formData, class: e.target.value })}
+                                            value={formData.grade}
+                                            onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
                                             className="font-medium text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 w-full focus:ring-2 focus:ring-cyan-500 outline-none"
                                         />
                                     ) : (
-                                        <div className="font-medium text-slate-900 dark:text-slate-100">{formData.class}</div>
+                                        <div className="font-medium text-slate-900 dark:text-slate-100">{formData.grade || 'Not specified'}</div>
                                     )}
                                 </div>
                                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">

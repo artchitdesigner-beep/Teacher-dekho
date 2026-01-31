@@ -1,62 +1,37 @@
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import BatchCard from '@/components/batches/BatchCard';
+import { useState, useEffect } from 'react';
+import { collection, query, limit, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function FeaturedBatches() {
-    const batches = [
-        {
-            id: '1',
-            title: "Class 12 Physics - Board Exam Special",
-            teacherName: "Alok Sir",
-            subject: "Physics",
-            class: "12",
-            startDate: "Nov 15, 2023",
-            price: 4999,
-            studentCount: 120,
-            maxStudents: 150,
-            rating: 4.9,
-            image: "https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&q=80&w=400&h=300"
-        },
-        {
-            id: '2',
-            title: "Complete Python Bootcamp 2024",
-            teacherName: "Neha Sharma",
-            subject: "Computer Science",
-            class: "11-12",
-            startDate: "Dec 01, 2023",
-            price: 2999,
-            studentCount: 450,
-            maxStudents: 500,
-            rating: 4.8,
-            image: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?auto=format&fit=crop&q=80&w=400&h=300"
-        },
-        {
-            id: '3',
-            title: "IELTS Preparation - Speaking & Writing",
-            teacherName: "Robert Smith",
-            subject: "English",
-            class: "Any",
-            startDate: "Nov 20, 2023",
-            price: 3500,
-            studentCount: 85,
-            maxStudents: 100,
-            rating: 5.0,
-            image: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=400&h=300"
-        },
-        {
-            id: '4',
-            title: "Mathematics - Calculus Masterclass",
-            teacherName: "Priya Gupta",
-            subject: "Mathematics",
-            class: "12",
-            startDate: "Nov 25, 2023",
-            price: 4500,
-            studentCount: 210,
-            maxStudents: 250,
-            rating: 4.7,
-            image: "https://images.unsplash.com/photo-1596495578065-6e0763fa1178?auto=format&fit=crop&q=80&w=400&h=300"
-        }
-    ];
+    const [batches, setBatches] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchBatches = async () => {
+            try {
+                const q = query(collection(db, 'batches'), limit(4));
+                const snap = await getDocs(q);
+                const batchesData = snap.docs.map(doc => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,
+                        ...data,
+                        // Convert Timestamp to string if needed
+                        startDate: data.startDate?.toDate ? data.startDate.toDate().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : data.startDate
+                    };
+                });
+                setBatches(batchesData);
+            } catch (error) {
+                console.error('Error fetching featured batches:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchBatches();
+    }, []);
 
     return (
         <section className="mb-16">
@@ -71,11 +46,22 @@ export default function FeaturedBatches() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {batches.map((batch) => (
-                    <div key={batch.id} className="h-full">
-                        <BatchCard batch={batch} />
+                {loading ? (
+                    [1, 2, 3, 4].map((i) => (
+                        <div key={i} className="h-[300px] bg-white dark:bg-slate-900 rounded-2xl animate-pulse border border-slate-100 dark:border-slate-800" />
+                    ))
+                ) : batches.length > 0 ? (
+                    batches.map((batch) => (
+                        <div key={batch.id} className="h-full">
+                            <BatchCard batch={batch} />
+                        </div>
+                    ))
+                ) : (
+                    <div className="col-span-full text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+                        <p className="text-slate-500 dark:text-slate-400 font-medium">No featured batches available at the moment.</p>
+                        <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">Check back later for new courses.</p>
                     </div>
-                ))}
+                )}
             </div>
         </section>
     );

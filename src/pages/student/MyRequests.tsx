@@ -13,6 +13,7 @@ interface Request {
     subject: string;
     course: string;
     timeSlot: string;
+    type: 'tuition' | 'batch';
     status: 'open' | 'accepted' | 'closed';
     createdAt: Timestamp;
     preferredTeacherId?: string;
@@ -46,6 +47,7 @@ export default function MyRequests() {
         subject: '',
         course: '',
         timeSlot: '',
+        type: 'tuition' as 'tuition' | 'batch',
         preferredTeacherId: '',
         preferredTeacherName: ''
     });
@@ -100,6 +102,7 @@ export default function MyRequests() {
                 subject: formData.subject,
                 course: formData.course,
                 timeSlot: formData.timeSlot,
+                type: formData.type,
                 preferredTeacherId: formData.preferredTeacherId || null,
                 preferredTeacherName: formData.preferredTeacherName || null,
                 status: 'open',
@@ -122,6 +125,7 @@ export default function MyRequests() {
                 subject: '',
                 course: '',
                 timeSlot: '',
+                type: 'tuition',
                 preferredTeacherId: '',
                 preferredTeacherName: ''
             });
@@ -143,6 +147,7 @@ export default function MyRequests() {
             subject: req.subject,
             course: req.course,
             timeSlot: req.timeSlot,
+            type: req.type || 'tuition',
             preferredTeacherId: req.preferredTeacherId || '',
             preferredTeacherName: req.preferredTeacherName || ''
         });
@@ -188,6 +193,7 @@ export default function MyRequests() {
                                 subject: '',
                                 course: '',
                                 timeSlot: '',
+                                type: 'tuition',
                                 preferredTeacherId: '',
                                 preferredTeacherName: ''
                             });
@@ -235,6 +241,24 @@ export default function MyRequests() {
                         {editingId ? 'Edit Request' : 'Create New Request'}
                     </h3>
                     <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, type: 'tuition' })}
+                                className={`flex-1 p-4 rounded-2xl border-2 transition-all text-left ${formData.type === 'tuition' ? 'border-cyan-700 bg-cyan-50/50 dark:bg-cyan-900/20' : 'border-slate-100 dark:border-slate-800'}`}
+                            >
+                                <div className="font-bold text-slate-900 dark:text-slate-100 italic">Personal Tuition</div>
+                                <div className="text-xs text-slate-500">One-on-one session for specific topics</div>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, type: 'batch' })}
+                                className={`flex-1 p-4 rounded-2xl border-2 transition-all text-left ${formData.type === 'batch' ? 'border-purple-600 bg-purple-50/50 dark:bg-purple-900/20' : 'border-slate-100 dark:border-slate-800'}`}
+                            >
+                                <div className="font-bold text-slate-900 dark:text-slate-100 italic">Batch Request</div>
+                                <div className="text-xs text-slate-500">Request to start a new group batch</div>
+                            </button>
+                        </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Subject</label>
@@ -386,6 +410,9 @@ export default function MyRequests() {
                             <div className="min-w-0">
                                 <div className="flex flex-wrap items-center gap-2 mb-1">
                                     <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base md:text-lg truncate">{req.topic}</h3>
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${req.type === 'batch' ? 'bg-purple-100 text-purple-700' : 'bg-cyan-100 text-cyan-700'}`}>
+                                        {req.type || 'tuition'}
+                                    </span>
                                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${req.status === 'open' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' :
                                         req.status === 'accepted' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                                         }`}>

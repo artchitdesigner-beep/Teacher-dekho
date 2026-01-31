@@ -22,7 +22,12 @@ export default function BatchDetails() {
                 const docRef = doc(db, 'batches', id);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                    setBatch({ id: docSnap.id, ...docSnap.data() });
+                    const data = docSnap.data();
+                    setBatch({
+                        id: docSnap.id,
+                        ...data,
+                        startDate: data.startDate?.toDate ? data.startDate.toDate().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : data.startDate
+                    });
                 }
             } catch (error) {
                 console.error("Error fetching batch:", error);

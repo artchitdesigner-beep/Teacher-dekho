@@ -84,7 +84,7 @@ export default function LandingPage() {
                         darkLineColor={[255, 255, 255]}
                         darkDotColor={[99, 102, 241]}
                         darkBlockColor={[79, 70, 229]}
-                        maxOpacity={0.1}
+                        maxOpacity={0.03}
                     />
                 </div>
                 <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
