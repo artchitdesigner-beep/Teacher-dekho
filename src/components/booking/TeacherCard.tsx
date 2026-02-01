@@ -1,6 +1,7 @@
 import { Star, Clock, MapPin, ShieldCheck, Award, Play, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/lib/auth-context';
+import { getMinMonthlyRate } from '@/lib/plans';
 
 interface TeacherCardProps {
     teacher: any;
@@ -33,24 +34,89 @@ export default function TeacherCard({
     const dummyImage = `https://images.unsplash.com/photo-${teacher.id.charCodeAt(0) % 2 === 0 ? '1535713875002-d1d0cf377fde' : '1580489944761-15a19d654956'}?auto=format&fit=crop&q=80&w=200&h=200`;
     const thumbnailUrl = teacher.photoURL || 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=1000&auto=format&fit=crop';
 
+    const monthlyRate = getMinMonthlyRate();
+
+    const verticalCard = (
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-5 hover:shadow-xl hover:shadow-cyan-100/30 dark:hover:shadow-none transition-all duration-500 group flex flex-col h-full relative overflow-hidden">
+            {/* Save Button - Top Right */}
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onSave && onSave();
+                }}
+                className="absolute top-4 right-4 z-30 p-2.5 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm text-slate-400 hover:text-red-500 shadow-sm transition-all active:scale-90"
+            >
+                <Heart size={18} className={isSaved ? "fill-red-500 text-red-500" : ""} />
+            </button>
+
+            {/* Avatar Section */}
+            <div className="relative mb-6 flex justify-center">
+                <div className={`w-28 h-28 rounded-3xl ${teacher.avatarColor || 'bg-cyan-100'} flex items-center justify-center overflow-hidden border-4 border-slate-50 dark:border-slate-800 shadow-inner group-hover:scale-105 transition-transform duration-500`}>
+                    <img src={dummyImage} alt={teacher.name} className="w-full h-full object-cover" />
+                </div>
+                {teacher.kycStatus === 'verified' && (
+                    <div className="absolute -bottom-2 right-1/2 translate-x-12 bg-emerald-500 text-white p-1 rounded-lg border-2 border-white dark:border-slate-900 shadow-sm">
+                        <ShieldCheck size={14} fill="currentColor" />
+                    </div>
+                )}
+            </div>
+
+            {/* Info Section */}
+            <div className="flex-grow flex flex-col text-center">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1 group-hover:text-cyan-700 transition-colors line-clamp-1">{teacher.name}</h3>
+                <p className="text-cyan-600 font-bold text-xs uppercase tracking-wider mb-4">{teacher.subject}</p>
+
+                {/* Simplified row: Price & Rating */}
+                <div className="flex items-center justify-center gap-4 py-3 border-y border-slate-50 dark:border-slate-800 mb-6">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30">
+                        <Star size={14} fill="currentColor" />
+                        <span className="font-bold text-sm tracking-tight">{teacher.rating || 'New'}</span>
+                    </div>
+                    <div className="flex items-baseline gap-0.5">
+                        <span className="text-lg font-extrabold text-slate-900 dark:text-slate-100">₹{monthlyRate}</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">/mo</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Actions */}
+            <div className="grid grid-cols-2 gap-3 mt-auto">
+                <button
+                    onClick={() => onBook(teacher.uid)}
+                    className="flex-1 py-3 bg-cyan-700 text-white font-bold text-xs rounded-2xl hover:bg-cyan-600 transition-all shadow-lg shadow-cyan-700/10 active:scale-95"
+                >
+                    Book
+                </button>
+                <Link
+                    to={profilePath}
+                    className="flex-1 py-3 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-2xl border border-slate-100 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all text-center"
+                >
+                    Profile
+                </Link>
+            </div>
+        </div>
+    );
+
+    if (isVertical) return verticalCard;
+
+    if (isVertical) return verticalCard;
+
     return (
         <div
             className="relative group w-full"
             onMouseEnter={onFocus}
         >
-            {/* Main Card Surface */}
+            {/* Main Card Surface (Horizontal) */}
             <div className={`
                 relative z-20
                 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 
                 hover:shadow-xl hover:shadow-cyan-100/50 dark:hover:shadow-none transition-all duration-300 
-                flex flex-col ${isVertical ? '' : 'md:flex-row'} gap-6
-                ${!isVertical ? 'md:w-[calc(100%-17rem)]' : 'w-full'}
+                flex flex-col md:flex-row gap-6
+                md:w-[calc(100%-17rem)]
             `}>
-
-
                 {/* Left: Avatar */}
-                <div className={`flex-shrink-0 flex justify-center ${isVertical ? '' : 'md:block'}`}>
-                    <div className={`w-20 h-20 md:w-32 md:h-32 rounded-full ${teacher.avatarColor || 'bg-cyan-100'} flex items-center justify-center text-2xl md:text-3xl font-bold text-cyan-700 border-4 border-white dark:border-slate-800 shadow-lg shadow-slate-100 dark:shadow-none overflow-hidden`}>
+                <div className="flex-shrink-0 flex justify-center md:block">
+                    <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-cyan-100 flex items-center justify-center text-2xl md:text-3xl font-bold text-cyan-700 border-4 border-white dark:border-slate-800 shadow-lg shadow-slate-100 dark:shadow-none overflow-hidden">
                         <img src={dummyImage} alt={teacher.name} className="w-full h-full object-cover" />
                     </div>
                 </div>
@@ -72,7 +138,7 @@ export default function TeacherCard({
                             </p>
                         </div>
 
-                        {/* Like Button (Moved here) */}
+                        {/* Like Button */}
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -84,9 +150,9 @@ export default function TeacherCard({
                             <Heart size={20} className={isSaved ? "fill-red-500 text-red-500" : ""} />
                         </button>
 
-                        <div className={`${isVertical ? '' : 'md:hidden'} text-right`}>
-                            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">₹{teacher.hourlyRate}</div>
-                            <div className="text-xs text-slate-500">/hour</div>
+                        <div className="md:hidden text-right">
+                            <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">₹{monthlyRate}</div>
+                            <div className="text-xs text-slate-500">/month</div>
                         </div>
                     </div>
 
@@ -106,24 +172,14 @@ export default function TeacherCard({
                         <span className="px-3 py-1 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-xs font-medium rounded-full border border-green-100 dark:border-green-900/30 flex items-center gap-1">
                             <Clock size={10} /> Available
                         </span>
-                        {teacher.class && (
-                            <span className="px-3 py-1 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400 text-xs font-medium rounded-full border border-cyan-100 dark:border-cyan-900/30">
-                                {Array.isArray(teacher.class) ? teacher.class.join(', ') : teacher.class}
-                            </span>
-                        )}
-                        {teacher.language && (
-                            <span className="px-3 py-1 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium rounded-full border border-slate-100 dark:border-slate-700">
-                                {Array.isArray(teacher.language) ? teacher.language.join(', ') : teacher.language}
-                            </span>
-                        )}
                     </div>
                 </div>
 
                 {/* Right: Action */}
-                <div className={`flex-shrink-0 flex flex-col items-end justify-between min-w-[140px] border-t border-slate-100 dark:border-slate-800 pt-4 mt-4 ${isVertical ? '' : 'md:border-t-0 md:border-l md:pt-0 md:pl-6 md:mt-0'}`}>
-                    <div className={`${isVertical ? 'hidden' : 'hidden md:block'} text-right mb-4`}>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">₹{teacher.hourlyRate}</div>
-                        <div className="text-xs text-slate-500">per hour</div>
+                <div className="flex-shrink-0 flex flex-col items-end justify-between min-w-[140px] border-t border-slate-100 dark:border-slate-800 pt-4 mt-4 md:border-t-0 md:border-l md:pt-0 md:pl-6 md:mt-0">
+                    <div className="hidden md:block text-right mb-4">
+                        <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">₹{monthlyRate}</div>
+                        <div className="text-xs text-slate-500">per month</div>
                     </div>
 
                     <div className="flex items-center gap-1 mb-4 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-lg border border-amber-100 dark:border-amber-900/30">
@@ -132,7 +188,7 @@ export default function TeacherCard({
                         <span className="text-slate-400 text-xs">({teacher.reviewCount || 0})</span>
                     </div>
 
-                    <div className={`flex gap-2 w-full ${isVertical ? 'flex-row' : 'flex-row md:flex-col'}`}>
+                    <div className="flex gap-2 w-full flex-row md:flex-col">
                         <button
                             onClick={() => onBook(teacher.uid)}
                             className="flex-1 md:w-full px-4 py-2.5 bg-cyan-700 text-white font-medium text-xs md:text-sm rounded-xl hover:bg-cyan-700 transition-all shadow-lg shadow-cyan-700/20 active:scale-95"

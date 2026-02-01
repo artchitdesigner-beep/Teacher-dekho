@@ -35,7 +35,7 @@ export default function Login() {
                     if (role === 'teacher') {
                         navigate('/teacher/dashboard');
                     } else {
-                        navigate('/student/dashboard');
+                        navigate('/');
                     }
                 } else {
                     // Fallback if no user doc found (shouldn't happen ideally)

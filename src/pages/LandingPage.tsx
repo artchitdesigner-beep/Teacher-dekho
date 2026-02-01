@@ -1,6 +1,10 @@
-import { useState } from 'react';
-import { Search, Sparkles, Users } from 'lucide-react';
+import { Search, Sparkles, Users, Star } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { collection, query, where, limit, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { useEffect, useState } from 'react';
+import TeacherCard from '@/components/booking/TeacherCard';
+import { Button } from '@/components/ui/button';
 import GridBackground from '@/components/landing/GridBackground';
 import FeaturedBatches from '@/components/landing/FeaturedBatches';
 import DownloadAppSection from '@/components/landing/DownloadAppSection';
@@ -58,6 +62,33 @@ function TestimonialCard({ quote, author }: { quote: string, author: string }) {
 export default function LandingPage() {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
+    const [topTeachers, setTopTeachers] = useState<any[]>([]);
+    const [loadingTeachers, setLoadingTeachers] = useState(true);
+
+    useEffect(() => {
+        const fetchTopTeachers = async () => {
+            try {
+                const q = query(
+                    collection(db, 'users'),
+                    where('role', '==', 'teacher'),
+                    limit(4)
+                );
+                const snap = await getDocs(q);
+                const teachers = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const sortedTeachers = teachers.sort((a: any, b: any) => {
+                    const ratingA = a.rating || 0;
+                    const ratingB = b.rating || 0;
+                    return ratingB - ratingA;
+                }).slice(0, 4);
+                setTopTeachers(sortedTeachers);
+            } catch (error) {
+                console.error('Error fetching teachers:', error);
+            } finally {
+                setLoadingTeachers(false);
+            }
+        };
+        fetchTopTeachers();
+    }, []);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -144,8 +175,39 @@ export default function LandingPage() {
 
 
 
-            {/* Featured Batches (NEW ADDITION) */}
-            <div className="max-w-7xl mx-auto px-6 pt-16">
+            {/* Top Rated Teachers & Featured Batches */}
+            <div className="max-w-7xl mx-auto px-6 pt-16 space-y-32">
+                <section>
+                    <div className="flex items-end justify-between mb-8">
+                        <div>
+                            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                                <Star size={28} className="text-amber-500" />
+                                Top Rated <span className="text-cyan-600">Teachers</span>
+                            </h2>
+                            <p className="text-slate-500 dark:text-slate-400 text-base mt-2 font-medium tracking-tight">Highly recommended mentors in your subjects.</p>
+                        </div>
+                        <Button variant="link" asChild className="text-cyan-700 font-bold text-sm p-0 h-auto">
+                            <Link to="/search">View All</Link>
+                        </Button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {loadingTeachers ? (
+                            [1, 2, 3, 4].map(i => (
+                                <div key={i} className="h-[300px] bg-white dark:bg-slate-900 rounded-3xl animate-pulse border border-slate-100 dark:border-slate-800" />
+                            ))
+                        ) : (
+                            topTeachers.map(teacher => (
+                                <TeacherCard
+                                    key={teacher.id}
+                                    teacher={teacher}
+                                    layout="vertical"
+                                    onBook={() => { }}
+                                />
+                            ))
+                        )}
+                    </div>
+                </section>
+
                 <FeaturedBatches />
             </div>
 

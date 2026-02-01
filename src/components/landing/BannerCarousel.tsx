@@ -39,7 +39,7 @@ export default function BannerCarousel() {
     const prev = () => setCurrent((prev) => (prev - 1 + banners.length) % banners.length);
 
     return (
-        <div className="relative w-full h-[200px] md:h-[300px] rounded-3xl overflow-hidden mb-12 group">
+        <div className="relative w-full h-[200px] md:h-[300px] overflow-hidden group">
             <div
                 className="flex transition-transform duration-500 ease-out h-full"
                 style={{ transform: `translateX(-${current * 100}%)` }}

@@ -100,7 +100,7 @@ export default function Onboarding() {
                 });
             }
 
-            navigate(role === 'teacher' ? '/teacher/dashboard' : '/student/dashboard');
+            navigate(role === 'teacher' ? '/teacher/dashboard' : '/');
         } catch (err: any) {
             setError(err.message || 'Failed to create account');
         } finally {

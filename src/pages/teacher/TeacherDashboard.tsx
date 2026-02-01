@@ -2,9 +2,31 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, getDoc, Timestamp, doc, updateDoc } from 'firebase/firestore';
-import { Clock, Gift, X, AlertCircle, CheckCircle, Info, ArrowRight, LayoutDashboard, PenTool, UploadCloud } from 'lucide-react';
+import {
+    Clock,
+    AlertCircle,
+    Info,
+    ArrowRight,
+    UploadCloud,
+    Users,
+    TrendingUp,
+    Star,
+    LayoutDashboard,
+    PenTool
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ReferralModal from '@/components/common/ReferralModal';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Session {
     id: string;
@@ -22,6 +44,7 @@ interface Booking {
     status: 'active' | 'pending' | 'completed' | 'rejected';
     paymentStatus: 'pending' | 'paid' | 'required';
     createdAt: Timestamp;
+    scheduledAt?: Timestamp;
     teacherRemark?: string;
 }
 
@@ -144,121 +167,273 @@ export default function TeacherDashboard() {
     }
 
     return (
-        <div className="space-y-8">
-            <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-cyan-100 rounded-2xl flex items-center justify-center text-cyan-700">
-                    <LayoutDashboard size={24} />
+        <div className="space-y-12 pb-12">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 bg-gradient-to-br from-cyan-600 to-blue-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-cyan-200 dark:shadow-none">
+                        <LayoutDashboard size={28} />
+                    </div>
+                    <div>
+                        <h1 className="text-3xl md:text-4xl font-serif font-black text-slate-900 dark:text-slate-100 tracking-tight">Dashboard</h1>
+                        <p className="text-slate-500 font-medium">Welcome back, {user?.displayName} ✨</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 className="text-3xl font-serif font-bold text-slate-900">Dashboard</h1>
-                    <p className="text-slate-500">Welcome back, {user?.displayName}</p>
+                <div className="flex items-center gap-3">
+                    <Link to="/teacher/batches" className="px-6 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all flex items-center gap-2">
+                        <PenTool size={18} className="text-cyan-600" /> Create Batch
+                    </Link>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                {/* Stats Cards */}
-                <Link to="/teacher/wallet" className="bg-cyan-700 text-white p-6 rounded-3xl shadow-lg shadow-cyan-200 hover:scale-[1.02] transition-transform cursor-pointer text-left">
-                    <div className="text-cyan-200 text-sm font-medium mb-1">Total Earnings</div>
-                    <div className="text-3xl font-bold">₹12,500</div>
-                    <div className="mt-4 text-xs bg-cyan-500/50 inline-block px-2 py-1 rounded-lg">
-                        +12% this month
+            {/* 1. Active Courses - High Impact Section (Now First) */}
+            <section className="relative">
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-3">
+                            Active <span className="text-cyan-600">Courses</span>
+                            {upcomingClasses.length > 0 && (
+                                <span className="px-2 py-0.5 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 text-[10px] font-black rounded-full uppercase tracking-tighter">
+                                    {upcomingClasses.length} Running
+                                </span>
+                            )}
+                        </h2>
+                        <p className="text-slate-500 text-sm mt-1">Manage your ongoing learning sessions and student progress.</p>
                     </div>
+                    <Link to="/teacher/batches" className="text-sm font-black text-cyan-600 hover:text-cyan-700 uppercase tracking-widest border-b-2 border-cyan-100 hover:border-cyan-600 transition-all pb-0.5">View Schedule</Link>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {upcomingClasses.length === 0 ? (
+                        <div className="md:col-span-2 lg:col-span-3 p-12 bg-white dark:bg-slate-900 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-800 text-center">
+                            <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300">
+                                <Info size={32} />
+                            </div>
+                            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-1">No Active Courses</h3>
+                            <p className="text-slate-400 text-sm">Once you approve a request, it will appear here.</p>
+                        </div>
+                    ) : (
+                        upcomingClasses.map((booking, idx) => {
+                            const completedSessions = booking.sessions?.filter(s => s.status === 'completed').length || 0;
+
+                            // Improve detection: check sessions array first, fallback to scheduledAt for first session/demo
+                            let nextSession = booking.sessions?.find(s =>
+                                (s.status === 'confirmed' || s.status === 'pending') &&
+                                s.scheduledAt.toMillis() > Date.now()
+                            );
+
+                            if (!nextSession && booking.scheduledAt && booking.scheduledAt.toMillis() > Date.now()) {
+                                nextSession = {
+                                    scheduledAt: booking.scheduledAt,
+                                    id: 'initial',
+                                    status: 'confirmed',
+                                    isDemo: true
+                                } as any;
+                            }
+                            const colors = [
+                                'from-indigo-50 to-blue-50 border-indigo-100/50 text-indigo-700',
+                                'from-emerald-50 to-teal-50 border-emerald-100/50 text-emerald-700',
+                                'from-rose-50 to-pink-50 border-rose-100/50 text-rose-700',
+                                'from-amber-50 to-orange-50 border-amber-100/50 text-amber-700'
+                            ];
+                            const colorClass = colors[idx % colors.length];
+
+                            return (
+                                <Card key={booking.id} className={`group relative overflow-hidden rounded-[2rem] border-none bg-gradient-to-br ${colorClass} transition-all duration-500 hover:shadow-2xl hover:scale-[1.02]`}>
+                                    <Link to={`/teacher/bookings/${booking.id}`} className="block p-6">
+                                        <div className="flex justify-between items-start mb-6">
+                                            <div>
+                                                <h3 className="font-black text-xl text-slate-900 tracking-tight mb-1 group-hover:text-cyan-700 transition-colors line-clamp-1">{booking.topic}</h3>
+                                                <div className="flex items-center gap-1.5 font-bold text-xs opacity-70">
+                                                    <Users size={14} /> {booking.studentName}
+                                                </div>
+                                            </div>
+                                            <Badge variant="secondary" className="bg-white/60 backdrop-blur-sm rounded-full text-[10px] font-black uppercase tracking-widest border-none shadow-sm">
+                                                {booking.status}
+                                            </Badge>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div className="space-y-2">
+                                                <div className="flex justify-between items-end text-[10px] font-black uppercase tracking-tighter opacity-60">
+                                                    <span>Progress</span>
+                                                    <span>{completedSessions}/{booking.totalSessions} Sessions</span>
+                                                </div>
+                                                <div className="h-2 bg-white/50 rounded-full overflow-hidden border border-white/20">
+                                                    <div
+                                                        className="h-full bg-slate-900 rounded-full transition-all duration-1000"
+                                                        style={{ width: `${(completedSessions / booking.totalSessions) * 100}%` }}
+                                                    ></div>
+                                                </div>
+                                            </div>
+
+                                            {nextSession && (
+                                                <div className="flex items-center gap-3 p-3 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/50 shadow-inner">
+                                                    <div className="flex-shrink-0 w-8 h-8 bg-slate-900 text-white rounded-xl flex items-center justify-center">
+                                                        <Clock size={16} />
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <div className="text-[10px] font-black uppercase tracking-tighter opacity-50">Next Session</div>
+                                                        <div className="text-xs font-bold text-slate-800 truncate">
+                                                            {nextSession.scheduledAt.toDate().toLocaleDateString([], { day: 'numeric', month: 'short' })} at {nextSession.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </Link>
+                                </Card>
+                            );
+                        })
+                    )}
+                </div>
+            </section>
+
+            {/* 2. Stats Section */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Link to="/teacher/wallet">
+                    <Card className="group bg-slate-900 text-white p-8 rounded-[2rem] shadow-2xl shadow-slate-200 dark:shadow-none hover:scale-[1.03] transition-all cursor-pointer relative overflow-hidden border-none text-left">
+                        <div className="relative z-10">
+                            <div className="text-slate-400 text-xs font-black uppercase tracking-widest mb-2">Total Earnings</div>
+                            <div className="text-4xl font-black tracking-tighter italic">₹12,500</div>
+                            <div className="mt-4">
+                                <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-400 border-none font-bold text-[10px] px-3 py-1 rounded-full">
+                                    <TrendingUp size={12} className="mr-1.5" /> +12% this month
+                                </Badge>
+                            </div>
+                        </div>
+                    </Card>
                 </Link>
-                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                    <div className="text-slate-500 text-sm font-medium mb-1">Active Students</div>
-                    <div className="text-3xl font-bold text-slate-900 font-mono">4</div>
-                    <div className="mt-4 flex items-center gap-1 text-xs text-emerald-600 font-bold">
-                        <CheckCircle size={12} /> Active
+
+                <Card className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border-slate-100 dark:border-slate-800 shadow-sm flex flex-col justify-center text-left">
+                    <div className="text-slate-500 text-xs font-black uppercase tracking-widest mb-2">Active Students</div>
+                    <div className="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tighter">04</div>
+                    <div className="mt-4 flex items-center gap-1.5 text-[10px] text-emerald-600 font-black uppercase tracking-tighter">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Growth Stage
                     </div>
-                </div>
-                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                    <div className="text-slate-500 text-sm font-medium mb-1">Hours Taught</div>
-                    <div className="text-3xl font-bold text-slate-900">24h</div>
-                </div>
-                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                    <div className="text-slate-500 text-sm font-medium mb-1">Average Rating</div>
-                    <div className="text-3xl font-bold text-slate-900">4.9</div>
-                </div>
+                </Card>
+
+                <Card className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border-slate-100 dark:border-slate-800 shadow-sm flex flex-col justify-center text-left">
+                    <div className="text-slate-500 text-xs font-black uppercase tracking-widest mb-2">Hours Taught</div>
+                    <div className="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tighter">24<span className="text-xl ml-1 opacity-40 italic">h</span></div>
+                    <div className="mt-4 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Lifetime Impact</div>
+                </Card>
+
+                <Card className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border-slate-100 dark:border-slate-800 shadow-sm flex flex-col justify-center text-left">
+                    <div className="text-slate-500 text-xs font-black uppercase tracking-widest mb-2">Average Rating</div>
+                    <div className="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tighter flex items-center gap-2">
+                        4.9 <Star size={24} className="fill-amber-400 text-amber-400" />
+                    </div>
+                    <div className="mt-4 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Top 5% Educator</div>
+                </Card>
             </div>
 
-            {/* Important section */}
-            <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/50 rounded-3xl p-6">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-amber-100 dark:bg-amber-900/40 rounded-xl text-amber-700 dark:text-amber-400">
-                        <Info size={20} />
-                    </div>
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Important for You</h2>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {profileStatus.kycStatus !== 'verified' && (
-                        <Link to="/teacher/profile" className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-2xl border border-amber-200 dark:border-amber-900 group hover:border-amber-400 transition-colors">
-                            <div className="flex items-center gap-3">
-                                <AlertCircle className="text-amber-600" size={20} />
-                                <div>
-                                    <div className="font-bold text-slate-900 dark:text-slate-100">Complete KYC</div>
-                                    <div className="text-xs text-slate-500">Your profile is missing verification</div>
-                                </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                <div className="lg:col-span-2 space-y-10">
+                    {/* Alerts */}
+                    <section className="bg-rose-50/50 dark:bg-rose-950/10 border border-rose-100 dark:border-rose-900/30 rounded-[2.5rem] p-8">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2.5 bg-rose-100 dark:bg-rose-900/40 rounded-xl text-rose-600 dark:text-rose-400">
+                                <AlertCircle size={22} />
                             </div>
-                            <ArrowRight size={16} className="text-amber-400 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                    )}
-                    {!profileStatus.hasBankInfo && (
-                        <Link to="/teacher/profile" className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-2xl border border-amber-200 dark:border-amber-900 group hover:border-amber-400 transition-colors">
-                            <div className="flex items-center gap-3">
-                                <AlertCircle className="text-amber-600" size={20} />
-                                <div>
-                                    <div className="font-bold text-slate-900 dark:text-slate-100">Bank Details Missing</div>
-                                    <div className="text-xs text-slate-500">Add info to receive payments</div>
-                                </div>
-                            </div>
-                            <ArrowRight size={16} className="text-amber-400 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                    )}
-                    {pendingRequests.length > 0 && (
-                        <Link to="/teacher/requests" className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-2xl border border-cyan-200 dark:border-cyan-900 group hover:border-cyan-400 transition-colors">
-                            <div className="flex items-center gap-3">
-                                <Clock className="text-cyan-600" size={20} />
-                                <div>
-                                    <div className="font-bold text-slate-900 dark:text-slate-100">{pendingRequests.length} New Requests</div>
-                                    <div className="text-xs text-slate-500">Approval pending</div>
-                                </div>
-                            </div>
-                            <ArrowRight size={16} className="text-cyan-400 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                    )}
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Left side: Quick actions */}
-                <div className="lg:col-span-1 space-y-8">
-                    <div className="space-y-4">
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Quick Actions</h2>
-                        <div className="grid grid-cols-2 gap-4">
-                            <Link to="/teacher/batches" className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-cyan-500 transition-all text-center group">
-                                <div className="w-10 h-10 bg-cyan-50 dark:bg-cyan-950 rounded-xl flex items-center justify-center mx-auto mb-2 text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white transition-all">
-                                    <PenTool size={20} />
-                                </div>
-                                <div className="text-xs font-bold text-slate-700 dark:text-slate-300">Create Batch</div>
-                            </Link>
-                            <Link to="/teacher/uploads" className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-cyan-500 transition-all text-center group">
-                                <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-950 rounded-xl flex items-center justify-center mx-auto mb-2 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                                    <UploadCloud size={20} />
-                                </div>
-                                <div className="text-xs font-bold text-slate-700 dark:text-slate-300">Upload Notes</div>
-                            </Link>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Pending Actions</h2>
                         </div>
-                    </div>
-
-                    {/* Weekly Calendar */}
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 shadow-sm">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Your Schedule</h2>
-                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {profileStatus.kycStatus !== 'verified' && (
+                                <Link to="/teacher/profile" className="flex items-center justify-between p-5 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-900/50 group hover:ring-2 hover:ring-rose-500/20 transition-all">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-rose-50 dark:bg-rose-900/30 rounded-full flex items-center justify-center text-rose-600">
+                                            <UploadCloud size={18} />
+                                        </div>
+                                        <div>
+                                            <div className="font-black text-sm text-slate-900 dark:text-slate-100">Complete KYC</div>
+                                            <div className="text-[10px] text-slate-500 uppercase font-bold">Unverified Profile</div>
+                                        </div>
+                                    </div>
+                                    <ArrowRight size={18} className="text-rose-300 group-hover:translate-x-1 transition-transform" />
+                                </Link>
+                            )}
+                            {!profileStatus.hasBankInfo && (
+                                <Link to="/teacher/profile" className="flex items-center justify-between p-5 bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-900/50 group hover:ring-2 hover:ring-rose-500/20 transition-all">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-600">
+                                            <Info size={18} />
+                                        </div>
+                                        <div>
+                                            <div className="font-black text-sm text-slate-900 dark:text-slate-100">Add Bank Info</div>
+                                            <div className="text-[10px] text-slate-500 uppercase font-bold">Payment Setup</div>
+                                        </div>
+                                    </div>
+                                    <ArrowRight size={18} className="text-indigo-300 group-hover:translate-x-1 transition-transform" />
+                                </Link>
+                            )}
                         </div>
-                        <div className="grid grid-cols-7 gap-2 mb-6">
+                    </section>
+
+                    {/* New Requests */}
+                    <section className="space-y-6">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">New <span className="text-cyan-600">Requests</span></h2>
+                            <Button variant="link" asChild className="text-sm font-black text-slate-400 hover:text-cyan-600 uppercase tracking-widest h-auto p-0">
+                                <Link to="/teacher/requests">See All</Link>
+                            </Button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {pendingRequests.length === 0 ? (
+                                <Card className="md:col-span-2 p-10 bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border-dashed text-center">
+                                    <p className="text-slate-400 font-medium">No new requests at the moment.</p>
+                                </Card>
+                            ) : (
+                                pendingRequests.map(booking => (
+                                    <Card key={booking.id} className="p-6 rounded-3xl border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all text-left">
+                                        <div className="flex justify-between items-start mb-6">
+                                            <div>
+                                                <div className="text-[10px] font-black text-cyan-600 uppercase tracking-widest mb-1">New Booking Request</div>
+                                                <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 leading-tight">{booking.topic}</h3>
+                                                <p className="text-xs text-slate-500 font-medium font-mono mt-1">ID: #{booking.id.slice(0, 8)}</p>
+                                            </div>
+                                            <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-2xl flex flex-col items-center justify-center text-slate-500">
+                                                <span className="text-[8px] font-black uppercase">Sessions</span>
+                                                <span className="text-lg font-black leading-none">{booking.totalSessions}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex gap-3">
+                                            <Button
+                                                onClick={() => openRemarkModal(booking.id, 'active')}
+                                                className="flex-1 bg-cyan-700 hover:bg-slate-900 text-white font-black rounded-xl h-12 shadow-lg shadow-cyan-200 dark:shadow-none"
+                                            >
+                                                Approve
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => openRemarkModal(booking.id, 'rejected')}
+                                                className="flex-1 rounded-xl h-12 border-slate-200 text-slate-500 font-black hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100"
+                                            >
+                                                Decline
+                                            </Button>
+                                        </div>
+                                    </Card>
+                                ))
+                            )}
+                        </div>
+                    </section>
+                </div>
+
+                <aside className="space-y-10">
+                    {/* Schedule */}
+                    <Card className="rounded-[2.5rem] border-slate-100 dark:border-slate-800 p-8 shadow-sm text-left">
+                        <div className="flex items-center justify-between mb-8">
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Schedule</h2>
+                            <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-500 px-3 py-1">
+                                {selectedDate.toLocaleString('default', { month: 'short' })}
+                            </Badge>
+                        </div>
+
+                        <div className="grid grid-cols-7 gap-1.5 mb-8">
                             {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
-                                <div key={i} className="text-center text-[10px] font-bold text-slate-400 uppercase">{day}</div>
+                                <div key={i} className="text-center text-[10px] font-black text-slate-300 uppercase">{day}</div>
                             ))}
                             {weekDates.map((date, i) => {
                                 const isSelected = selectedDate.toDateString() === date.toDateString();
@@ -272,23 +447,22 @@ export default function TeacherDashboard() {
                                         key={i}
                                         onClick={() => setSelectedDate(date)}
                                         className={`
-                                            flex flex-col items-center justify-center py-2 rounded-xl transition-all relative
-                                            ${isSelected ? 'bg-cyan-700 text-white shadow-lg shadow-cyan-200 dark:shadow-none' : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'}
-                                            ${isToday && !isSelected ? 'text-cyan-700 font-bold' : ''}
+                                            flex flex-col items-center justify-center py-2.5 rounded-2xl transition-all relative
+                                            ${isSelected ? 'bg-slate-900 text-white shadow-xl' : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'}
+                                            ${isToday && !isSelected ? 'ring-2 ring-cyan-500 ring-inset' : ''}
                                         `}
                                     >
-                                        <span className="text-xs">{date.getDate()}</span>
+                                        <span className="text-xs font-black leading-none">{date.getDate()}</span>
                                         {hasClasses && (
-                                            <span className={`w-1 h-1 rounded-full mt-1 ${isSelected ? 'bg-white' : 'bg-cyan-500'}`}></span>
+                                            <div className={`w-1 h-1 rounded-full mt-1.5 ${isSelected ? 'bg-cyan-400' : 'bg-cyan-600'}`}></div>
                                         )}
                                     </button>
                                 );
                             })}
                         </div>
 
-                        {/* Selected Date Classes */}
-                        <div className="space-y-3">
-                            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sessions on {selectedDate.toLocaleDateString([], { day: 'numeric', month: 'short' })}</h3>
+                        <div className="space-y-4">
+                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Timeline</h3>
                             {(() => {
                                 const dayClasses = upcomingClasses.flatMap(b =>
                                     (b.sessions || [])
@@ -297,147 +471,92 @@ export default function TeacherDashboard() {
                                 );
 
                                 if (dayClasses.length === 0) {
-                                    return <p className="text-xs text-slate-400 italic py-2">No classes scheduled.</p>;
+                                    return (
+                                        <div className="text-center py-8">
+                                            <p className="text-xs text-slate-400 italic font-medium">Free day! No sessions.</p>
+                                        </div>
+                                    );
                                 }
 
                                 return dayClasses.map((s, i) => (
-                                    <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <div className="w-8 h-8 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg flex items-center justify-center text-cyan-700 dark:text-cyan-400 text-[10px] font-bold">
+                                    <div key={i} className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-800 group hover:border-cyan-200 transition-all cursor-pointer">
+                                        <div className="w-12 h-12 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center text-slate-900 dark:text-white text-xs font-black shadow-sm group-hover:bg-cyan-600 group-hover:text-white transition-all">
                                             {s.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <div className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">{s.topic}</div>
-                                            <div className="text-[10px] text-slate-500 truncate">{s.studentName}</div>
+                                            <div className="text-xs font-black text-slate-900 dark:text-slate-100 truncate tracking-tight">{s.topic}</div>
+                                            <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter truncate mt-0.5">{s.studentName}</div>
                                         </div>
                                     </div>
                                 ));
                             })()}
                         </div>
-                    </div>
-                </div>
+                    </Card>
 
-                {/* Main section: Active Courses */}
-                <div className="lg:col-span-2 space-y-8">
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-slate-900">Active Courses</h2>
-                            <Link to="/teacher/schedule" className="text-cyan-700 text-sm font-bold hover:underline">View All</Link>
-                        </div>
-
-                        <div className="space-y-4">
-                            {upcomingClasses.length === 0 ? (
-                                <div className="p-8 bg-white rounded-3xl border border-dashed border-slate-200 text-center">
-                                    <p className="text-slate-400">No active courses found.</p>
-                                </div>
-                            ) : (
-                                upcomingClasses.map(booking => {
-                                    const completedSessions = booking.sessions?.filter(s => s.status === 'completed').length || 0;
-                                    const nextSession = booking.sessions?.find(s => s.status === 'confirmed' && s.scheduledAt.toMillis() > Date.now());
-
-                                    return (
-                                        <Link
-                                            key={booking.id}
-                                            to={`/teacher/bookings/${booking.id}`}
-                                            className="block p-5 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group text-left"
-                                        >
-                                            <div className="flex justify-between items-start mb-4">
-                                                <div>
-                                                    <h3 className="font-bold text-slate-900 group-hover:text-cyan-700 transition-colors">{booking.topic}</h3>
-                                                    <p className="text-xs text-slate-500">Student: {booking.studentName}</p>
-                                                </div>
-                                                <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase ${booking.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-                                                    }`}>
-                                                    {booking.status}
-                                                </span>
-                                            </div>
-
-                                            <div className="space-y-3">
-                                                <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
-                                                    <span>Progress</span>
-                                                    <span>{completedSessions}/{booking.totalSessions} Sessions</span>
-                                                </div>
-                                                <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                                    <div
-                                                        className="h-full bg-cyan-700 rounded-full transition-all duration-500"
-                                                        style={{ width: `${(completedSessions / booking.totalSessions) * 100}%` }}
-                                                    ></div>
-                                                </div>
-                                                {nextSession && (
-                                                    <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 p-2 rounded-lg">
-                                                        <Clock size={14} className="text-cyan-500" />
-                                                        Next: {nextSession.scheduledAt.toDate().toLocaleDateString()} at {nextSession.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </Link>
-                                    );
-                                })
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Pending Approvals */}
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-slate-900">New Requests</h2>
-                            <Link to="/teacher/requests" className="text-cyan-700 text-sm font-bold hover:underline">View All</Link>
-                        </div>
-
-                        <div className="space-y-4">
-                            {pendingRequests.length === 0 ? (
-                                <div className="p-8 bg-white rounded-3xl border border-dashed border-slate-200 text-center">
-                                    <p className="text-slate-400">No pending requests.</p>
-                                </div>
-                            ) : (
-                                pendingRequests.map(booking => (
-                                    <div key={booking.id} className="p-5 bg-white rounded-2xl border border-slate-100 shadow-sm text-left">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div>
-                                                <h3 className="font-bold text-slate-900">{booking.topic}</h3>
-                                                <p className="text-xs text-slate-500">From: {booking.studentName}</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <div className="text-[10px] font-bold text-slate-400 uppercase mb-1">Requested On</div>
-                                                <div className="text-xs font-bold text-slate-900">{booking.createdAt.toDate().toLocaleDateString()}</div>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={(e) => { e.preventDefault(); openRemarkModal(booking.id, 'active'); }}
-                                                className="flex-1 py-2 bg-cyan-700 text-white text-xs font-bold rounded-xl hover:bg-cyan-700 transition-all"
-                                            >
-                                                Approve
-                                            </button>
-                                            <button
-                                                onClick={(e) => { e.preventDefault(); openRemarkModal(booking.id, 'rejected'); }}
-                                                className="flex-1 py-2 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all"
-                                            >
-                                                Decline
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Refer & Earn Card */}
-                    <div className="bg-gradient-to-br from-violet-600 to-cyan-700 rounded-3xl p-6 text-white relative overflow-hidden group cursor-pointer text-left" onClick={() => setShowReferralModal(true)}>
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-white/20 transition-all"></div>
+                    {/* Refer & Earn */}
+                    <Card className="bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden group border-none text-left">
                         <div className="relative z-10">
-                            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-4 backdrop-blur-sm">
-                                <Gift size={20} className="text-white" />
-                            </div>
-                            <h4 className="font-bold text-lg mb-1">Refer & Earn Bonus</h4>
-                            <p className="text-cyan-100 text-sm mb-4">Invite other teachers to Teacher Dekho and earn a joining bonus.</p>
-                            <button className="px-4 py-2 bg-white text-cyan-700 font-bold rounded-lg text-xs hover:bg-cyan-50 transition-colors">
+                            <h4 className="font-black text-xl mb-2 tracking-tight">Refer & Earn</h4>
+                            <p className="text-indigo-100 text-xs font-medium leading-relaxed mb-6 opacity-80">Invite fellow teachers and earn exclusive joining bonuses.</p>
+                            <Button
+                                onClick={() => setShowReferralModal(true)}
+                                className="w-full h-12 bg-white text-indigo-900 font-black rounded-xl text-xs hover:bg-slate-100 shadow-lg"
+                            >
                                 Invite Teachers
-                            </button>
+                            </Button>
                         </div>
-                    </div>
-                </div>
+                        <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-all duration-700"></div>
+                    </Card>
+                </aside>
             </div>
+
+            {/* Remark Modal */}
+            <Dialog
+                open={remarkModal.isOpen}
+                onOpenChange={(open) => !open && setRemarkModal({ isOpen: false, bookingId: null, action: null })}
+            >
+                <DialogContent className="sm:max-w-md rounded-[2rem] p-8 border-none overflow-hidden">
+                    <DialogHeader>
+                        <DialogTitle className="text-2xl font-black tracking-tight text-slate-900">
+                            {remarkModal.action === 'active' ? 'Approve Request' : 'Decline Request'}
+                        </DialogTitle>
+                        <DialogDescription className="text-slate-500 font-medium">
+                            {remarkModal.action === 'active'
+                                ? "Add a note for the student (e.g., 'Looking forward to our class!')."
+                                : "Please provide a reason for declining this request."}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="my-6">
+                        <textarea
+                            value={remarkText}
+                            onChange={(e) => setRemarkText(e.target.value)}
+                            placeholder="Write your remark here..."
+                            className="w-full p-6 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-cyan-500/10 outline-none resize-none h-40 font-medium text-slate-700 transition-all"
+                        ></textarea>
+                    </div>
+
+                    <DialogFooter className="gap-3 sm:space-x-0">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setRemarkModal({ isOpen: false, bookingId: null, action: null })}
+                            className="flex-1 h-12 rounded-xl text-slate-400 font-black tracking-widest uppercase text-[10px] hover:text-slate-900"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleStatusUpdate}
+                            disabled={processing || (remarkModal.action === 'rejected' && !remarkText.trim())}
+                            className={`flex-1 h-12 rounded-xl font-black tracking-widest uppercase text-[10px] transition-all ${remarkModal.action === 'active'
+                                ? 'bg-cyan-700 hover:bg-slate-900 text-white'
+                                : 'bg-rose-600 hover:bg-slate-900 text-white'
+                                }`}
+                        >
+                            {processing ? 'Processing...' : (remarkModal.action === 'active' ? 'Approve' : 'Decline')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Referral Modal */}
             <ReferralModal
@@ -446,52 +565,6 @@ export default function TeacherDashboard() {
                 userRole="teacher"
                 userName={user?.displayName || "Teacher"}
             />
-
-            {/* Remark Modal */}
-            {remarkModal.isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-xl font-bold text-slate-900">
-                                {remarkModal.action === 'active' ? 'Approve Request' : 'Decline Request'}
-                            </h3>
-                            <button onClick={() => setRemarkModal({ isOpen: false, bookingId: null, action: null })} className="p-2 hover:bg-slate-100 rounded-full">
-                                <X size={20} className="text-slate-500" />
-                            </button>
-                        </div>
-
-                        <p className="text-slate-500 text-sm mb-4">
-                            {remarkModal.action === 'active'
-                                ? "Add a note for the student (e.g., 'Looking forward to our class!')."
-                                : "Please provide a reason for declining this request."}
-                        </p>
-
-                        <textarea
-                            value={remarkText}
-                            onChange={(e) => setRemarkText(e.target.value)}
-                            placeholder="Write your remark here..."
-                            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none resize-none h-32 mb-6"
-                        ></textarea>
-
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setRemarkModal({ isOpen: false, bookingId: null, action: null })}
-                                className="flex-1 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleStatusUpdate}
-                                disabled={processing || (remarkModal.action === 'rejected' && !remarkText.trim())}
-                                className={`flex-1 py-3 font-bold rounded-xl text-white transition-colors ${remarkModal.action === 'active' ? 'bg-cyan-700 hover:bg-cyan-800' : 'bg-red-600 hover:bg-red-700'
-                                    } disabled:opacity-50 disabled:cursor-not-allowed`}
-                            >
-                                {processing ? 'Processing...' : (remarkModal.action === 'active' ? 'Approve' : 'Decline')}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

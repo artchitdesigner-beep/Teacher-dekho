@@ -35,7 +35,7 @@ export default function BookingCheckout() {
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Booking Confirmed!</h1>
                     <p className="text-slate-500 mb-8">Your session with {teacher?.name} has been successfully scheduled.</p>
                     <button
-                        onClick={() => navigate('/student/dashboard')}
+                        onClick={() => navigate('/')}
                         className="w-full py-3 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-800 transition-all"
                     >
                         Go to Dashboard

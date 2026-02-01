@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
-import { Search, Filter, User, MoreVertical, Mail, Loader2 } from 'lucide-react';
+import { Search, Filter, User, MoreVertical, Mail, Loader2, Users, BookOpen, Clock, Check, X } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface Session {
     id: string;
@@ -35,6 +39,7 @@ interface StudentStats {
 export default function TeacherStudents() {
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<'requests' | 'current' | 'refer'>('requests');
+    const [requestType, setRequestType] = useState<'tuition' | 'batch'>('tuition');
     const [referMode, setReferMode] = useState<'new' | 'existing'>('new');
     const [loading, setLoading] = useState(true);
     const [students, setStudents] = useState<StudentStats[]>([]);
@@ -95,8 +100,10 @@ export default function TeacherStudents() {
     // Note: User also has a separate "Requests" page in sidebar. This might be redundant or a specific "New Student Inquiries" tab. 
     // I will implement a placeholder list for "New Requests" here as requested.
     const newRequests = [
-        { id: 1, name: "Rahul Gupta", subject: "Physics", message: "Interested in your mechanics batch.", date: "2 mins ago" },
-        { id: 2, name: "Sneha Redy", subject: "Maths", message: "Do you teach Calculus?", date: "1 hour ago" },
+        { id: 1, type: 'tuition', name: "Rahul Gupta", subject: "Physics", message: "Interested in your mechanics batch.", date: "2 mins ago" },
+        { id: 2, type: 'tuition', name: "Sneha Redy", subject: "Maths", message: "Do you teach Calculus?", date: "1 hour ago" },
+        { id: 3, type: 'batch', name: "Group Study", subject: "Organic Chemistry", message: "5 students waiting for a batch.", date: "3 hours ago", count: 5 },
+        { id: 4, type: 'batch', name: "Physics Class 12", subject: "Electrostatics", message: "Looking for weekend masterclass.", date: "5 hours ago", count: 8 },
     ];
 
     if (loading) return <div className="p-8 text-center"><Loader2 className="animate-spin mx-auto" /></div>;
@@ -145,36 +152,116 @@ export default function TeacherStudents() {
 
     function navContent() {
         switch (activeTab) {
-            case 'requests':
+            case 'requests': {
+                const tuitionReqs = newRequests.filter(r => r.type === 'tuition');
+                const batchReqs = newRequests.filter(r => r.type === 'batch');
+
                 return (
-                    <div className="space-y-4 animate-in slide-in-from-bottom-4 duration-500">
-                        {newRequests.length === 0 ? (
-                            <div className="text-center py-12 text-slate-500">No new requests.</div>
-                        ) : (
-                            newRequests.map(req => (
-                                <div key={req.id} className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center font-bold">
-                                            {req.name[0]}
-                                        </div>
-                                        <div>
-                                            <h3 className="font-bold text-slate-900 dark:text-slate-100">{req.name}</h3>
-                                            <p className="text-sm text-slate-500 dark:text-slate-400">{req.message}</p>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <span className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">{req.subject}</span>
-                                                <span className="text-xs text-slate-400">{req.date}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-2 w-full sm:w-auto">
-                                        <button className="flex-1 sm:flex-none px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold rounded-xl text-sm hover:bg-slate-200 dark:hover:bg-slate-700">Ignore</button>
-                                        <button className="flex-1 sm:flex-none px-4 py-2 bg-cyan-700 text-white font-bold rounded-xl text-sm hover:bg-cyan-800">Accept</button>
-                                    </div>
-                                </div>
-                            ))
-                        )}
+                    <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+                        <Tabs value={requestType} onValueChange={(v: any) => setRequestType(v)} className="w-full">
+                            <TabsList className="bg-slate-100 dark:bg-slate-800 p-1 rounded-xl mb-6">
+                                <TabsTrigger value="tuition" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:shadow-sm font-bold px-6">
+                                    Tuition Requests
+                                    <Badge className="ml-2 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-none">{tuitionReqs.length}</Badge>
+                                </TabsTrigger>
+                                <TabsTrigger value="batch" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:shadow-sm font-bold px-6">
+                                    Batch Requests
+                                    <Badge className="ml-2 bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600 dark:text-cyan-400 border-none">{batchReqs.length}</Badge>
+                                </TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent value="tuition" className="space-y-4 outline-none">
+                                {tuitionReqs.length === 0 ? (
+                                    <div className="text-center py-12 text-slate-500">No new tuition requests.</div>
+                                ) : (
+                                    tuitionReqs.map(req => (
+                                        <Card key={req.id} className="rounded-3xl border-slate-200 dark:border-slate-800 overflow-hidden hover:border-cyan-200 transition-colors">
+                                            <CardContent className="p-6">
+                                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-2xl flex items-center justify-center font-bold text-lg">
+                                                            {req.name[0]}
+                                                        </div>
+                                                        <div>
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <h3 className="font-bold text-slate-900 dark:text-slate-100">{req.name}</h3>
+                                                                <Badge variant="outline" className="text-[10px] text-purple-600 border-purple-200 uppercase font-black tracking-tight">Direct Tuition</Badge>
+                                                            </div>
+                                                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{req.message}</p>
+                                                            <div className="flex items-center gap-3">
+                                                                <span className="flex items-center gap-1 text-[11px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-200 dark:border-slate-700 uppercase">
+                                                                    <BookOpen size={10} className="text-cyan-500" /> {req.subject}
+                                                                </span>
+                                                                <span className="flex items-center gap-1 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
+                                                                    <Clock size={10} className="text-cyan-500" /> {req.date}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex gap-2 w-full sm:w-auto mt-4 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-none border-slate-50 dark:border-slate-800">
+                                                        <Button variant="ghost" size="sm" className="flex-1 sm:flex-none rounded-xl text-slate-500 font-bold hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10">
+                                                            <X size={16} className="mr-2" /> Reject
+                                                        </Button>
+                                                        <Button size="sm" className="flex-1 sm:flex-none rounded-xl bg-cyan-700 hover:bg-cyan-800 text-white font-bold shadow-lg shadow-cyan-900/20">
+                                                            <Check size={16} className="mr-2" /> Accept
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    ))
+                                )}
+                            </TabsContent>
+
+                            <TabsContent value="batch" className="space-y-4 outline-none">
+                                {batchReqs.length === 0 ? (
+                                    <div className="text-center py-12 text-slate-500">No new batch formation requests.</div>
+                                ) : (
+                                    batchReqs.map(req => (
+                                        <Card key={req.id} className="rounded-3xl border-slate-200 dark:border-slate-800 overflow-hidden hover:border-cyan-200 transition-colors">
+                                            <CardContent className="p-6">
+                                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-12 h-12 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 rounded-2xl flex items-center justify-center font-bold text-lg">
+                                                            <Users size={24} />
+                                                        </div>
+                                                        <div>
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <h3 className="font-bold text-slate-900 dark:text-slate-100">{req.name}</h3>
+                                                                <Badge variant="outline" className="text-[10px] text-cyan-600 border-cyan-200 uppercase font-black tracking-tight">Batch Creation</Badge>
+                                                            </div>
+                                                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{req.message}</p>
+                                                            <div className="flex items-center gap-3">
+                                                                <span className="flex items-center gap-1 text-[11px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-200 dark:border-slate-700 uppercase">
+                                                                    <BookOpen size={10} className="text-cyan-500" /> {req.subject}
+                                                                </span>
+                                                                <span className="flex items-center gap-1 text-[11px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-200 dark:border-slate-700 uppercase">
+                                                                    <Users size={10} className="text-cyan-500" /> {req.count} Students Interested
+                                                                </span>
+                                                                <span className="flex items-center gap-1 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
+                                                                    <Clock size={10} className="text-cyan-500" /> {req.date}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex gap-2 w-full sm:w-auto mt-4 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-none border-slate-50 dark:border-slate-800">
+                                                        <Button variant="ghost" size="sm" className="flex-1 sm:flex-none rounded-xl text-slate-500 font-bold hover:bg-slate-100">
+                                                            Interested
+                                                        </Button>
+                                                        <Button size="sm" className="flex-1 sm:flex-none rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 group">
+                                                            Create Batch <Check size={16} className="ml-2 group-hover:scale-125 transition-transform" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    ))
+                                )}
+                            </TabsContent>
+                        </Tabs>
                     </div>
                 );
+            }
             case 'current':
                 return (
                     <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">

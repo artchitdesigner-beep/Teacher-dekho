@@ -3,36 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Check, Calendar, Clock, CreditCard, Shield, BookOpen } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { PLANS } from '@/lib/plans';
 
 const STEPS = ['Select Plan', 'Schedule', 'Details', 'Payment'];
-
-const PLANS = [
-    {
-        id: 'silver',
-        name: 'Silver',
-        classesPerWeek: 2,
-        priceMonthly: 2000,
-        priceFull: 10000,
-        features: ['2 classes/week', 'Basic doubts support', 'Standard notes']
-    },
-    {
-        id: 'gold',
-        name: 'Gold',
-        classesPerWeek: 3,
-        priceMonthly: 3500,
-        priceFull: 18000,
-        features: ['3 classes/week', 'Priority doubts support', 'Premium notes', 'Weekly tests'],
-        popular: true
-    },
-    {
-        id: 'platinum',
-        name: 'Platinum',
-        classesPerWeek: 5,
-        priceMonthly: 5000,
-        priceFull: 25000,
-        features: ['5 classes/week', '24/7 doubts support', 'All study material', '1-on-1 mentorship']
-    }
-];
 
 export default function BookingWizard() {
     const { teacherId } = useParams();
@@ -189,7 +162,7 @@ export default function BookingWizard() {
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        {plan.features.map((feature, i) => (
+                                        {plan.features?.map((feature, i) => (
                                             <div key={i} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
                                                 <Check size={16} className="text-cyan-600" />
                                                 {feature}

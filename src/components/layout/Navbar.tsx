@@ -1,14 +1,22 @@
 import { useState, useEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { Menu, X, ChevronDown, LogOut, User, LayoutDashboard, Calendar, Bell } from 'lucide-react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Menu, X, ChevronDown, Bell } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
-import { auth } from '@/lib/firebase';
 import ProfileDropdown from './ProfileDropdown';
 import logoWithBackground from '@/assets/logo with Background.svg';
 import { ModeToggle } from '@/components/mode-toggle';
+import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from '@/lib/utils';
 
 export default function Navbar() {
     const { user, userRole } = useAuth();
+    const location = useLocation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     // Determine current view mode based on User Role
@@ -16,20 +24,13 @@ export default function Navbar() {
     const isStudentView = role === 'student';
     const isTeacherView = role === 'teacher';
 
-    const handleLogout = () => {
-        auth.signOut();
-        window.location.href = '/';
-    };
-
     interface NavLinkItem {
         label: string;
         to: string;
-        icon?: React.ElementType;
         children?: { label: string; to: string; }[];
     }
 
     const studentPrimaryLinks: NavLinkItem[] = [
-        { label: 'Dashboard', to: '/student/dashboard' },
         { label: 'Batches', to: '/student/batches' },
         { label: 'Find Tutors', to: '/student/search' },
         { label: 'My Courses', to: '/student/courses' },
@@ -60,19 +61,17 @@ export default function Navbar() {
     ];
 
     const teacherLinks: NavLinkItem[] = [
-        { label: 'Dashboard', to: '/teacher/dashboard', icon: LayoutDashboard },
+        { label: 'Dashboard', to: '/teacher/dashboard' },
         {
             label: 'Teaching',
             to: '/teacher/schedule',
-            icon: Calendar,
             children: [
                 { label: 'My Schedule', to: '/teacher/schedule' },
                 { label: 'Requests', to: '/teacher/requests' },
                 { label: 'Availability', to: '/teacher/availability' }
             ]
         },
-
-        { label: 'Profile', to: '/teacher/profile', icon: User },
+        { label: 'Profile', to: '/teacher/profile' },
     ];
 
     const publicLinks: NavLinkItem[] = [
@@ -100,7 +99,12 @@ export default function Navbar() {
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
 
-            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+            // Don't hide navbar on search pages to keep filter bar stable
+            const isSearchPage = location.pathname.includes('/search') || location.pathname.includes('/batches');
+
+            if (isSearchPage) {
+                setIsVisible(true);
+            } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
                 setIsVisible(false);
             } else {
                 setIsVisible(true);
@@ -111,10 +115,13 @@ export default function Navbar() {
 
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [lastScrollY]);
+    }, [lastScrollY, location.pathname]);
 
     return (
-        <nav className={`sticky top-0 z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+        <nav className={cn(
+            "sticky top-0 z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-transform duration-300",
+            !isVisible && "-translate-y-full"
+        )}>
             <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                 {/* Logo */}
                 <div className="flex-1 flex items-center">
@@ -125,41 +132,40 @@ export default function Navbar() {
                 </div>
 
                 {/* Desktop Primary Navigation */}
-                <div className="hidden lg:flex items-center gap-6">
+                <div className="hidden lg:flex items-center gap-2">
                     {primaryLinks.map((link) => (
-                        <div key={link.label} className="relative group">
+                        <div key={link.label}>
                             {link.children ? (
-                                <>
-                                    <button className="flex items-center gap-1 px-3 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors rounded-lg group-hover:bg-slate-50 dark:group-hover:bg-slate-800">
-                                        {link.icon && <link.icon size={16} className="mr-1" />}
-                                        {link.label}
-                                        <ChevronDown size={14} className="opacity-50 group-hover:rotate-180 transition-transform duration-200" />
-                                    </button>
-                                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 z-50">
-                                        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 p-2 overflow-hidden">
-                                            {link.children.map(child => (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="sm" className="font-semibold text-slate-600 dark:text-slate-300 hover:text-cyan-700 hover:bg-slate-50 dark:hover:bg-slate-800">
+                                            {link.label}
+                                            <ChevronDown size={14} className="ml-1 opacity-50 transition-transform" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="p-2 w-48 rounded-xl border-slate-100 dark:border-slate-800">
+                                        {link.children.map(child => (
+                                            <DropdownMenuItem key={child.label} asChild>
                                                 <Link
-                                                    key={child.label}
                                                     to={child.to}
-                                                    className="block px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-700 dark:hover:text-cyan-400 rounded-lg transition-colors"
+                                                    className="w-full font-medium text-slate-600 dark:text-slate-300 focus:bg-cyan-50 dark:focus:bg-cyan-900/20 focus:text-cyan-700 dark:focus:text-cyan-400 rounded-lg"
                                                 >
                                                     {child.label}
                                                 </Link>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </>
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             ) : (
                                 <NavLink
                                     to={link.to}
-                                    className={({ isActive }) => `
-                                        flex items-center gap-1 px-3 py-2 text-sm font-semibold transition-all duration-200 rounded-lg
-                                        ${isActive
+                                    className={({ isActive }) => cn(
+                                        "px-3 py-2 text-sm font-semibold transition-all duration-200 rounded-lg",
+                                        isActive
                                             ? 'text-cyan-700 bg-cyan-50/50 dark:bg-cyan-900/20'
-                                            : 'text-slate-600 dark:text-slate-300 hover:text-cyan-700 hover:bg-slate-50 dark:hover:bg-slate-800'}
-                                    `}
+                                            : 'text-slate-600 dark:text-slate-300 hover:text-cyan-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                    )}
                                 >
-                                    {link.icon && <link.icon size={16} className="mr-1" />}
                                     {link.label}
                                 </NavLink>
                             )}
@@ -168,40 +174,39 @@ export default function Navbar() {
                 </div>
 
                 {/* Right Side: Secondary Nav + Auth */}
-                <div className="flex-1 hidden lg:flex items-center justify-end gap-6">
+                <div className="flex-1 hidden lg:flex items-center justify-end gap-4">
                     {/* Secondary Navigation (Dropdowns) */}
-                    <div className="flex items-center gap-2 border-r border-slate-100 dark:border-slate-800 pr-6 mr-2">
+                    <div className="flex items-center gap-1 border-r border-slate-100 dark:border-slate-800 pr-4">
                         {secondaryLinks.map((link) => (
-                            <div key={link.label} className="relative group">
+                            <div key={link.label}>
                                 {link.children ? (
-                                    <>
-                                        <button className="flex items-center gap-1 px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors rounded-lg group-hover:bg-slate-50 dark:group-hover:bg-slate-800">
-                                            {link.label}
-                                            <ChevronDown size={12} className="opacity-50 group-hover:rotate-180 transition-transform duration-200" />
-                                        </button>
-                                        <div className="absolute top-full right-0 pt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 z-50">
-                                            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 p-2 overflow-hidden text-left">
-                                                {link.children.map(child => (
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="sm" className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 hover:text-cyan-700 dark:hover:text-cyan-400 p-2 h-auto">
+                                                {link.label}
+                                                <ChevronDown size={12} className="ml-1 opacity-50" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="p-2 w-48 rounded-xl border-slate-100 dark:border-slate-800">
+                                            {link.children.map(child => (
+                                                <DropdownMenuItem key={child.label} asChild>
                                                     <Link
-                                                        key={child.label}
                                                         to={child.to}
-                                                        className="block px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-700 dark:hover:text-cyan-400 rounded-lg transition-colors capitalize tracking-normal"
+                                                        className="w-full text-xs font-semibold text-slate-600 dark:text-slate-300 focus:bg-cyan-50 dark:focus:bg-cyan-900/20 focus:text-cyan-700 dark:focus:text-cyan-400 rounded-lg capitalize"
                                                     >
                                                         {child.label}
                                                     </Link>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </>
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 ) : (
                                     <NavLink
                                         to={link.to}
-                                        className={({ isActive }) => `
-                                            text-[11px] font-bold uppercase tracking-wider transition-all duration-200
-                                            ${isActive
-                                                ? 'text-cyan-700'
-                                                : 'text-slate-400 dark:text-slate-500 hover:text-cyan-700 dark:hover:text-cyan-400'}
-                                        `}
+                                        className={({ isActive }) => cn(
+                                            "text-[11px] font-bold uppercase tracking-wider px-2 py-1 transition-all duration-200",
+                                            isActive ? 'text-cyan-700' : 'text-slate-400 dark:text-slate-500 hover:text-cyan-700 dark:hover:text-cyan-400'
+                                        )}
                                     >
                                         {link.label}
                                     </NavLink>
@@ -210,10 +215,10 @@ export default function Navbar() {
                         ))}
                     </div>
                     {user ? (
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
                             <Link
                                 to="/notifications"
-                                className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-cyan-700 hover:bg-cyan-50 transition-all"
+                                className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-cyan-700 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all"
                                 title="Notifications"
                             >
                                 <Bell size={20} />
@@ -221,32 +226,31 @@ export default function Navbar() {
                             <ProfileDropdown />
                         </div>
                     ) : (
-                        <div className="flex items-center gap-4">
-                            <Link to="/login" className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-cyan-700 transition-colors">
+                        <div className="flex items-center gap-3">
+                            <Link to="/login" className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-cyan-700 border-none bg-transparent h-auto p-0">
                                 Log in
                             </Link>
-                            <Link
-                                to="/onboarding"
-                                className="px-5 py-2.5 bg-cyan-700 text-white text-sm font-semibold rounded-xl hover:bg-cyan-700 transition-all shadow-md shadow-cyan-700/10 active:scale-95"
-                            >
-                                Sign up
-                            </Link>
+                            <Button asChild className="bg-cyan-700 hover:bg-cyan-800 text-white font-semibold rounded-xl shadow-md shadow-cyan-700/10">
+                                <Link to="/onboarding">Sign up</Link>
+                            </Button>
                         </div>
                     )}
                 </div>
 
                 {/* Mobile Menu Button */}
-                <button
-                    className="lg:hidden p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="lg:hidden text-slate-600 dark:text-slate-300"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
                     {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
+                </Button>
             </div>
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="lg:hidden bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 py-6 px-6 space-y-4 animate-in slide-in-from-top-2 duration-200 h-[calc(100vh-80px)] overflow-y-auto">
+                <div className="lg:hidden bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 py-6 px-6 space-y-4 animate-in slide-in-from-top-2 duration-300 h-[calc(100vh-80px)] overflow-y-auto">
                     <div className="flex items-center justify-between mb-4">
                         <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Theme</span>
                         <ModeToggle />
@@ -257,7 +261,6 @@ export default function Navbar() {
                             {link.children ? (
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-2 text-base font-bold text-slate-900 dark:text-slate-100 py-2">
-                                        {link.icon && <link.icon size={18} />}
                                         {link.label}
                                     </div>
                                     <div className="pl-4 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 ml-1">
@@ -277,12 +280,11 @@ export default function Navbar() {
                                 <NavLink
                                     to={link.to}
                                     onClick={() => setIsMenuOpen(false)}
-                                    className={({ isActive }) => `
-                                        flex items-center gap-2 py-2 text-base font-bold transition-colors
-                                        ${isActive ? 'text-cyan-700' : 'text-slate-600 dark:text-slate-300'}
-                                    `}
+                                    className={({ isActive }) => cn(
+                                        "flex items-center gap-2 py-2 text-base font-bold transition-colors",
+                                        isActive ? 'text-cyan-700' : 'text-slate-600 dark:text-slate-300'
+                                    )}
                                 >
-                                    {link.icon && <link.icon size={18} />}
                                     {link.label}
                                 </NavLink>
                             )}
@@ -300,30 +302,26 @@ export default function Navbar() {
                                     <Bell size={18} />
                                     Notifications
                                 </Link>
-                                <button
-                                    onClick={handleLogout}
-                                    className="flex items-center gap-2 py-2 text-base font-medium text-red-500"
+                                <Button
+                                    variant="ghost"
+                                    className="justify-start px-0 h-auto text-base font-medium text-red-500 hover:text-red-600 hover:bg-transparent"
+                                    onClick={async () => {
+                                        const { auth } = await import('@/lib/firebase');
+                                        auth.signOut();
+                                        window.location.href = '/';
+                                    }}
                                 >
-                                    <LogOut size={18} />
                                     Log Out
-                                </button>
+                                </Button>
                             </>
                         ) : (
                             <>
-                                <Link
-                                    to="/login"
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="w-full py-3 bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300 text-center font-semibold rounded-xl border border-slate-200 dark:border-slate-800"
-                                >
-                                    Log in
-                                </Link>
-                                <Link
-                                    to="/onboarding"
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="w-full py-3 bg-cyan-700 text-white text-center font-semibold rounded-xl shadow-md shadow-cyan-700/10"
-                                >
-                                    Sign up
-                                </Link>
+                                <Button asChild variant="secondary" className="w-full py-6 font-semibold rounded-xl">
+                                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>Log in</Link>
+                                </Button>
+                                <Button asChild className="w-full py-6 bg-cyan-700 hover:bg-cyan-800 font-semibold rounded-xl shadow-md shadow-cyan-700/10">
+                                    <Link to="/onboarding" onClick={() => setIsMenuOpen(false)}>Sign up</Link>
+                                </Button>
                             </>
                         )}
                     </div>

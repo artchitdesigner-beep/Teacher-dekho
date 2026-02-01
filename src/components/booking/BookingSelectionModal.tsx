@@ -1,46 +1,13 @@
 import { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight, Clock, ArrowRight, Sunrise, Sun, Moon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { PLANS } from '@/lib/plans';
 
 interface BookingSelectionModalProps {
     teacher: any;
     studentId: string;
     onClose: () => void;
 }
-
-const PLANS = [
-    {
-        id: 'silver',
-        name: 'Silver',
-        classesPerWeek: 3,
-        priceMonthly: 2000,
-        priceFull: 10000,
-        type: 'selection', // MWF or TTS
-        options: [
-            { label: 'MWF', days: ['Mon', 'Wed', 'Fri'] },
-            { label: 'TTS', days: ['Tue', 'Thu', 'Sat'] }
-        ]
-    },
-    {
-        id: 'gold',
-        name: 'Gold',
-        classesPerWeek: 6,
-        priceMonthly: 3500,
-        priceFull: 18000,
-        type: 'fixed',
-        days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-        popular: true
-    },
-    {
-        id: 'platinum',
-        name: 'Platinum',
-        classesPerWeek: 7,
-        priceMonthly: 5000,
-        priceFull: 25000,
-        type: 'fixed',
-        days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    }
-];
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 

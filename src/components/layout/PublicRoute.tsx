@@ -15,7 +15,7 @@ export default function PublicRoute() {
 
     if (user) {
         // Redirect to dashboard if already logged in
-        const target = userRole === 'teacher' ? '/teacher/dashboard' : '/student/dashboard';
+        const target = userRole === 'teacher' ? '/teacher/dashboard' : '/';
         return <Navigate to={target} replace />;
     }
 
