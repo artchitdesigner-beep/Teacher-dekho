@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { Save, Plus, CheckCircle, AlertCircle, Sun, Moon, Sunrise, Copy, RotateCcw, X } from 'lucide-react';
+import { Save, Plus, CheckCircle, AlertCircle, Sun, Moon, Sunrise, Copy, RotateCcw, X, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface TimeSlot {
     start: string;
@@ -196,7 +199,7 @@ export default function TeacherAvailability() {
     }
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8 pb-24">
+        <div className="w-full space-y-8 pb-24">
             <div>
                 <h1 className="text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">Availability Settings</h1>
                 <p className="text-slate-500 dark:text-slate-400">Set your weekly schedule. Use the Master Schedule to quickly set multiple days.</p>
@@ -210,146 +213,162 @@ export default function TeacherAvailability() {
             )}
 
             {/* Master Schedule Section */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 md:p-8 shadow-sm">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <Card className="rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-slate-100">
                         <Copy className="bg-cyan-100 text-cyan-700 p-1.5 rounded-lg" size={32} />
                         Master Schedule
-                    </h2>
-                    <button
+                    </CardTitle>
+                    <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => setMasterSlots([])}
-                        className="text-sm text-slate-500 hover:text-red-500 flex items-center gap-1 transition-colors"
+                        className="text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10"
                     >
-                        <RotateCcw size={14} /> Reset
-                    </button>
-                </div>
+                        <RotateCcw size={14} className="mr-1" /> Reset
+                    </Button>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-slate-500 mb-6 font-medium">
+                        Define a schedule here and apply it to multiple days at once. Great for setting standard weekly hours.
+                    </p>
 
-                <p className="text-sm text-slate-500 mb-6">
-                    Define a schedule here and apply it to multiple days at once. This is great for setting your standard weekly hours.
-                </p>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Left: Define Slots */}
+                        <div className="space-y-4">
+                            <h3 className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                <span className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center text-xs">1</span>
+                                Define Slots
+                            </h3>
+                            <div className="flex flex-wrap gap-2 mb-4">
+                                {PERIODS.map(period => (
+                                    <Button
+                                        key={period.label}
+                                        onClick={() => addMasterSlot(period.label as any)}
+                                        variant="outline"
+                                        size="sm"
+                                        className={`text-xs font-bold border ${period.bg} ${period.color} ${period.border} hover:brightness-95 h-8`}
+                                    >
+                                        <Plus size={12} className="mr-1.5" /> {period.label}
+                                    </Button>
+                                ))}
+                            </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Left: Define Slots */}
-                    <div className="space-y-4">
-                        <h3 className="font-bold text-slate-700 dark:text-slate-300">1. Define Slots</h3>
-                        <div className="flex flex-wrap gap-2 mb-4">
-                            {PERIODS.map(period => (
-                                <button
-                                    key={period.label}
-                                    onClick={() => addMasterSlot(period.label as any)}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all flex items-center gap-1.5 ${period.bg} ${period.color} ${period.border} hover:brightness-95`}
-                                >
-                                    <Plus size={12} /> {period.label}
-                                </button>
-                            ))}
-                        </div>
+                            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                {masterSlots.length === 0 ? (
+                                    <div className="text-center py-8 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-xl">
+                                        <Clock className="mx-auto text-slate-300 mb-2" size={24} />
+                                        <p className="text-slate-400 text-sm font-medium">No slots added yet</p>
+                                    </div>
+                                ) : (
+                                    masterSlots.map((slot, index) => {
+                                        const periodStyle = PERIODS.find(p => p.label === slot.period) || PERIODS[0];
+                                        const hourOptions = generateHourOptions(slot.period);
 
-                        <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
-                            {masterSlots.length === 0 ? (
-                                <div className="text-center py-8 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-xl">
-                                    <p className="text-slate-400 text-sm">No slots added to master schedule yet.</p>
-                                </div>
-                            ) : (
-                                masterSlots.map((slot, index) => {
-                                    const periodStyle = PERIODS.find(p => p.label === slot.period) || PERIODS[0];
-                                    const hourOptions = generateHourOptions(slot.period);
-
-                                    return (
-                                        <div key={index} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-700">
-                                            <span className={`text-xs font-bold px-2 py-1 rounded ${periodStyle.bg} ${periodStyle.color}`}>
-                                                {slot.period}
-                                            </span>
-                                            <div className="grid grid-cols-2 gap-2 flex-1">
-                                                <select
-                                                    value={slot.start}
-                                                    onChange={(e) => updateMasterSlot(index, 'start', e.target.value)}
-                                                    className="w-full text-xs font-bold bg-transparent border-b border-slate-200 focus:border-cyan-500 outline-none text-slate-700 dark:text-slate-300 py-1"
+                                        return (
+                                            <div key={index} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-700">
+                                                <span className={`text-xs font-bold px-2 py-1 rounded ${periodStyle.bg} ${periodStyle.color}`}>
+                                                    {slot.period}
+                                                </span>
+                                                <div className="grid grid-cols-2 gap-2 flex-1">
+                                                    <select
+                                                        value={slot.start}
+                                                        onChange={(e) => updateMasterSlot(index, 'start', e.target.value)}
+                                                        className="w-full text-xs font-bold bg-transparent border-b border-slate-200 focus:border-cyan-500 outline-none text-slate-700 dark:text-slate-300 py-1"
+                                                    >
+                                                        {hourOptions.map(time => (
+                                                            <option key={time} value={time}>{time}</option>
+                                                        ))}
+                                                    </select>
+                                                    <select
+                                                        value={slot.end}
+                                                        onChange={(e) => updateMasterSlot(index, 'end', e.target.value)}
+                                                        className="w-full text-xs font-bold bg-transparent border-b border-slate-200 focus:border-cyan-500 outline-none text-slate-700 dark:text-slate-300 py-1"
+                                                    >
+                                                        {hourOptions.map(time => (
+                                                            <option key={time} value={time}>{time}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <button
+                                                    onClick={() => removeMasterSlot(index)}
+                                                    className="text-slate-400 hover:text-red-500 transition-colors p-1"
                                                 >
-                                                    {hourOptions.map(time => (
-                                                        <option key={time} value={time}>{time}</option>
-                                                    ))}
-                                                </select>
-                                                <select
-                                                    value={slot.end}
-                                                    onChange={(e) => updateMasterSlot(index, 'end', e.target.value)}
-                                                    className="w-full text-xs font-bold bg-transparent border-b border-slate-200 focus:border-cyan-500 outline-none text-slate-700 dark:text-slate-300 py-1"
-                                                >
-                                                    {hourOptions.map(time => (
-                                                        <option key={time} value={time}>{time}</option>
-                                                    ))}
-                                                </select>
+                                                    <X size={14} />
+                                                </button>
                                             </div>
-                                            <button
-                                                onClick={() => removeMasterSlot(index)}
-                                                className="text-slate-400 hover:text-red-500 transition-colors p-1"
-                                            >
-                                                <X size={14} />
-                                            </button>
-                                        </div>
-                                    );
-                                })
-                            )}
+                                        );
+                                    })
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Right: Select Days & Apply */}
+                        <div className="space-y-4">
+                            <h3 className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                <span className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center text-xs">2</span>
+                                Apply to Days
+                            </h3>
+
+                            {/* Quick Patterns */}
+                            <div className="flex flex-wrap gap-2 mb-2">
+                                {[
+                                    { label: 'MWF', days: ['Mon', 'Wed', 'Fri'] },
+                                    { label: 'TTS', days: ['Tue', 'Thu', 'Sat'] },
+                                    { label: 'Mon-Sat', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] },
+                                    { label: 'All Days', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+                                ].map(pattern => (
+                                    <Button
+                                        key={pattern.label}
+                                        onClick={() => setSelectedMasterDays(pattern.days)}
+                                        variant="secondary"
+                                        size="sm"
+                                        className="text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-700 dark:hover:text-cyan-400 h-8"
+                                    >
+                                        {pattern.label}
+                                    </Button>
+                                ))}
+                            </div>
+
+                            <div className="flex flex-wrap gap-2">
+                                {DAYS.map(day => (
+                                    <button
+                                        key={day}
+                                        onClick={() => toggleMasterDay(day)}
+                                        className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${selectedMasterDays.includes(day)
+                                            ? 'bg-cyan-700 text-white shadow-md scale-105'
+                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                            }`}
+                                    >
+                                        {day}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="pt-4">
+                                <Button
+                                    onClick={applyMasterSchedule}
+                                    disabled={masterSlots.length === 0 || selectedMasterDays.length === 0}
+                                    className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl hover:opacity-90 shadow-lg shadow-slate-900/10"
+                                >
+                                    <Copy size={18} className="mr-2" /> Apply to Selected Days
+                                </Button>
+                                <p className="text-xs text-slate-400 mt-2 text-center font-medium">
+                                    This will overwrite existing slots for the selected days.
+                                </p>
+                            </div>
                         </div>
                     </div>
-
-                    {/* Right: Select Days & Apply */}
-                    <div className="space-y-4">
-                        <h3 className="font-bold text-slate-700 dark:text-slate-300">2. Apply to Days</h3>
-
-                        {/* Quick Patterns */}
-                        <div className="flex flex-wrap gap-2 mb-2">
-                            {[
-                                { label: 'MWF', days: ['Mon', 'Wed', 'Fri'] },
-                                { label: 'TTS', days: ['Tue', 'Thu', 'Sat'] },
-                                { label: 'Mon-Sat', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] },
-                                { label: 'All Days', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
-                            ].map(pattern => (
-                                <button
-                                    key={pattern.label}
-                                    onClick={() => setSelectedMasterDays(pattern.days)}
-                                    className="px-3 py-1 text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-700 dark:hover:text-cyan-400 transition-colors"
-                                >
-                                    {pattern.label}
-                                </button>
-                            ))}
-                        </div>
-
-                        <div className="flex flex-wrap gap-2">
-                            {DAYS.map(day => (
-                                <button
-                                    key={day}
-                                    onClick={() => toggleMasterDay(day)}
-                                    className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${selectedMasterDays.includes(day)
-                                        ? 'bg-cyan-700 text-white shadow-md scale-105'
-                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                        }`}
-                                >
-                                    {day}
-                                </button>
-                            ))}
-                        </div>
-
-                        <div className="pt-4">
-                            <button
-                                onClick={applyMasterSchedule}
-                                disabled={masterSlots.length === 0 || selectedMasterDays.length === 0}
-                                className="w-full py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                            >
-                                <Copy size={18} /> Apply to Selected Days
-                            </button>
-                            <p className="text-xs text-slate-400 mt-2 text-center">
-                                This will overwrite existing slots for the selected days.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
 
             {/* Weekly Schedule */}
             <div className="space-y-6">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 px-2">Weekly Schedule</h2>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 px-2 flex items-center gap-2">
+                    <Clock size={24} className="text-cyan-600" /> Weekly Schedule
+                </h2>
                 {DAYS.map(day => (
-                    <div key={day} className={`bg-white dark:bg-slate-900 rounded-2xl border transition-all ${availability[day]?.enabled ? 'border-slate-200 dark:border-slate-800 shadow-sm' : 'border-slate-100 dark:border-slate-800 opacity-70'}`}>
+                    <Card key={day} className={`rounded-2xl transition-all ${availability[day]?.enabled ? 'border-slate-200 dark:border-slate-800 shadow-sm' : 'border-slate-100 dark:border-slate-800 opacity-70'}`}>
                         {/* Day Header */}
                         <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
                             <div className="flex items-center gap-4">
@@ -362,10 +381,10 @@ export default function TeacherAvailability() {
                                     />
                                     <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-300 dark:peer-focus:ring-cyan-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-cyan-700"></div>
                                 </label>
-                                <span className="font-bold text-lg text-slate-900 dark:text-slate-100">{day}</span>
+                                <span className={`font-bold text-lg ${availability[day]?.enabled ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400'}`}>{day}</span>
                             </div>
                             {!availability[day]?.enabled && (
-                                <span className="text-sm text-slate-400 font-medium">Unavailable</span>
+                                <Badge variant="secondary" className="text-slate-400 bg-slate-100 dark:bg-slate-800">Unavailable</Badge>
                             )}
                         </div>
 
@@ -437,25 +456,25 @@ export default function TeacherAvailability() {
                                 })}
                             </div>
                         )}
-                    </div>
+                    </Card>
                 ))}
             </div>
 
             <div className="fixed bottom-6 right-6 z-20">
-                <button
+                <Button
                     onClick={saveAvailability}
                     disabled={saving}
-                    className="px-6 py-3 bg-cyan-700 text-white font-bold rounded-full hover:bg-cyan-800 transition-all shadow-xl shadow-cyan-700/30 active:scale-95 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="h-14 px-8 bg-cyan-700 hover:bg-cyan-800 text-base font-bold rounded-full shadow-xl shadow-cyan-700/30"
                 >
                     {saving ? (
                         <>Saving...</>
                     ) : (
                         <>
-                            <Save size={20} /> Save Changes
+                            <Save size={20} className="mr-2" /> Save Changes
                         </>
                     )}
-                </button>
+                </Button>
             </div>
-        </div>
+        </div >
     );
 }

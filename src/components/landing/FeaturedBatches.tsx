@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import BatchCard from '@/components/batches/BatchCard';
+import BatchCardSmall from '@/components/batches/BatchCardSmall';
 import { useState, useEffect } from 'react';
 import { collection, query, limit, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -53,7 +53,7 @@ export default function FeaturedBatches() {
                 ) : batches.length > 0 ? (
                     batches.map((batch) => (
                         <div key={batch.id} className="h-full">
-                            <BatchCard batch={batch} />
+                            <BatchCardSmall batch={batch} />
                         </div>
                     ))
                 ) : (

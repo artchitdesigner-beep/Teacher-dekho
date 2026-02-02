@@ -3,6 +3,11 @@ import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs, deleteDoc, Timestamp } from 'firebase/firestore';
 import { Loader2, Save, AlertCircle, CheckCircle, Database, Trash2, Clock, Zap, User, ShieldCheck, CreditCard } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 
 export default function TeacherProfile() {
     const { user } = useAuth();
@@ -203,7 +208,7 @@ export default function TeacherProfile() {
     }
 
     return (
-        <div className="max-w-2xl mx-auto">
+        <div className="w-full">
             <div className="mb-8">
                 <h1 className="text-3xl font-serif font-bold text-slate-900 dark:text-slate-100 mb-2">Profile & KYC</h1>
                 <p className="text-slate-500 dark:text-slate-400">Manage your public profile and verification status.</p>
@@ -218,8 +223,10 @@ export default function TeacherProfile() {
                         {formData.kycStatus === 'verified' ? <CheckCircle size={24} /> : <AlertCircle size={24} />}
                     </div>
                     <div>
-                        <div className="font-bold text-slate-900 dark:text-slate-100 capitalize">KYC Status: {formData.kycStatus}</div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400">
+                        <div className="font-bold text-slate-900 dark:text-slate-100 capitalize flex items-center gap-2">
+                            KYC Status: <Badge variant={formData.kycStatus === 'verified' ? 'default' : 'secondary'} className={formData.kycStatus === 'verified' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}>{formData.kycStatus}</Badge>
+                        </div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                             {formData.kycStatus === 'verified'
                                 ? 'Your profile is verified and visible to students.'
                                 : 'Complete your profile to get verified.'}
@@ -258,138 +265,113 @@ export default function TeacherProfile() {
                     </div>
                 </div>
 
-                {/* Section Tabs */}
-                <div className="flex items-center gap-2 mb-8 bg-slate-50 dark:bg-slate-800 p-1.5 rounded-2xl">
-                    <button
-                        onClick={() => setActiveTab('basic')}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'basic' ? 'bg-white dark:bg-slate-900 text-cyan-700 dark:text-cyan-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
-                    >
-                        <User size={16} /> Basic Details
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('kyc')}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'kyc' ? 'bg-white dark:bg-slate-900 text-cyan-700 dark:text-cyan-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
-                    >
-                        <ShieldCheck size={16} /> KYC Verification
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('bank')}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'bank' ? 'bg-white dark:bg-slate-900 text-cyan-700 dark:text-cyan-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
-                    >
-                        <CreditCard size={16} /> Bank Info
-                    </button>
-                </div>
+                <Tabs value={activeTab} onValueChange={(v: any) => setActiveTab(v)} className="w-full">
+                    <TabsList className="grid w-full grid-cols-3 mb-8 h-auto p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                        <TabsTrigger value="basic" className="rounded-lg py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:text-cyan-700 dark:data-[state=active]:text-cyan-400 data-[state=active]:shadow-sm">
+                            <User size={16} className="mr-2" /> Basic Details
+                        </TabsTrigger>
+                        <TabsTrigger value="kyc" className="rounded-lg py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:text-cyan-700 dark:data-[state=active]:text-cyan-400 data-[state=active]:shadow-sm">
+                            <ShieldCheck size={16} className="mr-2" /> KYC Verification
+                        </TabsTrigger>
+                        <TabsTrigger value="bank" className="rounded-lg py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:text-cyan-700 dark:data-[state=active]:text-cyan-400 data-[state=active]:shadow-sm">
+                            <CreditCard size={16} className="mr-2" /> Bank Info
+                        </TabsTrigger>
+                    </TabsList>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {message && (
-                        <div className={`p-4 rounded-xl text-sm font-medium ${message.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400'
-                            }`}>
-                            {message.text}
-                        </div>
-                    )}
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {message && (
+                            <div className={`p-4 rounded-xl text-sm font-medium flex items-center gap-2 ${message.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400'
+                                }`}>
+                                {message.type === 'success' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+                                {message.text}
+                            </div>
+                        )}
 
-                    {activeTab === 'basic' && (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <TabsContent value="basic" className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 mt-0">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Full Name</label>
-                                    <input
-                                        type="text"
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Full Name</label>
+                                    <Input
                                         required
                                         value={formData.name}
                                         onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                        className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Subject</label>
-                                    <input
-                                        type="text"
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Subject</label>
+                                    <Input
                                         required
                                         value={formData.subject}
                                         onChange={e => setFormData({ ...formData, subject: e.target.value })}
-                                        className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
                                     />
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Hourly Rate (₹)</label>
-                                    <input
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Hourly Rate (₹)</label>
+                                    <Input
                                         type="number"
                                         required
                                         min="0"
                                         value={formData.hourlyRate}
                                         onChange={e => setFormData({ ...formData, hourlyRate: e.target.value })}
-                                        className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Years of Experience</label>
-                                    <input
-                                        type="text"
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Years of Experience</label>
+                                    <Input
                                         required
                                         placeholder="e.g. 5 years"
                                         value={formData.experience}
                                         onChange={e => setFormData({ ...formData, experience: e.target.value })}
-                                        className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
                                     />
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">College/University</label>
-                                <input
-                                    type="text"
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">College/University</label>
+                                <Input
                                     required
                                     placeholder="e.g. IIT Delhi"
                                     value={formData.college}
                                     onChange={e => setFormData({ ...formData, college: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Bio</label>
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Bio</label>
                                 <textarea
                                     required
                                     rows={4}
                                     value={formData.bio}
                                     onChange={e => setFormData({ ...formData, bio: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition resize-none text-slate-900 dark:text-slate-100"
+                                    className="flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400"
                                 />
                             </div>
-                        </div>
-                    )}
+                        </TabsContent>
 
-                    {activeTab === 'kyc' && (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <TabsContent value="kyc" className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 mt-0">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Aadhar Number</label>
-                                <input
-                                    type="text"
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Aadhar Number</label>
+                                <Input
                                     placeholder="XXXX-XXXX-XXXX"
                                     value={formData.aadhar}
                                     onChange={e => setFormData({ ...formData, aadhar: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">PAN Number</label>
-                                <input
-                                    type="text"
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">PAN Number</label>
+                                <Input
                                     placeholder="ABCDE1234F"
                                     value={formData.pan}
                                     onChange={e => setFormData({ ...formData, pan: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Video Intro URL (Optional)</label>
-                                <input
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Video Intro URL (Optional)</label>
+                                <Input
                                     type="url"
                                     placeholder="https://youtube.com/..."
                                     value={formData.videoIntroUrl}
                                     onChange={e => setFormData({ ...formData, videoIntroUrl: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
                                 />
                             </div>
                             <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900 rounded-xl">
@@ -400,39 +382,31 @@ export default function TeacherProfile() {
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        </TabsContent>
 
-                    {activeTab === 'bank' && (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <TabsContent value="bank" className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 mt-0">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Bank Name</label>
-                                <input
-                                    type="text"
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Bank Name</label>
+                                <Input
                                     placeholder="e.g. HDFC Bank"
                                     value={formData.bankName}
                                     onChange={e => setFormData({ ...formData, bankName: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Account Number</label>
-                                <input
-                                    type="text"
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Account Number</label>
+                                <Input
                                     placeholder="XXXXXXXXXXXX"
                                     value={formData.accountNumber}
                                     onChange={e => setFormData({ ...formData, accountNumber: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">IFSC Code</label>
-                                <input
-                                    type="text"
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">IFSC Code</label>
+                                <Input
                                     placeholder="HDFC0001234"
                                     value={formData.ifsc}
                                     onChange={e => setFormData({ ...formData, ifsc: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none transition text-slate-900 dark:text-slate-100"
                                 />
                             </div>
                             <div className="p-4 bg-cyan-50 dark:bg-cyan-950/20 border border-cyan-100 dark:border-cyan-900 rounded-xl">
@@ -443,52 +417,54 @@ export default function TeacherProfile() {
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        </TabsContent>
 
-                    <div className="pt-4">
-                        <button
-                            type="submit"
-                            disabled={saving}
-                            className="px-6 py-3 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all flex items-center gap-2 disabled:opacity-50"
-                        >
-                            {saving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-                            Save Changes
-                        </button>
-                    </div>
-                </form>
+                        <div className="pt-4">
+                            <Button
+                                type="submit"
+                                disabled={saving}
+                                className="w-full sm:w-auto h-12 px-8 bg-cyan-700 hover:bg-cyan-800 text-base font-bold rounded-xl shadow-lg shadow-cyan-900/10"
+                            >
+                                {saving ? <Loader2 className="animate-spin mr-2" size={20} /> : <Save size={20} className="mr-2" />}
+                                Save Changes
+                            </Button>
+                        </div>
+                    </form>
+                </Tabs>
             </div>
 
             {/* Developer Tools */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-8 mb-8">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-                    <Database size={20} className="text-cyan-600" />
-                    Developer Tools
-                </h2>
-                <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
-                    Use these tools to populate your dashboard with dummy data for testing purposes.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4">
-                    <button
-                        type="button"
+            <Card className="rounded-3xl border-slate-200 dark:border-slate-800 shadow-sm">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-xl font-bold">
+                        <Database size={20} className="text-cyan-600" />
+                        Developer Tools
+                    </CardTitle>
+                    <CardDescription>
+                        Use these tools to populate your dashboard with dummy data for testing purposes.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-col sm:flex-row gap-4">
+                    <Button
+                        variant="outline"
                         onClick={handleSeedData}
                         disabled={saving}
-                        className="px-6 py-3 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 font-bold rounded-xl hover:bg-cyan-200 dark:hover:bg-cyan-900/50 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        className="flex-1 bg-cyan-50 text-cyan-700 border-cyan-200 hover:bg-cyan-100 dark:bg-cyan-900/30 dark:text-cyan-400 dark:border-cyan-800 dark:hover:bg-cyan-900/50"
                     >
-                        {saving ? <Loader2 className="animate-spin" size={20} /> : <Database size={20} />}
+                        {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : <Database size={16} className="mr-2" />}
                         Seed Demo Data
-                    </button>
-                    <button
-                        type="button"
+                    </Button>
+                    <Button
+                        variant="outline"
                         onClick={handleClearData}
                         disabled={saving}
-                        className="px-6 py-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 font-bold rounded-xl hover:bg-red-200 dark:hover:bg-red-900/50 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        className="flex-1 bg-red-50 text-red-700 border-red-200 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/50"
                     >
-                        {saving ? <Loader2 className="animate-spin" size={20} /> : <Trash2 size={20} />}
+                        {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : <Trash2 size={16} className="mr-2" />}
                         Clear All Data
-                    </button>
-                </div>
-            </div>
+                    </Button>
+                </CardContent>
+            </Card>
         </div>
     );
 }

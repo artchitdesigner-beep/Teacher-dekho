@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
-import logoteal from '@/assets/Logo teal.svg';
+import logoteal from '@/assets/logo.svg';
 
 export default function PublicLayout() {
     return (

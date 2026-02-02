@@ -18,7 +18,7 @@ import {
 import ProfileDropdown from './ProfileDropdown';
 import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import logoWithBackground from '@/assets/logo with Background.svg';
+import logoWithBackground from '@/assets/logo.svg';
 import { Button } from '@/components/ui/button';
 import {
     Sheet,
@@ -54,7 +54,7 @@ export default function TeacherLayout() {
             {/* Logo Area */}
             <div className="p-8 border-b border-white/5 flex items-center gap-3">
                 <div className="w-10 h-10 bg-cyan-600 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-900/20">
-                    <img src={logoWithBackground} alt="T" className="h-6 w-auto brightness-0 invert" />
+                    <img src={logoWithBackground} alt="T" className="h-8 w-auto brightness-0 invert" />
                 </div>
                 <div>
                     <span className="font-extrabold text-xl tracking-tight block leading-none">Teacher</span>

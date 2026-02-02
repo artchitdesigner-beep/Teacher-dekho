@@ -1,7 +1,16 @@
 import { useState, useEffect } from 'react';
-import { X, ChevronLeft, ChevronRight, Clock, ArrowRight, Sunrise, Sun, Moon } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Clock, ArrowRight, Sunrise, Sun, Moon, Check, Calendar, Users, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PLANS } from '@/lib/plans';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 interface BookingSelectionModalProps {
     teacher: any;
@@ -9,11 +18,19 @@ interface BookingSelectionModalProps {
     onClose: () => void;
 }
 
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+
+const STEPS = [
+    { id: 1, label: 'Select Plan', icon: CreditCard },
+    { id: 2, label: 'Schedule', icon: Calendar },
+    { id: 3, label: 'Details', icon: Users },
+];
 
 export default function BookingSelectionModal({ teacher, studentId, onClose }: BookingSelectionModalProps) {
     const navigate = useNavigate();
-    const [step, setStep] = useState<1 | 2>(1);
+    const [step, setStep] = useState<1 | 2 | 3>(1);
+
+    // Step 3 States
     const [courseTopic, setCourseTopic] = useState('');
     const [subject, setSubject] = useState('');
     const [grade, setGrade] = useState('');
@@ -22,8 +39,11 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
     const [newMemberName, setNewMemberName] = useState('');
     const [newMemberPhone, setNewMemberPhone] = useState('');
 
+    // Step 1 States
     const [paymentMode, setPaymentMode] = useState<'monthly' | 'full'>('monthly');
     const [selectedPlan, setSelectedPlan] = useState<string>('gold');
+
+    // Step 2 States
     const [selectedDays, setSelectedDays] = useState<string[]>([]);
     const [silverOption, setSilverOption] = useState<'MWF' | 'TTS'>('MWF');
     const [weekOffset, setWeekOffset] = useState(0);
@@ -76,8 +96,10 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
 
     const handleContinue = () => {
         if (step === 1) {
+            setStep(2);
+        } else if (step === 2) {
             if (selectedDate && selectedSlot) {
-                setStep(2);
+                setStep(3);
             }
         } else {
             if (!courseTopic || !subject || !grade) return;
@@ -100,6 +122,11 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
                 }
             });
         }
+    };
+
+    const handleBack = () => {
+        if (step === 3) setStep(2);
+        else if (step === 2) setStep(1);
     };
 
     // Get available slots for the selected date
@@ -143,205 +170,257 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
-                {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800">
-                    <div className="flex items-center gap-4">
-                        {step === 2 && (
-                            <button onClick={() => setStep(1)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                                <ChevronLeft size={20} />
-                            </button>
-                        )}
-                        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-slate-100 dark:border-slate-800">
-                            <img src={teacher.photoURL || "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=100&h=100&fit=crop"} alt={teacher.name} className="w-full h-full object-cover" />
+                {/* Header with Stepper */}
+                <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center justify-between p-6 pb-2">
+                        <div className="flex items-center gap-4">
+                            {(step === 2 || step === 3) && (
+                                <Button variant="ghost" size="icon" onClick={handleBack} className="rounded-full">
+                                    <ChevronLeft size={20} />
+                                </Button>
+                            )}
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                                    Book a Session
+                                </h2>
+                                <p className="text-sm text-slate-500">with {teacher.name}</p>
+                            </div>
                         </div>
-                        <div>
-                            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                                {step === 1 ? 'Book a session' : 'Course Details'}
-                            </h2>
-                            <p className="text-sm text-slate-500">with {teacher.name}</p>
-                        </div>
+                        <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
+                            <X size={24} className="text-slate-500" />
+                        </Button>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
-                        <X size={24} className="text-slate-500" />
-                    </button>
+
+                    {/* Stepper */}
+                    <div className="flex items-center justify-between px-8 py-4">
+                        {STEPS.map((s, i) => (
+                            <div key={s.id} className="flex flex-1 items-center">
+                                <div className="flex flex-col items-center relative z-10 gap-1">
+                                    <div className={cn(
+                                        "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all",
+                                        step >= s.id ? "bg-cyan-700 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-400"
+                                    )}>
+                                        {step > s.id ? <Check size={14} /> : s.id}
+                                    </div>
+                                    <span className={cn(
+                                        "text-[10px] font-medium transition-all absolute top-full mt-1 whitespace-nowrap",
+                                        step >= s.id ? "text-cyan-700 dark:text-cyan-400" : "text-slate-400"
+                                    )}>
+                                        {s.label}
+                                    </span>
+                                </div>
+                                {i < STEPS.length - 1 && (
+                                    <div className={cn(
+                                        "h-[2px] w-full mx-2 transition-all",
+                                        step > s.id ? "bg-cyan-700" : "bg-slate-100 dark:bg-slate-800"
+                                    )} />
+                                )}
+                            </div>
+                        ))}
+                        {/* Final spacer to balance the last item if needed, but justify-between works */}
+                        {/* Actually, the above flex-1 approach puts lines to the right of items. The last item shouldn't have a line. */}
+                        {/* Correcting Logic: The items should be centered nodes with lines between them. */}
+                    </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6 space-y-8">
-                    {step === 1 ? (
-                        <>
-                            {/* Payment Mode & Plan Selection */}
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="font-bold text-slate-900 dark:text-slate-100">Select Plan</h3>
-                                    <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-lg inline-flex">
-                                        <button
-                                            onClick={() => setPaymentMode('monthly')}
-                                            className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${paymentMode === 'monthly' ? 'bg-white dark:bg-slate-700 shadow-sm text-cyan-700 dark:text-cyan-400' : 'text-slate-500'}`}
-                                        >
-                                            Monthly
-                                        </button>
-                                        <button
-                                            onClick={() => setPaymentMode('full')}
-                                            className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${paymentMode === 'full' ? 'bg-white dark:bg-slate-700 shadow-sm text-cyan-700 dark:text-cyan-400' : 'text-slate-500'}`}
-                                        >
-                                            Full Course
-                                        </button>
-                                    </div>
+                <div className="flex-1 overflow-y-auto p-6 space-y-8 pt-8">
+                    {/* Step 1: Select Plan */}
+                    {step === 1 && (
+                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                            <div className="flex items-center justify-between">
+                                <h3 className="font-bold text-slate-900 dark:text-slate-100">Choose your plan</h3>
+                                <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-lg inline-flex">
+                                    <button
+                                        onClick={() => setPaymentMode('monthly')}
+                                        className={cn(
+                                            "px-4 py-1.5 rounded-md text-xs font-bold transition-all",
+                                            paymentMode === 'monthly' ? "bg-white dark:bg-slate-700 shadow-sm text-cyan-700 dark:text-cyan-400" : "text-slate-500"
+                                        )}
+                                    >
+                                        Monthly
+                                    </button>
+                                    <button
+                                        onClick={() => setPaymentMode('full')}
+                                        className={cn(
+                                            "px-4 py-1.5 rounded-md text-xs font-bold transition-all",
+                                            paymentMode === 'full' ? "bg-white dark:bg-slate-700 shadow-sm text-cyan-700 dark:text-cyan-400" : "text-slate-500"
+                                        )}
+                                    >
+                                        Full Course
+                                    </button>
                                 </div>
+                            </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                    {PLANS.map(plan => (
+                            <div className="grid grid-cols-1 gap-4">
+                                {PLANS.map(plan => {
+                                    const totalSessions = paymentMode === 'monthly'
+                                        ? plan.classesPerWeek * 4
+                                        : plan.classesPerWeek * 20; // Assuming ~5 months for full course
+
+                                    return (
                                         <div
                                             key={plan.id}
                                             onClick={() => setSelectedPlan(plan.id)}
-                                            className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedPlan === plan.id ? 'border-cyan-500 bg-cyan-50/50 dark:bg-cyan-900/20' : 'border-slate-100 dark:border-slate-800 hover:border-cyan-200'}`}
-                                        >
-                                            {plan.popular && (
-                                                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-amber-400 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                                                    POPULAR
-                                                </div>
+                                            className={cn(
+                                                "relative p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between group",
+                                                selectedPlan === plan.id
+                                                    ? "border-cyan-500 bg-cyan-50/50 dark:bg-cyan-900/10 shadow-md transform scale-[1.02]"
+                                                    : "border-slate-100 dark:border-slate-800 hover:border-cyan-200 dark:hover:border-cyan-800"
                                             )}
-                                            <div className="text-center mb-2">
-                                                <div className="font-bold text-slate-900 dark:text-slate-100">{plan.name}</div>
-                                                <div className="text-xs text-slate-500">{plan.classesPerWeek} days/week</div>
-                                            </div>
-                                            <div className="text-center">
-                                                <span className="font-bold text-lg text-slate-900 dark:text-slate-100">₹{paymentMode === 'monthly' ? plan.priceMonthly : plan.priceFull}</span>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Day Selection */}
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="font-bold text-slate-900 dark:text-slate-100">Selected Days</h3>
-                                    {selectedPlan === 'silver' && (
-                                        <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-lg inline-flex">
-                                            <button
-                                                onClick={() => setSilverOption('MWF')}
-                                                className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${silverOption === 'MWF' ? 'bg-white dark:bg-slate-700 shadow-sm text-cyan-700 dark:text-cyan-400' : 'text-slate-500'}`}
-                                            >
-                                                MWF
-                                            </button>
-                                            <button
-                                                onClick={() => setSilverOption('TTS')}
-                                                className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${silverOption === 'TTS' ? 'bg-white dark:bg-slate-700 shadow-sm text-cyan-700 dark:text-cyan-400' : 'text-slate-500'}`}
-                                            >
-                                                TTS
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="flex flex-wrap gap-2">
-                                    {DAYS.map(day => {
-                                        const isSelected = selectedDays.includes(day);
-                                        return (
-                                            <div
-                                                key={day}
-                                                className={`flex-1 min-w-[40px] py-2 rounded-lg text-sm font-medium border text-center transition-all ${isSelected
-                                                    ? 'bg-cyan-700 text-white border-cyan-700 shadow-sm'
-                                                    : 'bg-slate-50 dark:bg-slate-900 text-slate-300 dark:text-slate-700 border-slate-100 dark:border-slate-800'
-                                                    }`}
-                                            >
-                                                {day}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                                <p className="text-xs text-slate-500">
-                                    {selectedPlan === 'silver'
-                                        ? "Choose between Mon-Wed-Fri or Tue-Thu-Sat schedule."
-                                        : selectedPlan === 'gold'
-                                            ? "Gold plan includes classes from Monday to Saturday."
-                                            : "Platinum plan includes classes on all days of the week."}
-                                </p>
-                            </div>
-
-                            {/* Schedule Selection */}
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="font-bold text-slate-900 dark:text-slate-100">Select Starting Date and Time</h3>
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => setWeekOffset(prev => Math.max(0, prev - 1))}
-                                            disabled={weekOffset === 0}
-                                            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg disabled:opacity-30"
                                         >
-                                            <ChevronLeft size={18} />
-                                        </button>
-                                        <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                                            <div className="flex items-center gap-4">
+                                                <div className={cn(
+                                                    "w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg",
+                                                    selectedPlan === plan.id ? "bg-cyan-100 text-cyan-700" : "bg-slate-100 text-slate-500"
+                                                )}>
+                                                    {plan.name.charAt(0)}
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <h4 className="font-bold text-slate-900 dark:text-slate-100">{plan.name} Plan</h4>
+                                                        {plan.popular && <Badge className="bg-amber-500 hover:bg-amber-500 text-[10px] h-5">POPULAR</Badge>}
+                                                    </div>
+                                                    <p className="text-sm text-slate-500">{plan.classesPerWeek} classes per week</p>
+                                                    <p className="text-xs font-bold text-cyan-600 dark:text-cyan-400 mt-1">
+                                                        Total Sessions: {totalSessions}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="block font-bold text-lg text-slate-900 dark:text-slate-100">
+                                                    ₹{paymentMode === 'monthly' ? plan.priceMonthly : plan.priceFull}
+                                                </span>
+                                                <span className="text-xs text-slate-400">{paymentMode === 'monthly' ? '/month' : '/course'}</span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+                                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-2">Plan Features:</h4>
+                                <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1 list-disc list-inside">
+                                    <li>Interactive live sessions</li>
+                                    <li>Access to class recordings</li>
+                                    <li>Doubt solving support</li>
+                                    {selectedPlan === 'platinum' && <li><strong>1-on-1 Mentorship included</strong></li>}
+                                </ul>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 2: Schedule */}
+                    {step === 2 && (
+                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+
+                            <div className="bg-cyan-50 dark:bg-cyan-900/20 p-4 rounded-xl border border-cyan-100 dark:border-cyan-800 flex items-center justify-between">
+                                <div>
+                                    <span className="text-xs text-cyan-600 font-bold uppercase tracking-wider block mb-1">Selected Plan</span>
+                                    <span className="font-bold text-slate-900 dark:text-slate-100">{PLANS.find(p => p.id === selectedPlan)?.name} Plan</span>
+                                </div>
+                                <Button variant="link" size="sm" onClick={() => setStep(1)} className="text-cyan-700 h-auto p-0">Change</Button>
+                            </div>
+
+                            {selectedPlan === 'silver' && (
+                                <div className="space-y-3">
+                                    <Label>Preferred Schedule</Label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div
+                                            onClick={() => setSilverOption('MWF')}
+                                            className={cn(
+                                                "p-3 rounded-xl border-2 cursor-pointer text-center transition-all",
+                                                silverOption === 'MWF' ? "border-cyan-500 bg-cyan-50 text-cyan-700" : "border-slate-100 hover:border-slate-200"
+                                            )}
+                                        >
+                                            <span className="font-bold block">Mon - Wed - Fri</span>
+                                        </div>
+                                        <div
+                                            onClick={() => setSilverOption('TTS')}
+                                            className={cn(
+                                                "p-3 rounded-xl border-2 cursor-pointer text-center transition-all",
+                                                silverOption === 'TTS' ? "border-cyan-500 bg-cyan-50 text-cyan-700" : "border-slate-100 hover:border-slate-200"
+                                            )}
+                                        >
+                                            <span className="font-bold block">Tue - Thu - Sat</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <Label>Select Start Date</Label>
+                                    <div className="flex items-center gap-1">
+                                        <Button variant="ghost" size="icon" onClick={() => setWeekOffset(Math.max(0, weekOffset - 1))} disabled={weekOffset === 0} className="h-8 w-8">
+                                            <ChevronLeft size={16} />
+                                        </Button>
+                                        <span className="text-xs font-bold w-24 text-center">
                                             {dates[0].toLocaleDateString('default', { month: 'short', day: 'numeric' })} - {dates[6].toLocaleDateString('default', { month: 'short', day: 'numeric' })}
                                         </span>
-                                        <button
-                                            onClick={() => setWeekOffset(prev => prev + 1)}
-                                            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
-                                        >
-                                            <ChevronRight size={18} />
-                                        </button>
+                                        <Button variant="ghost" size="icon" onClick={() => setWeekOffset(weekOffset + 1)} className="h-8 w-8">
+                                            <ChevronRight size={16} />
+                                        </Button>
                                     </div>
                                 </div>
 
-                                {/* Calendar Strip */}
-                                <div className="flex justify-between gap-2 overflow-x-auto pb-2">
-                                    {dates.map((date, index) => {
-                                        const dayName = date.toLocaleDateString('default', { weekday: 'short' });
-                                        const isAvailable = selectedDays.includes(dayName);
-                                        const isSelected = selectedDate?.toDateString() === date.toDateString();
+                                <ScrollArea className="w-full pb-4">
+                                    <div className="flex gap-2">
+                                        {dates.map((date, index) => {
+                                            const dayName = date.toLocaleDateString('default', { weekday: 'short' });
+                                            const isAvailable = selectedDays.includes(dayName);
+                                            const isSelected = selectedDate?.toDateString() === date.toDateString();
 
-                                        return (
-                                            <button
-                                                key={index}
-                                                onClick={() => {
-                                                    if (isAvailable) {
-                                                        setSelectedDate(date);
-                                                        setSelectedSlot(null); // Reset slot on date change
-                                                    }
-                                                }}
-                                                disabled={!isAvailable}
-                                                className={`flex-1 min-w-[60px] flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${isSelected
-                                                    ? 'bg-cyan-700 text-white border-cyan-700 shadow-md transform scale-105'
-                                                    : isAvailable
-                                                        ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-cyan-300'
-                                                        : 'bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 text-slate-300 dark:text-slate-700 cursor-not-allowed'
-                                                    }`}
-                                            >
-                                                <span className="text-xs font-medium mb-1">{dayName}</span>
-                                                <span className="text-lg font-bold">{date.getDate()}</span>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
+                                            return (
+                                                <button
+                                                    key={index}
+                                                    onClick={() => {
+                                                        if (isAvailable) {
+                                                            setSelectedDate(date);
+                                                            setSelectedSlot(null);
+                                                        }
+                                                    }}
+                                                    disabled={!isAvailable}
+                                                    className={cn(
+                                                        "flex-shrink-0 w-[4.5rem] flex flex-col items-center justify-center p-3 rounded-xl border transition-all",
+                                                        isSelected ? "bg-cyan-700 text-white border-cyan-700 shadow-md transform scale-105" :
+                                                            isAvailable ? "bg-white dark:bg-slate-900 border-slate-200 hover:border-cyan-300 text-slate-700 dark:text-slate-300" :
+                                                                "bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 text-slate-300 cursor-not-allowed"
+                                                    )}
+                                                >
+                                                    <span className="text-[10px] font-medium uppercase mb-0.5">{dayName}</span>
+                                                    <span className="text-xl font-bold">{date.getDate()}</span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </ScrollArea>
+                            </div>
 
-                                {/* Time Slots */}
-                                {selectedDate && (
-                                    <div className="animate-in fade-in slide-in-from-top-2 duration-200 space-y-6">
-                                        <div className="flex items-center gap-2 text-sm text-slate-500">
-                                            <Clock size={14} />
-                                            <span>Available slots for {selectedDate.toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
+                            {selectedDate && (
+                                <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div className="flex items-center gap-2 text-sm text-slate-500 font-medium">
+                                        <Clock size={16} className="text-cyan-600" />
+                                        Available slots for {selectedDate.toLocaleDateString('default', { weekday: 'long', day: 'numeric', month: 'long' })}
+                                    </div>
+
+                                    {!hasSlots ? (
+                                        <div className="p-8 text-center bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200">
+                                            <p className="text-slate-500 text-sm">No slots available for this day. Please choose another date.</p>
                                         </div>
-
-                                        {!hasSlots ? (
-                                            <div className="text-center py-8 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
-                                                <p className="text-slate-500">No slots available for this day.</p>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                {/* Morning Slots */}
+                                    ) : (
+                                        <ScrollArea className="h-48 pr-4">
+                                            <div className="space-y-4">
                                                 {availableSlots.morning.length > 0 && (
-                                                    <div className="space-y-3">
-                                                        <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-slate-100">
-                                                            <Sunrise size={16} className="text-amber-500" />
-                                                            Morning
-                                                        </div>
-                                                        <div className="flex flex-wrap gap-3">
+                                                    <div className="space-y-2">
+                                                        <span className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                                                            <Sunrise size={14} /> Morning
+                                                        </span>
+                                                        <div className="flex flex-wrap gap-2">
                                                             {availableSlots.morning.map(time => (
                                                                 <button
                                                                     key={time}
                                                                     onClick={() => setSelectedSlot(time)}
-                                                                    className={`py-2 px-4 rounded-lg text-sm font-medium border transition-all ${selectedSlot === time ? 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-800 dark:text-cyan-300 border-cyan-300 dark:border-cyan-700' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-cyan-300'}`}
+                                                                    className={cn("px-3 py-2 text-xs font-bold rounded-lg border transition-all", selectedSlot === time ? "bg-cyan-100 text-cyan-800 border-cyan-300" : "bg-white border-slate-200 hover:border-cyan-200")}
                                                                 >
                                                                     {time}
                                                                 </button>
@@ -349,20 +428,17 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
                                                         </div>
                                                     </div>
                                                 )}
-
-                                                {/* Afternoon Slots */}
                                                 {availableSlots.afternoon.length > 0 && (
-                                                    <div className="space-y-3">
-                                                        <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-slate-100">
-                                                            <Sun size={16} className="text-orange-500" />
-                                                            Afternoon
-                                                        </div>
-                                                        <div className="flex flex-wrap gap-3">
+                                                    <div className="space-y-2">
+                                                        <span className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                                                            <Sun size={14} /> Afternoon
+                                                        </span>
+                                                        <div className="flex flex-wrap gap-2">
                                                             {availableSlots.afternoon.map(time => (
                                                                 <button
                                                                     key={time}
                                                                     onClick={() => setSelectedSlot(time)}
-                                                                    className={`py-2 px-4 rounded-lg text-sm font-medium border transition-all ${selectedSlot === time ? 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-800 dark:text-cyan-300 border-cyan-300 dark:border-cyan-700' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-cyan-300'}`}
+                                                                    className={cn("px-3 py-2 text-xs font-bold rounded-lg border transition-all", selectedSlot === time ? "bg-cyan-100 text-cyan-800 border-cyan-300" : "bg-white border-slate-200 hover:border-cyan-200")}
                                                                 >
                                                                     {time}
                                                                 </button>
@@ -370,20 +446,17 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
                                                         </div>
                                                     </div>
                                                 )}
-
-                                                {/* Evening Slots */}
                                                 {availableSlots.evening.length > 0 && (
-                                                    <div className="space-y-3">
-                                                        <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-slate-100">
-                                                            <Moon size={16} className="text-indigo-500" />
-                                                            Evening
-                                                        </div>
-                                                        <div className="flex flex-wrap gap-3">
+                                                    <div className="space-y-2">
+                                                        <span className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                                                            <Moon size={14} /> Evening
+                                                        </span>
+                                                        <div className="flex flex-wrap gap-2">
                                                             {availableSlots.evening.map(time => (
                                                                 <button
                                                                     key={time}
                                                                     onClick={() => setSelectedSlot(time)}
-                                                                    className={`py-2 px-4 rounded-lg text-sm font-medium border transition-all ${selectedSlot === time ? 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-800 dark:text-cyan-300 border-cyan-300 dark:border-cyan-700' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-cyan-300'}`}
+                                                                    className={cn("px-3 py-2 text-xs font-bold rounded-lg border transition-all", selectedSlot === time ? "bg-cyan-100 text-cyan-800 border-cyan-300" : "bg-white border-slate-200 hover:border-cyan-200")}
                                                                 >
                                                                     {time}
                                                                 </button>
@@ -391,146 +464,147 @@ export default function BookingSelectionModal({ teacher, studentId, onClose }: B
                                                         </div>
                                                     </div>
                                                 )}
+                                            </div>
+                                        </ScrollArea>
+                                    )}
+                                </div>
+                            )}
 
-                                                {/* Night Slots */}
-                                                {availableSlots.night.length > 0 && (
-                                                    <div className="space-y-3">
-                                                        <div className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-slate-100">
-                                                            <Moon size={16} className="text-slate-600" />
-                                                            Night
-                                                        </div>
-                                                        <div className="flex flex-wrap gap-3">
-                                                            {availableSlots.night.map(time => (
-                                                                <button
-                                                                    key={time}
-                                                                    onClick={() => setSelectedSlot(time)}
-                                                                    className={`py-2 px-4 rounded-lg text-sm font-medium border transition-all ${selectedSlot === time ? 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-800 dark:text-cyan-300 border-cyan-300 dark:border-cyan-700' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-cyan-300'}`}
-                                                                >
-                                                                    {time}
-                                                                </button>
-                                                            ))}
-                                                        </div>
+                        </div>
+                    )}
+
+                    {/* Step 3: Details */}
+                    {step === 3 && (
+                        <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                            <div className="bg-cyan-50 dark:bg-cyan-900/20 p-4 rounded-xl border border-cyan-100 dark:border-cyan-800 flex items-center gap-4">
+                                <div className="bg-white p-2 rounded-lg shadow-sm">
+                                    <div className="text-center min-w-[3rem]">
+                                        <span className="text-[10px] uppercase font-bold text-slate-500 block">{selectedDate?.toLocaleDateString('default', { month: 'short' })}</span>
+                                        <span className="text-xl font-bold text-slate-900">{selectedDate?.getDate()}</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <h4 className="font-bold text-slate-900 dark:text-slate-100">{selectedSlot}</h4>
+                                        <Button variant="link" size="sm" onClick={() => setStep(2)} className="text-cyan-700 h-auto p-0">Change</Button>
+                                    </div>
+                                    <p className="text-xs text-slate-500">First session starts on {selectedDate?.toLocaleDateString('default', { weekday: 'long' })}</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Subject <span className="text-red-500">*</span></Label>
+                                    <Select value={subject} onValueChange={setSubject}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select Subject" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {['Physics', 'Chemistry', 'Mathematics', 'Biology', 'English', 'Computer Science', 'Economics'].map(s => (
+                                                <SelectItem key={s} value={s}>{s}</SelectItem>
+                                            ))}
+                                            <SelectItem value="Other">Other</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Grade/Class <span className="text-red-500">*</span></Label>
+                                    <Select value={grade} onValueChange={setGrade}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select Grade" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {['Class 9', 'Class 10', 'Class 11', 'Class 12', 'College'].map(g => (
+                                                <SelectItem key={g} value={g}>{g}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Topic / Course Title <span className="text-red-500">*</span></Label>
+                                <Input
+                                    value={courseTopic}
+                                    onChange={(e) => setCourseTopic(e.target.value)}
+                                    placeholder="e.g. Thermodynamics, calculus, etc."
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Description (Optional)</Label>
+                                <Textarea
+                                    value={courseDescription}
+                                    onChange={(e) => setCourseDescription(e.target.value)}
+                                    placeholder="Briefly describe what you want to learn..."
+                                    className="h-20 resize-none"
+                                />
+                            </div>
+
+                            <div className="space-y-3 pt-2">
+                                <div className="flex items-center justify-between">
+                                    <Label>Invite Friends (Group Study)</Label>
+                                    <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">Get 5% off per friend</span>
+                                </div>
+
+                                <div className="flex gap-2 items-end">
+                                    <div className="w-32">
+                                        <Label className="text-xs text-slate-500 mb-1.5 block">Phone Number</Label>
+                                        <Input
+                                            value={newMemberPhone}
+                                            onChange={(e) => setNewMemberPhone(e.target.value)}
+                                            placeholder="98765..."
+                                            className="h-10"
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <Label className="text-xs text-slate-500 mb-1.5 block">Student Name</Label>
+                                        <Input
+                                            value={newMemberName}
+                                            readOnly
+                                            placeholder="Name auto-fills..."
+                                            className="h-10 bg-slate-50 dark:bg-slate-900 text-slate-500"
+                                        />
+                                    </div>
+                                    <Button onClick={handleAddMember} disabled={!newMemberPhone} size="icon" className="h-10 w-10 shrink-0">
+                                        <Users size={18} />
+                                    </Button>
+                                </div>
+
+                                {members.length > 0 && (
+                                    <div className="space-y-2">
+                                        {members.map((member, idx) => (
+                                            <div key={idx} className="flex items-center justify-between bg-slate-50 dark:bg-slate-800 p-2 rounded-lg text-sm">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-6 h-6 rounded-full bg-cyan-100 text-cyan-700 flex items-center justify-center text-xs font-bold">
+                                                        {member.name.charAt(0)}
                                                     </div>
-                                                )}
-                                            </>
-                                        )}
+                                                    <span>{member.name}</span>
+                                                </div>
+                                                <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500" onClick={() => handleRemoveMember(idx)}>
+                                                    <X size={14} />
+                                                </Button>
+                                            </div>
+                                        ))}
                                     </div>
                                 )}
-                            </div>
-                        </>
-                    ) : (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                            <div className="space-y-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-900 dark:text-slate-100">Subject <span className="text-red-500">*</span></label>
-                                        <select
-                                            value={subject}
-                                            onChange={(e) => setSubject(e.target.value)}
-                                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none"
-                                        >
-                                            <option value="">Select Subject</option>
-                                            {['Physics', 'Chemistry', 'Mathematics', 'Biology', 'English', 'Computer Science', 'History', 'Geography', 'Economics', 'Other'].map(s => (
-                                                <option key={s} value={s}>{s}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-900 dark:text-slate-100">Grade / Class <span className="text-red-500">*</span></label>
-                                        <select
-                                            value={grade}
-                                            onChange={(e) => setGrade(e.target.value)}
-                                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none"
-                                        >
-                                            <option value="">Select Grade</option>
-                                            {['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12', 'College', 'Other'].map(g => (
-                                                <option key={g} value={g}>{g}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold text-slate-900 dark:text-slate-100">Course Title <span className="text-red-500">*</span></label>
-                                    <input
-                                        type="text"
-                                        value={courseTopic}
-                                        onChange={(e) => setCourseTopic(e.target.value)}
-                                        placeholder="e.g. Physics for Class 12th"
-                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none"
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold text-slate-900 dark:text-slate-100">Description (Optional)</label>
-                                    <textarea
-                                        value={courseDescription}
-                                        onChange={(e) => setCourseDescription(e.target.value)}
-                                        placeholder="Briefly describe what you want to learn..."
-                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none h-24 resize-none"
-                                    />
-                                </div>
-
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-900 dark:text-slate-100">Add Friends (Group Study)</label>
-                                        <p className="text-xs text-slate-500 mb-2">Add friends to your group and get 5% discount for each member!</p>
-
-                                        <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
-                                            <input
-                                                type="text"
-                                                value={newMemberName}
-                                                onChange={(e) => setNewMemberName(e.target.value)}
-                                                placeholder="Friend's Name"
-                                                className="sm:col-span-2 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none"
-                                            />
-                                            <input
-                                                type="tel"
-                                                value={newMemberPhone}
-                                                onChange={(e) => setNewMemberPhone(e.target.value)}
-                                                placeholder="Phone Number"
-                                                className="sm:col-span-2 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none"
-                                            />
-                                            <button
-                                                onClick={handleAddMember}
-                                                disabled={!newMemberName || !newMemberPhone}
-                                                className="sm:col-span-1 px-4 py-2 bg-slate-900 dark:bg-slate-700 text-white rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                                Add
-                                            </button>
-                                        </div>
-
-                                        {members.length > 0 && (
-                                            <div className="flex flex-col gap-2 mt-3">
-                                                {members.map((member, idx) => (
-                                                    <div key={idx} className="flex items-center justify-between bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 px-4 py-2 rounded-lg text-sm font-medium border border-cyan-100 dark:border-cyan-800">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="font-bold">{member.name}</span>
-                                                            <span className="text-xs opacity-70">({member.phone})</span>
-                                                        </div>
-                                                        <button onClick={() => handleRemoveMember(idx)} className="hover:text-red-500 transition-colors p-1">
-                                                            <X size={16} />
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     )}
                 </div>
 
-                {/* Footer */}
-                <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
-                    <button
+                {/* Footer Action */}
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                    <Button
                         onClick={handleContinue}
-                        disabled={step === 1 ? (!selectedDate || !selectedSlot) : (!courseTopic || !subject || !grade)}
-                        className="w-full py-3.5 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-800 transition-all shadow-lg shadow-cyan-700/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        disabled={
+                            step === 2 ? (!selectedDate || !selectedSlot) :
+                                step === 3 ? (!courseTopic || !subject || !grade) : false
+                        }
+                        className="w-full py-6 text-base font-bold shadow-lg shadow-cyan-700/20"
                     >
-                        {step === 1 ? 'Next Step' : 'Proceed to Checkout'} <ArrowRight size={18} />
-                    </button>
+                        {step === 3 ? 'Proceed to Checkout' : 'Next Step'} <ArrowRight className="ml-2" size={20} />
+                    </Button>
                 </div>
             </div>
         </div>

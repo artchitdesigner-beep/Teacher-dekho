@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, X, ChevronDown, Bell } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import ProfileDropdown from './ProfileDropdown';
-import logoWithBackground from '@/assets/logo with Background.svg';
+import logoWithBackground from '@/assets/logo.svg';
 import { ModeToggle } from '@/components/mode-toggle';
 import { Button } from '@/components/ui/button';
 import {

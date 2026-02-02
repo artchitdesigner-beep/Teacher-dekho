@@ -7,8 +7,15 @@ import {
     Clock, AlertCircle,
     Video, Info, User,
     ExternalLink, ChevronLeft, Trash2, CreditCard,
-    Crown, Zap, Star, MoreVertical
+    Crown, Zap, Star, CheckCircle2,
+    Calendar, FileText, MessageSquare, Users, Megaphone, Download, File
 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
 
 interface Session {
     id: string;
@@ -83,20 +90,7 @@ export default function BookingDetail() {
         fetchBooking();
     }, [bookingId, user]);
 
-    const handleCancelBooking = async () => {
-        if (!booking) return;
-        if (!confirm("Are you sure you want to cancel this booking? This action cannot be undone.")) return;
-
-        try {
-            const docRef = doc(db, 'bookings', booking.id);
-            await updateDoc(docRef, { status: 'rejected', teacherRemarks: 'Cancelled by student' });
-            setBooking({ ...booking, status: 'rejected' });
-            alert("Booking cancelled successfully.");
-        } catch (err) {
-            console.error("Error cancelling booking:", err);
-            alert("Failed to cancel booking.");
-        }
-    };
+    // function handleCancelBooking removed.
 
     const handlePayment = async () => {
         if (!booking) return;
@@ -123,6 +117,10 @@ export default function BookingDetail() {
     const nextSession = getNextSession();
     const firstSessionCompleted = booking?.sessions?.some(s => s.isDemo && s.status === 'completed');
 
+    // Calculate progress
+    const completedSessions = booking?.sessions?.filter(s => s.status === 'completed').length || 0;
+    const progressPercent = booking ? (completedSessions / booking.totalSessions) * 100 : 0;
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
@@ -137,12 +135,9 @@ export default function BookingDetail() {
                 <AlertCircle className="mx-auto text-red-500 mb-4" size={48} />
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Oops!</h2>
                 <p className="text-slate-500 dark:text-slate-400 mb-6">{error || "Something went wrong."}</p>
-                <button
-                    onClick={() => navigate('/student/courses')}
-                    className="px-6 py-2 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all"
-                >
+                <Button onClick={() => navigate('/student/courses')}>
                     Go Back
-                </button>
+                </Button>
             </div>
         );
     }
@@ -160,337 +155,413 @@ export default function BookingDetail() {
                     <ChevronLeft size={20} />
                     Back to Courses
                 </button>
-                <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${booking.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
-                    booking.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                        'bg-slate-100 text-slate-600'
+                <Badge variant="outline" className={`px-3 py-1 text-xs font-bold uppercase tracking-wider ${booking.status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                    booking.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                        'bg-slate-50 text-slate-600 border-slate-200'
                     }`}>
                     {booking.status}
-                </div>
+                </Badge>
             </div>
 
             {/* Main Header Card */}
-            <div className="bg-white dark:bg-slate-900 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
-                <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-                    <div className="space-y-4">
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                <div className="relative z-10 flex flex-col lg:flex-row gap-8 justify-between">
+                    <div className="space-y-4 flex-grow max-w-3xl">
                         <div className="flex flex-wrap items-center gap-3">
-                            <span className="px-3 py-1 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400 text-[10px] font-bold uppercase rounded-lg">
-                                {booking.totalSessions} Sessions Course
-                            </span>
+                            <Badge variant="secondary" className="text-cyan-700 bg-cyan-50">
+                                {booking.totalSessions} Sessions
+                            </Badge>
                             {/* Plan Badge */}
                             {(booking as any).planType && (
-                                <span className={`px-3 py-1 text-[10px] font-bold uppercase rounded-lg flex items-center gap-1
-                                    ${(booking as any).planType === 'platinum' ? 'bg-cyan-100 text-cyan-700' :
-                                        (booking as any).planType === 'gold' ? 'bg-amber-100 text-amber-700' :
-                                            'bg-slate-100 text-slate-600'}`}>
-                                    {(booking as any).planType === 'platinum' && <Crown size={12} />}
-                                    {(booking as any).planType === 'gold' && <Zap size={12} />}
-                                    {(booking as any).planType === 'silver' && <Star size={12} />}
-                                    {(booking as any).planType} Plan
-                                </span>
+                                <Badge variant="outline" className="flex items-center gap-1">
+                                    {(booking as any).planType === 'platinum' && <Crown size={12} className="text-cyan-500" />}
+                                    {(booking as any).planType === 'gold' && <Zap size={12} className="text-amber-500" />}
+                                    {(booking as any).planType === 'silver' && <Star size={12} className="text-slate-400" />}
+                                    <span className="capitalize">{(booking as any).planType} Plan</span>
+                                </Badge>
                             )}
-                            <span className="hidden md:inline text-slate-300">|</span>
-                            <span className="text-slate-500 text-xs md:text-sm flex items-center gap-1">
+                            <span className="text-slate-300">|</span>
+                            <span className="text-slate-500 text-sm flex items-center gap-1 font-medium">
                                 <User size={14} /> {booking.teacherName}
                             </span>
                         </div>
-                        <h1 className="text-3xl md:text-5xl font-serif font-bold text-slate-900 dark:text-slate-100 leading-tight">
+
+                        <h1 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-slate-100 leading-tight">
                             {booking.topic}
                         </h1>
-                        {booking.description && (
-                            <p className="text-slate-500 dark:text-slate-400 text-base md:text-lg max-w-2xl">{booking.description}</p>
-                        )}
+
+                        <div className="flex items-center gap-4 pt-2">
+                            <div className="flex-1 max-w-md">
+                                <div className="flex justify-between text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">
+                                    <span>Progress</span>
+                                    <span>{Math.round(progressPercent)}%</span>
+                                </div>
+                                <Progress value={progressPercent} className="h-2" />
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="flex flex-col gap-3 min-w-[200px]">
+                    <div className="flex flex-col gap-3 min-w-[240px] shrink-0">
                         {canJoin ? (
-                            <button className="w-full py-3.5 md:py-4 bg-cyan-700 text-white font-bold rounded-2xl hover:bg-cyan-700 transition-all shadow-lg shadow-cyan-100 flex items-center justify-center gap-2">
-                                <Video size={20} />
-                                Join Class Now
-                            </button>
-                        ) : (
-                            <button disabled className="w-full py-3.5 md:py-4 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-bold rounded-2xl cursor-not-allowed flex items-center justify-center gap-2">
-                                <Video size={20} />
-                                Join Class
-                            </button>
-                        )}
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => alert("Change Plan feature coming soon!")}
-                                className="flex-1 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-2xl hover:border-cyan-200 dark:hover:border-cyan-800 hover:text-cyan-700 dark:hover:text-cyan-400 transition-all text-sm"
+                            <Button
+                                className="w-full py-6 text-lg font-bold shadow-xl shadow-cyan-700/20"
+                                onClick={() => { }} // Integration logic would go here
                             >
-                                Change Plan
-                            </button>
-                            {booking.status !== 'rejected' && (
-                                <button
-                                    onClick={handleCancelBooking}
-                                    className="p-3 text-red-500 hover:bg-red-50 rounded-2xl transition-colors border border-transparent hover:border-red-100"
-                                >
-                                    <Trash2 size={20} />
-                                </button>
-                            )}
+                                <Video size={20} className="mr-2" /> Join Class Now
+                            </Button>
+                        ) : (
+                            <Button disabled className="w-full py-6 text-lg font-bold opacity-50">
+                                <Video size={20} className="mr-2" /> No Class Now
+                            </Button>
+                        )}
+
+                        <div className="flex gap-2">
+                            <Button variant="outline" className="flex-1 border-cyan-200 text-cyan-700 hover:bg-cyan-50 hover:text-cyan-800 hover:border-cyan-300" onClick={() => alert("Upgrade Plan feature coming soon!")}>
+                                <Crown size={16} className="mr-2" /> Upgrade Plan
+                            </Button>
+                            {/* Cancel button removed as per requirement */}
                         </div>
                     </div>
                 </div>
                 {/* Decorative background element */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-50 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl opacity-50"></div>
+                <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-50/50 dark:bg-cyan-900/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none"></div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Left Column: Details */}
-                <div className="lg:col-span-2 space-y-8">
-                    {/* Sessions List Card */}
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
-                            <Clock className="text-cyan-700 dark:text-cyan-400" size={20} />
-                            Course Sessions
-                        </h3>
-                        <div className="space-y-4">
+                {/* Left Column: Tabs Content */}
+                <div className="lg:col-span-2">
+                    <Tabs defaultValue="sessions" className="w-full">
+                        <TabsList className="w-full justify-start h-auto p-0 bg-transparent border-b border-slate-200 dark:border-slate-800 rounded-none mb-8 gap-6 overflow-x-auto">
+                            <TabsTrigger
+                                value="sessions"
+                                className="bg-transparent text-slate-500 dark:text-slate-400 data-[state=active]:bg-transparent data-[state=active]:text-cyan-700 dark:data-[state=active]:text-cyan-400 data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-cyan-700 dark:data-[state=active]:border-cyan-400 rounded-none px-2 py-3 font-bold flex items-center gap-2 transition-all"
+                            >
+                                <Clock size={16} /> Sessions
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="resources"
+                                className="bg-transparent text-slate-500 dark:text-slate-400 data-[state=active]:bg-transparent data-[state=active]:text-cyan-700 dark:data-[state=active]:text-cyan-400 data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-cyan-700 dark:data-[state=active]:border-cyan-400 rounded-none px-2 py-3 font-bold flex items-center gap-2 transition-all"
+                            >
+                                <FileText size={16} /> Resources
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="announcements"
+                                className="bg-transparent text-slate-500 dark:text-slate-400 data-[state=active]:bg-transparent data-[state=active]:text-cyan-700 dark:data-[state=active]:text-cyan-400 data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-cyan-700 dark:data-[state=active]:border-cyan-400 rounded-none px-2 py-3 font-bold flex items-center gap-2 transition-all"
+                            >
+                                <Megaphone size={16} /> Updates
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="curriculum"
+                                className="bg-transparent text-slate-500 dark:text-slate-400 data-[state=active]:bg-transparent data-[state=active]:text-cyan-700 dark:data-[state=active]:text-cyan-400 data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-cyan-700 dark:data-[state=active]:border-cyan-400 rounded-none px-2 py-3 font-bold flex items-center gap-2 transition-all"
+                            >
+                                <Info size={16} /> Course Info
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="group"
+                                className="bg-transparent text-slate-500 dark:text-slate-400 data-[state=active]:bg-transparent data-[state=active]:text-cyan-700 dark:data-[state=active]:text-cyan-400 data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-cyan-700 dark:data-[state=active]:border-cyan-400 rounded-none px-2 py-3 font-bold flex items-center gap-2 transition-all"
+                            >
+                                <Users size={16} /> Study Group
+                            </TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="sessions" className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
                             {booking.sessions?.map((session, idx) => (
-                                <div key={session.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${session.id === nextSession?.id ? 'bg-cyan-50 dark:bg-cyan-900/20 border-cyan-100 dark:border-cyan-900/30 ring-1 ring-cyan-50 dark:ring-cyan-900/20' : 'bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-700'}`}>
-                                    <div className="flex items-center gap-4">
-                                        <div className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center font-bold shrink-0 ${session.id === nextSession?.id ? 'bg-white dark:bg-slate-900 text-cyan-700 dark:text-cyan-400 shadow-sm' : 'bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500'}`}>
-                                            <span className="text-sm">{session.scheduledAt.toDate().getDate()}</span>
-                                            <span className="text-[8px] uppercase">{session.scheduledAt.toDate().toLocaleString('default', { month: 'short' })}</span>
+                                <Card key={session.id} className={`border transition-all ${session.id === nextSession?.id ? 'border-cyan-200 bg-cyan-50/50 dark:border-cyan-800 dark:bg-cyan-900/10 shadow-md' : 'border-slate-100 dark:border-slate-800 shadow-sm'}`}>
+                                    <div className="p-4 flex items-center justify-between">
+                                        <div className="flex items-center gap-4">
+                                            <div className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center font-bold shrink-0 ${session.id === nextSession?.id ? 'bg-white dark:bg-slate-900 text-cyan-700 dark:text-cyan-400 shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'}`}>
+                                                <span className="text-lg leading-none">{session.scheduledAt.toDate().getDate()}</span>
+                                                <span className="text-[9px] uppercase font-bold">{session.scheduledAt.toDate().toLocaleString('default', { month: 'short' })}</span>
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="font-bold text-slate-900 dark:text-slate-100">Session {idx + 1}</span>
+                                                    {session.isDemo && <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-cyan-100 text-cyan-700 uppercase">Demo</Badge>}
+                                                </div>
+                                                <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                                                    <Clock size={14} /> {session.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    <span className="text-slate-300">•</span>
+                                                    <span>{session.scheduledAt.toDate().toLocaleDateString('en-US', { weekday: 'long' })}</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <div className="flex items-center gap-2 mb-0.5">
-                                                <span className="text-sm font-bold text-slate-900 dark:text-slate-100">Session {idx + 1}</span>
-                                                {session.isDemo && <span className="text-[8px] font-bold bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 px-1.5 py-0.5 rounded uppercase">Demo</span>}
-                                            </div>
-                                            <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                                                <Clock size={12} /> {session.scheduledAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </div>
+
+                                        <div className="flex items-center gap-3">
+                                            <Badge variant={session.status === 'completed' ? 'default' : session.status === 'confirmed' ? 'outline' : 'secondary'}
+                                                className={session.status === 'completed' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-emerald-200' :
+                                                    session.status === 'confirmed' ? 'text-blue-600 border-blue-200 bg-blue-50' : ''}>
+                                                {session.status}
+                                            </Badge>
+
+                                            {session.id === nextSession?.id && (
+                                                <Button size="sm" className="bg-cyan-700 hover:bg-cyan-800 text-white shadow-lg shadow-cyan-100">
+                                                    Start <Video size={14} className="ml-1.5" />
+                                                </Button>
+                                            )}
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${session.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
-                                            session.status === 'confirmed' ? 'bg-blue-100 text-blue-700' :
-                                                'bg-amber-100 text-amber-700'
-                                            }`}>
-                                            {session.status}
-                                        </span>
-                                        {session.id === nextSession?.id && (
-                                            <button className="p-2 bg-cyan-700 text-white rounded-lg hover:bg-cyan-700 transition-all shadow-md shadow-cyan-100">
-                                                <Video size={16} />
-                                            </button>
-                                        )}
-                                        {session.status === 'confirmed' && (
-                                            <div className="relative group">
-                                                <button className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-                                                    <MoreVertical size={16} />
-                                                </button>
-                                                <div className="absolute right-0 top-full mt-1 w-32 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 p-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                                </Card>
+                            ))}
+                        </TabsContent>
+
+                        <TabsContent value="resources" className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                            <Card className="rounded-[2rem] border-slate-200 dark:border-slate-800 shadow-sm">
+                                <CardHeader>
+                                    <div className="flex items-center gap-2">
+                                        <FileText className="text-cyan-700" size={20} />
+                                        <CardTitle className="text-lg">Class Resources</CardTitle>
+                                    </div>
+                                    <CardDescription>
+                                        Files and documents shared by your teacher.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-3">
+                                    {[1, 2, 3].map((i) => (
+                                        <div key={i} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group cursor-pointer border border-slate-100 dark:border-slate-700">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center shrink-0">
+                                                    <File size={20} />
+                                                </div>
+                                                <div>
+                                                    <div className="font-bold text-slate-900 dark:text-slate-100">Lecture {i} Notes.pdf</div>
+                                                    <div className="text-xs text-slate-500">Uploaded {i} days ago • 2.4 MB</div>
+                                                </div>
+                                            </div>
+                                            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-cyan-700">
+                                                <Download size={18} />
+                                            </Button>
+                                        </div>
+                                    ))}
+                                    <div className="p-4 bg-cyan-50 dark:bg-cyan-900/10 rounded-2xl border border-cyan-100 dark:border-cyan-800 text-center text-sm text-cyan-800 dark:text-cyan-300">
+                                        No more resources available.
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+
+                        <TabsContent value="announcements" className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                            <Card className="rounded-[2rem] border-slate-200 dark:border-slate-800 shadow-sm">
+                                <CardHeader>
+                                    <div className="flex items-center gap-2">
+                                        <Megaphone className="text-cyan-700" size={20} />
+                                        <CardTitle className="text-lg">Announcements</CardTitle>
+                                    </div>
+                                    <CardDescription>
+                                        Latest updates from your teacher.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-6">
+                                    {[
+                                        { title: "Class Rescheduled", date: "2 days ago", content: "The class scheduled for Friday is moved to Saturday at 10 AM.", important: true },
+                                        { title: "Exam Preparation", date: "1 week ago", content: "Please review Chapter 4 before the next session." }
+                                    ].map((update, i) => (
+                                        <div key={i} className={`p-5 rounded-2xl border ${update.important ? 'bg-amber-50 border-amber-100 dark:bg-amber-900/10 dark:border-amber-800/30' : 'bg-slate-50 border-slate-100 dark:bg-slate-800/50 dark:border-slate-700'}`}>
+                                            <div className="flex items-start justify-between mb-2">
+                                                <div className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                                                    {update.title}
+                                                    {update.important && <Badge variant="secondary" className="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0 h-5">Important</Badge>}
+                                                </div>
+                                                <span className="text-xs text-slate-500">{update.date}</span>
+                                            </div>
+                                            <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+                                                {update.content}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+
+                        <TabsContent value="curriculum" className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                            <Card className="rounded-[2rem] border-slate-200 dark:border-slate-800 shadow-sm">
+                                <CardHeader>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Info className="text-cyan-700" size={20} />
+                                        <CardTitle className="text-lg">Course Information</CardTitle>
+                                    </div>
+                                    <CardDescription>
+                                        You are learning <strong>{booking.topic}</strong> with <strong>{booking.teacherName}</strong>.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-6">
+                                    {batch && (
+                                        <>
+                                            <div>
+                                                <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+                                                    <CheckCircle2 size={16} className="text-cyan-600" /> Syllabus
+                                                </h4>
+                                                <div className="space-y-3">
+                                                    {batch.syllabus?.map((module: any, i: number) => (
+                                                        <div key={i} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                                            <div className="font-bold text-slate-800 dark:text-slate-200 text-sm mb-2">{module.title}</div>
+                                                            <div className="space-y-1.5 pl-2 border-l-2 border-slate-200 dark:border-slate-700">
+                                                                {module.lessons.map((lesson: string, li: number) => (
+                                                                    <div key={li} className="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                                                                        <div className="w-1 h-1 bg-cyan-400 rounded-full" />
+                                                                        {lesson}
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <Separator />
+
+                                            <div>
+                                                <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+                                                    <Calendar size={16} className="text-cyan-600" /> Weekly Schedule
+                                                </h4>
+                                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                                    {batch.schedule?.map((item: any, i: number) => (
+                                                        <div key={i} className="p-3 bg-cyan-50 dark:bg-cyan-900/20 rounded-xl border border-cyan-100 dark:border-cyan-900/30 text-xs text-center">
+                                                            <div className="font-bold text-cyan-700 dark:text-cyan-400 mb-1">{item.day}</div>
+                                                            <div className="text-cyan-600 dark:text-cyan-300 bg-white dark:bg-slate-900 rounded px-2 py-0.5 inline-block text-[10px]">{item.time}</div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+
+                                    {/* Fallback schedule display if no batch linked */}
+                                    {booking.selectedDays && booking.selectedDays.length > 0 && !batch && (
+                                        <div>
+                                            <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-4">Weekly Schedule</h4>
+                                            <div className="flex flex-wrap gap-2">
+                                                {booking.selectedDays.map((day, i) => (
+                                                    <Badge key={i} variant="secondary" className="px-3 py-1 bg-cyan-50 text-cyan-700">
+                                                        {day}
+                                                    </Badge>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+
+                        <TabsContent value="group" className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                            <Card className="rounded-[2rem] border-slate-200 dark:border-slate-800 shadow-sm">
+                                <CardHeader className="flex flex-row items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Users className="text-cyan-700" size={20} />
+                                        <CardTitle className="text-lg">Study Group</CardTitle>
+                                    </div>
+                                    <Button size="sm" variant="outline" onClick={() => {
+                                        const name = prompt("Enter student name:");
+                                        if (!name) return;
+                                        const phone = prompt("Enter student phone:");
+                                        if (!phone) return;
+                                        const newMember = { name, phone };
+                                        const updatedMembers = [...(booking.members || []), newMember];
+                                        updateDoc(doc(db, 'bookings', booking.id), { members: updatedMembers })
+                                            .then(() => setBooking({ ...booking, members: updatedMembers }));
+                                    }}>
+                                        + Add Member
+                                    </Button>
+                                </CardHeader>
+                                <CardContent>
+                                    {booking.members && booking.members.length > 0 ? (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {booking.members.map((member, idx) => (
+                                                <div key={idx} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 relative group flex items-start justify-between">
+                                                    <div>
+                                                        <div className="font-bold text-slate-900 dark:text-slate-100">{member.name}</div>
+                                                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{member.phone}</div>
+                                                    </div>
                                                     <button
-                                                        onClick={() => alert("Reschedule feature coming soon!")}
-                                                        className="w-full text-left px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                                                        onClick={() => {
+                                                            if (!confirm('Remove this member?')) return;
+                                                            const updatedMembers = booking.members!.filter((_, i) => i !== idx);
+                                                            updateDoc(doc(db, 'bookings', booking.id), { members: updatedMembers })
+                                                                .then(() => setBooking({ ...booking, members: updatedMembers }));
+                                                        }}
+                                                        className="text-slate-300 hover:text-red-500 transition-colors"
                                                     >
-                                                        Reschedule
+                                                        <Trash2 size={16} />
                                                     </button>
                                                 </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Group Members */}
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                                <User className="text-cyan-700 dark:text-cyan-400" size={20} />
-                                Group Members
-                            </h3>
-                            <button
-                                onClick={() => {
-                                    const name = prompt("Enter student name:");
-                                    if (!name) return;
-                                    const phone = prompt("Enter student phone:");
-                                    if (!phone) return;
-
-                                    const newMember = { name, phone };
-                                    const updatedMembers = [...(booking.members || []), newMember];
-
-                                    updateDoc(doc(db, 'bookings', booking.id), { members: updatedMembers })
-                                        .then(() => {
-                                            setBooking({ ...booking, members: updatedMembers });
-                                        })
-                                        .catch(err => console.error("Error adding member:", err));
-                                }}
-                                className="text-sm font-bold text-cyan-700 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300"
-                            >
-                                + Add Member
-                            </button>
-                        </div>
-
-                        {booking.members && booking.members.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {booking.members.map((member, idx) => (
-                                    <div key={idx} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 relative group">
-                                        <div className="font-bold text-slate-900 dark:text-slate-100">{member.name}</div>
-                                        <div className="text-xs text-slate-500 dark:text-slate-400">{member.phone}</div>
-                                        <button
-                                            onClick={() => {
-                                                if (!confirm('Remove this member?')) return;
-                                                const updatedMembers = booking.members!.filter((_, i) => i !== idx);
-                                                updateDoc(doc(db, 'bookings', booking.id), { members: updatedMembers })
-                                                    .then(() => {
-                                                        setBooking({ ...booking, members: updatedMembers });
-                                                    })
-                                                    .catch(err => console.error("Error removing member:", err));
-                                            }}
-                                            className="absolute top-2 right-2 p-1 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                            <Trash2 size={14} />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-8 text-slate-500 dark:text-slate-400 text-sm">
-                                No other students added to this group.
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Course Info Card */}
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
-                            <Info className="text-cyan-700 dark:text-cyan-400" size={20} />
-                            Course Information
-                        </h3>
-                        <div className="space-y-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                            <p>This course covers <strong>{booking.topic}</strong> with <strong>{booking.teacherName}</strong>.</p>
-
-                            {batch && (
-                                <>
-                                    <div className="mt-8">
-                                        <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-4">Curriculum</h4>
-                                        <div className="space-y-3">
-                                            {batch.syllabus?.map((module: any, i: number) => (
-                                                <div key={i} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700">
-                                                    <div className="font-bold text-slate-800 dark:text-slate-200 text-xs mb-2">{module.title}</div>
-                                                    <div className="space-y-1">
-                                                        {module.lessons.map((lesson: string, li: number) => (
-                                                            <div key={li} className="text-[10px] flex items-center gap-2">
-                                                                <div className="w-1 h-1 bg-cyan-400 rounded-full" />
-                                                                {lesson}
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
                                             ))}
                                         </div>
-                                    </div>
-
-                                    <div className="mt-8">
-                                        <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-4">Weekly Schedule</h4>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {batch.schedule?.map((item: any, i: number) => (
-                                                <div key={i} className="p-3 bg-cyan-50 dark:bg-cyan-900/20 rounded-xl border border-cyan-100 dark:border-cyan-900/30 text-[10px]">
-                                                    <div className="font-bold text-cyan-700 dark:text-cyan-400">{item.day}</div>
-                                                    <div className="text-cyan-700 dark:text-cyan-300">{item.time}</div>
-                                                </div>
-                                            ))}
+                                    ) : (
+                                        <div className="text-center py-12 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
+                                            <Users size={32} className="mx-auto text-slate-300 mb-3" />
+                                            <p className="text-slate-500 dark:text-slate-400 text-sm">No other students added to this group.</p>
                                         </div>
-                                    </div>
-                                </>
-                            )}
-
-                            {booking.selectedDays && booking.selectedDays.length > 0 && !batch && (
-                                <div className="mt-8">
-                                    <h4 className="font-bold text-slate-900 dark:text-slate-100 mb-4">Weekly Schedule</h4>
-                                    <div className="flex flex-wrap gap-2">
-                                        {booking.selectedDays.map((day, i) => (
-                                            <div key={i} className="px-4 py-2 bg-cyan-50 dark:bg-cyan-900/20 rounded-xl border border-cyan-100 dark:border-cyan-900/30 text-xs font-bold text-cyan-700 dark:text-cyan-400">
-                                                {day}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-2xl border border-amber-100 dark:border-amber-900/30 text-amber-800 dark:text-amber-400 text-xs mt-6">
-                                <div className="flex items-center gap-2 font-bold mb-1">
-                                    <AlertCircle size={14} />
-                                    Payment Policy
-                                </div>
-                                The first session is a Demo. Payment for the entire course is required after the demo session is completed to continue with the rest of the classes.
-                            </div>
-                        </div>
-                    </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                    </Tabs>
                 </div>
 
-                {/* Right Column: Payment & Teacher */}
-                <div className="space-y-8">
-                    {/* Payment Card */}
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
-                            <CreditCard className="text-cyan-700 dark:text-cyan-400" size={20} />
-                            Payment Details
-                        </h3>
-                        <div className="space-y-6">
-                            <div className="flex items-center justify-between">
-                                <span className="text-slate-500 dark:text-slate-400 text-sm">Status</span>
-                                <span className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase ${booking.paymentStatus === 'paid' ? 'bg-emerald-100 text-emerald-700' :
-                                    booking.paymentStatus === 'required' ? 'bg-red-100 text-red-700 animate-pulse' : 'bg-amber-100 text-amber-700'
-                                    }`}>
-                                    {booking.paymentStatus || 'pending'}
-                                </span>
+                {/* Right Column: Payment & Help */}
+                <div className="space-y-6">
+                    <Card className="rounded-[2rem] border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <CardHeader className="bg-slate-50 dark:bg-slate-800/50 pb-4">
+                            <div className="flex items-center gap-2">
+                                <CreditCard className="text-cyan-700" size={20} />
+                                <CardTitle className="text-lg">Payment</CardTitle>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-slate-500 dark:text-slate-400 text-sm">Course Fee</span>
-                                <span className="font-bold text-slate-900 dark:text-slate-100">₹{booking.totalSessions * 500}</span>
+                        </CardHeader>
+                        <CardContent className="p-6 pt-6 space-y-4">
+                            <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                                <span className="text-slate-500 text-sm font-medium">Status</span>
+                                <Badge variant={booking.paymentStatus === 'paid' ? 'default' : 'destructive'}
+                                    className={booking.paymentStatus === 'paid' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : 'bg-amber-100 text-amber-700 hover:bg-amber-100'}>
+                                    {booking.paymentStatus || 'pending'}
+                                </Badge>
+                            </div>
+                            <div className="flex items-center justify-between px-2">
+                                <span className="text-slate-500 text-sm">Total Fee</span>
+                                <span className="font-bold text-xl text-slate-900 dark:text-slate-100">₹{booking.totalSessions * 500}</span>
                             </div>
 
                             {booking.paymentStatus === 'required' && (
-                                <button
-                                    onClick={handlePayment}
-                                    className="w-full py-3.5 bg-cyan-700 text-white font-bold rounded-2xl hover:bg-cyan-700 transition-all shadow-lg shadow-cyan-100"
-                                >
+                                <Button className="w-full bg-cyan-700 hover:bg-cyan-800 shadow-lg shadow-cyan-100" onClick={handlePayment}>
                                     Pay Course Fee
-                                </button>
+                                </Button>
                             )}
 
                             {booking.paymentStatus === 'pending' && !firstSessionCompleted && (
-                                <div className="p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-2xl border border-cyan-100 dark:border-cyan-900/30">
-                                    <p className="text-[11px] md:text-xs text-cyan-700 dark:text-cyan-300 leading-relaxed">
-                                        <strong>Note:</strong> The first session is a demo. Payment is required after the demo to continue the course.
-                                    </p>
+                                <div className="p-3 bg-amber-50 rounded-xl border border-amber-100 text-[11px] text-amber-800 leading-relaxed flex gap-2">
+                                    <AlertCircle size={14} className="shrink-0 mt-0.5" />
+                                    <span>Payment required after the demo session to continue.</span>
                                 </div>
                             )}
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
 
-                    {/* Teacher Remarks Card */}
                     {booking.teacherRemarks && (
-                        <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-                                <MessageSquare size={20} className="text-cyan-700 dark:text-cyan-400" />
-                                Teacher's Remarks
-                            </h3>
-                            <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl italic text-slate-600 dark:text-slate-300 text-sm">
-                                "{booking.teacherRemarks}"
-                            </div>
-                        </div>
+                        <Card className="rounded-[2rem] border-slate-200 shadow-sm">
+                            <CardHeader>
+                                <div className="flex items-center gap-2">
+                                    <MessageSquare size={20} className="text-cyan-700" />
+                                    <CardTitle className="text-lg">Remarks</CardTitle>
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl italic text-slate-600 dark:text-slate-300 text-sm border border-slate-100">
+                                    "{booking.teacherRemarks}"
+                                </div>
+                            </CardContent>
+                        </Card>
                     )}
 
-                    {/* Help Card */}
-                    <div className="bg-slate-900 text-white rounded-3xl p-8 shadow-xl shadow-slate-200">
-                        <h3 className="font-bold mb-2">Need Help?</h3>
-                        <p className="text-slate-400 text-sm mb-6">If you're having trouble joining or need to contact support.</p>
-                        <button className="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl transition-all text-sm flex items-center justify-center gap-2">
-                            Contact Support
-                            <ExternalLink size={16} />
-                        </button>
-                    </div>
+                    <Card className="rounded-[2rem] bg-slate-900 text-white shadow-xl shadow-slate-200">
+                        <CardContent className="p-8">
+                            <h3 className="font-bold mb-2">Need Help?</h3>
+                            <p className="text-slate-400 text-sm mb-6">Contact support if you face any issues.</p>
+                            <Button variant="outline" className="w-full bg-white/10 hover:bg-white/20 text-white border-0">
+                                Contact Support <ExternalLink size={16} className="ml-2" />
+                            </Button>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </div>
     );
-}
-
-function MessageSquare({ className, size }: { className?: string, size?: number }) {
-    return <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>;
 }

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
-import logoWithBackground from '@/assets/logo with Background.svg';
+import logoWithBackground from '@/assets/logo.svg';
 
 export default function Footer() {
     return (

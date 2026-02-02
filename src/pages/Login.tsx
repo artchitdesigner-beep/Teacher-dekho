@@ -3,7 +3,7 @@ import { ChevronLeft, Loader2, ArrowRight } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
-import logoteal from '@/assets/Logo teal.svg';
+import logoteal from '@/assets/logo.svg';
 import Footer from '@/components/layout/Footer';
 
 export default function Login() {
@@ -68,7 +68,7 @@ export default function Login() {
                     <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
                         <div className="mb-8">
                             <div className="mb-4">
-                                <img src={logoteal} alt="TeacherDekho" className="h-12 w-auto" />
+                                <img src={logoteal} alt="TeacherDekho" className="h-16 w-auto" />
                             </div>
                             <h2 className="text-2xl font-serif font-bold text-slate-900 dark:text-slate-100">Welcome back</h2>
                             <p className="text-slate-500 dark:text-slate-400 text-sm">Please enter your details to sign in.</p>

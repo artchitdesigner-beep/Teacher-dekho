@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { MonitorPlay, Camera, Mic, Speaker, Cpu, Lightbulb, CheckCircle2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export default function TeacherExpenses() {
     const [hasApplied, setHasApplied] = useState(false);
@@ -19,7 +22,7 @@ export default function TeacherExpenses() {
     };
 
     return (
-        <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+        <div className="w-full space-y-8 animate-in slide-in-from-bottom-4 duration-500">
             <div>
                 <h1 className="text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">Studio Setup</h1>
                 <p className="text-slate-500 dark:text-slate-400">Manage your company-provided assets and studio hardwares.</p>
@@ -40,17 +43,17 @@ export default function TeacherExpenses() {
                             </p>
                         </div>
                         {hasApplied ? (
-                            <div className="bg-green-500/20 border border-green-500/50 text-green-200 px-6 py-3 rounded-xl flex items-center gap-3 font-bold">
-                                <CheckCircle2 size={24} />
+                            <Badge variant="outline" className="bg-green-500/20 border-green-500/50 text-green-200 px-6 py-3 rounded-xl flex items-center gap-3 font-bold text-base">
+                                <CheckCircle2 size={20} />
                                 Application Pending
-                            </div>
+                            </Badge>
                         ) : (
-                            <button
+                            <Button
                                 onClick={handleApply}
-                                className="bg-cyan-500 hover:bg-cyan-400 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-cyan-500/25 hover:shadow-cyan-400/40 active:scale-95"
+                                className="bg-cyan-500 hover:bg-cyan-400 text-white px-8 py-6 rounded-xl font-bold transition-all shadow-lg shadow-cyan-500/25 hover:shadow-cyan-400/40 text-base"
                             >
                                 Apply for Setup
-                            </button>
+                            </Button>
                         )}
                     </div>
 
@@ -75,11 +78,13 @@ export default function TeacherExpenses() {
             <div className="mt-12 opacity-50 pointer-events-none filter grayscale">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Recent Expenses</h2>
-                    <button className="text-sm font-bold text-cyan-700">View All</button>
+                    <Button variant="link" className="text-sm font-bold text-cyan-700">View All</Button>
                 </div>
-                <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 text-center text-slate-400">
-                    No expense claims found.
-                </div>
+                <Card className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
+                    <CardContent className="p-8 text-center text-slate-400">
+                        No expense claims found.
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );

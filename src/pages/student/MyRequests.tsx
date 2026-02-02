@@ -3,7 +3,15 @@ import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/lib/auth-context';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, query, where, getDocs, Timestamp, updateDoc, doc, deleteDoc } from 'firebase/firestore';
-import { Plus, MessageSquare, Loader2, CheckCircle, Clock, Edit2, Trash2, X, Search, SlidersHorizontal } from 'lucide-react';
+import { Plus, MessageSquare, Loader2, CheckCircle, Clock, Edit2, Trash2, Search, SlidersHorizontal, BookOpen, GraduationCap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from '@/components/ui/separator';
 
 interface Request {
     id: string;
@@ -25,7 +33,7 @@ export default function MyRequests() {
     const [requests, setRequests] = useState<Request[]>([]);
     const [teachers, setTeachers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [showForm, setShowForm] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -34,8 +42,7 @@ export default function MyRequests() {
 
     useEffect(() => {
         if (searchParams.get('action') === 'new') {
-            setShowForm(true);
-            // Clear the param so refreshing doesn't reopen it
+            setOpenDialog(true);
             setSearchParams({}, { replace: true });
         }
     }, [searchParams]);
@@ -78,7 +85,6 @@ export default function MyRequests() {
             );
             const snap = await getDocs(q);
             const all = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Request));
-            // Memory sort to avoid composite index
             setRequests(all.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis()));
         } catch (error) {
             console.error('Error fetching requests:', error);
@@ -86,6 +92,21 @@ export default function MyRequests() {
             setLoading(false);
         }
     }
+
+    const resetForm = () => {
+        setFormData({
+            topic: '',
+            description: '',
+            budget: '500',
+            subject: '',
+            course: '',
+            timeSlot: '',
+            type: 'tuition',
+            preferredTeacherId: '',
+            preferredTeacherName: ''
+        });
+        setEditingId(null);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -118,20 +139,9 @@ export default function MyRequests() {
                 });
             }
 
-            setFormData({
-                topic: '',
-                description: '',
-                budget: '500',
-                subject: '',
-                course: '',
-                timeSlot: '',
-                type: 'tuition',
-                preferredTeacherId: '',
-                preferredTeacherName: ''
-            });
-            setShowForm(false);
-            setEditingId(null);
-            fetchRequests(); // Refresh list
+            resetForm();
+            setOpenDialog(false);
+            fetchRequests();
         } catch (error) {
             console.error('Error saving request:', error);
         } finally {
@@ -152,8 +162,7 @@ export default function MyRequests() {
             preferredTeacherName: req.preferredTeacherName || ''
         });
         setEditingId(req.id);
-        setShowForm(true);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setOpenDialog(true);
     };
 
     const handleDelete = async (id: string) => {
@@ -173,59 +182,199 @@ export default function MyRequests() {
         return matchesSearch && matchesStatus;
     });
 
-    if (loading) return <div className="p-8"><Loader2 className="animate-spin" /></div>;
+    if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin" /></div>;
 
     return (
-        <div className="space-y-8">
+        <div className="w-full space-y-8 p-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">My Requests</h1>
-                    <p className="text-sm md:text-base text-slate-500 dark:text-slate-400">Post a requirement and let teachers contact you.</p>
+                    <h1 className="text-3xl font-serif font-bold text-slate-900 dark:text-slate-100">My Requests</h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-2">Post a requirement and let teachers contact you.</p>
                 </div>
-                <button
-                    onClick={() => {
-                        if (showForm && editingId) {
-                            setEditingId(null);
-                            setFormData({
-                                topic: '',
-                                description: '',
-                                budget: '500',
-                                subject: '',
-                                course: '',
-                                timeSlot: '',
-                                type: 'tuition',
-                                preferredTeacherId: '',
-                                preferredTeacherName: ''
-                            });
-                        } else {
-                            setShowForm(!showForm);
-                        }
-                    }}
-                    className="w-full sm:w-auto px-5 py-2.5 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all flex items-center justify-center gap-2"
-                >
-                    {showForm && editingId ? <X size={20} /> : <Plus size={20} />}
-                    {showForm && editingId ? 'Cancel Edit' : 'New Request'}
-                </button>
+
+                <Dialog open={openDialog} onOpenChange={(open) => {
+                    setOpenDialog(open);
+                    if (!open) resetForm();
+                }}>
+                    <DialogTrigger asChild>
+                        <Button className="bg-cyan-700 hover:bg-cyan-800 text-white gap-2 font-bold px-6">
+                            <Plus size={18} /> New Request
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                            <DialogTitle>{editingId ? 'Edit Request' : 'Create New Request'}</DialogTitle>
+                            <DialogDescription>
+                                Describe your learning requirements to find the perfect teacher.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <form onSubmit={handleSubmit} className="space-y-6 py-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div
+                                    onClick={() => setFormData({ ...formData, type: 'tuition' })}
+                                    className={`cursor-pointer rounded-xl border-2 p-4 text-center transition-all ${formData.type === 'tuition' ? 'border-cyan-600 bg-cyan-50 dark:bg-cyan-950' : 'border-slate-100 hover:border-slate-200 dark:border-slate-800'}`}
+                                >
+                                    <h3 className={`font-bold ${formData.type === 'tuition' ? 'text-cyan-700' : 'text-slate-700 dark:text-slate-300'}`}>Private Tuition</h3>
+                                    <p className="text-xs text-slate-500 mt-1">One-on-one custom learning</p>
+                                </div>
+                                <div
+                                    onClick={() => setFormData({ ...formData, type: 'batch' })}
+                                    className={`cursor-pointer rounded-xl border-2 p-4 text-center transition-all ${formData.type === 'batch' ? 'border-purple-600 bg-purple-50 dark:bg-purple-950' : 'border-slate-100 hover:border-slate-200 dark:border-slate-800'}`}
+                                >
+                                    <h3 className={`font-bold ${formData.type === 'batch' ? 'text-purple-700' : 'text-slate-700 dark:text-slate-300'}`}>Group Batch</h3>
+                                    <p className="text-xs text-slate-500 mt-1">Learn with other students</p>
+                                </div>
+                            </div>
+
+                            <Separator />
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Subject</label>
+                                    <Select value={formData.subject} onValueChange={(val: string) => setFormData({ ...formData, subject: val })} required>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Subject" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Mathematics">Mathematics</SelectItem>
+                                            <SelectItem value="Physics">Physics</SelectItem>
+                                            <SelectItem value="Chemistry">Chemistry</SelectItem>
+                                            <SelectItem value="Biology">Biology</SelectItem>
+                                            <SelectItem value="English">English</SelectItem>
+                                            <SelectItem value="Computer Science">Computer Science</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Course / Level</label>
+                                    <Select value={formData.course} onValueChange={(val: string) => setFormData({ ...formData, course: val })} required>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Course" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="JEE Mains/Adv">JEE Mains/Adv</SelectItem>
+                                            <SelectItem value="NEET">NEET</SelectItem>
+                                            <SelectItem value="CBSE Board (10th)">CBSE Board (10th)</SelectItem>
+                                            <SelectItem value="CBSE Board (12th)">CBSE Board (12th)</SelectItem>
+                                            <SelectItem value="ICSE/ISC">ICSE/ISC</SelectItem>
+                                            <SelectItem value="Foundation (8-10)">Foundation (8-10)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Specific Topic</label>
+                                <Input
+                                    value={formData.topic}
+                                    onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
+                                    placeholder="e.g. Organic Chemistry, Calculus, Shakespeare"
+                                    required
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Preferred Time</label>
+                                    <Select value={formData.timeSlot} onValueChange={(val: string) => setFormData({ ...formData, timeSlot: val })} required>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Time Slot" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Morning (8 AM - 12 PM)">Morning (8 AM - 12 PM)</SelectItem>
+                                            <SelectItem value="Afternoon (12 PM - 4 PM)">Afternoon (12 PM - 4 PM)</SelectItem>
+                                            <SelectItem value="Evening (4 PM - 8 PM)">Evening (4 PM - 8 PM)</SelectItem>
+                                            <SelectItem value="Night (8 PM - 11 PM)">Night (8 PM - 11 PM)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Budget (₹{formData.budget}/hr)</label>
+                                    <Input
+                                        type="range"
+                                        min="200"
+                                        max="2000"
+                                        step="50"
+                                        value={formData.budget}
+                                        onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                                        className="h-2 p-0 bg-transparent border-0"
+                                    />
+                                    <div className="flex justify-between text-[10px] text-zinc-500">
+                                        <span>₹200</span>
+                                        <span>₹2000</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Description (Optional)</label>
+                                <Textarea
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    placeholder="Any specific requirements or details..."
+                                    rows={3}
+                                />
+                            </div>
+
+                            <Separator />
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Preferred Teacher (Optional)</label>
+                                <Select
+                                    value={formData.preferredTeacherId || "any"}
+                                    onValueChange={(val: string) => {
+                                        const processedVal = val === 'any' ? '' : val;
+                                        const teacher = teachers.find(t => t.id === processedVal);
+                                        setFormData({
+                                            ...formData,
+                                            preferredTeacherId: processedVal,
+                                            preferredTeacherName: teacher ? teacher.name : ''
+                                        });
+                                    }}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Any Teacher" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="any">Any Teacher</SelectItem>
+                                        {teachers.map(t => (
+                                            <SelectItem key={t.id} value={t.id}>{t.name} ({t.subject})</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <DialogFooter>
+                                <Button type="button" variant="outline" onClick={() => setOpenDialog(false)}>Cancel</Button>
+                                <Button type="submit" disabled={submitting} className="bg-cyan-700 hover:bg-cyan-800 text-white">
+                                    {submitting && <Loader2 className="animate-spin mr-2" size={16} />}
+                                    {editingId ? 'Update Request' : 'Post Request'}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
             </div>
 
             {/* Filters */}
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col md:flex-row gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2 rounded-2xl">
                 <div className="relative flex-grow">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                    <input
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                    <Input
                         type="text"
                         placeholder="Search your requests..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none transition dark:text-white"
+                        className="pl-10 border-0 bg-transparent focus-visible:ring-0"
                     />
                 </div>
-                <div className="flex items-center gap-2">
-                    <SlidersHorizontal size={20} className="text-slate-400" />
+                <div className="w-px bg-slate-200 dark:bg-slate-800 hidden md:block" />
+                <div className="flex items-center gap-2 px-2">
+                    <SlidersHorizontal size={18} className="text-slate-400" />
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl font-bold text-slate-700 dark:text-slate-300 outline-none cursor-pointer focus:ring-2 focus:ring-cyan-500"
+                        className="bg-transparent text-sm font-medium outline-none cursor-pointer text-slate-700 dark:text-slate-300 border-none focus:ring-0"
                     >
                         <option value="All">All Status</option>
                         <option value="Open">Open</option>
@@ -235,230 +384,85 @@ export default function MyRequests() {
                 </div>
             </div>
 
-            {showForm && (
-                <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-xl animate-in slide-in-from-top-4">
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-                        {editingId ? 'Edit Request' : 'Create New Request'}
-                    </h3>
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                            <button
-                                type="button"
-                                onClick={() => setFormData({ ...formData, type: 'tuition' })}
-                                className={`flex-1 p-4 rounded-2xl border-2 transition-all text-left ${formData.type === 'tuition' ? 'border-cyan-700 bg-cyan-50/50 dark:bg-cyan-900/20' : 'border-slate-100 dark:border-slate-800'}`}
-                            >
-                                <div className="font-bold text-slate-900 dark:text-slate-100 italic">Personal Tuition</div>
-                                <div className="text-xs text-slate-500">One-on-one session for specific topics</div>
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setFormData({ ...formData, type: 'batch' })}
-                                className={`flex-1 p-4 rounded-2xl border-2 transition-all text-left ${formData.type === 'batch' ? 'border-purple-600 bg-purple-50/50 dark:bg-purple-900/20' : 'border-slate-100 dark:border-slate-800'}`}
-                            >
-                                <div className="font-bold text-slate-900 dark:text-slate-100 italic">Batch Request</div>
-                                <div className="text-xs text-slate-500">Request to start a new group batch</div>
-                            </button>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Subject</label>
-                                <select
-                                    required
-                                    value={formData.subject}
-                                    onChange={e => setFormData({ ...formData, subject: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none text-sm dark:text-white"
-                                >
-                                    <option value="">Select Subject</option>
-                                    <option value="Mathematics">Mathematics</option>
-                                    <option value="Physics">Physics</option>
-                                    <option value="Chemistry">Chemistry</option>
-                                    <option value="Biology">Biology</option>
-                                    <option value="English">English</option>
-                                    <option value="Computer Science">Computer Science</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Course / Level</label>
-                                <select
-                                    required
-                                    value={formData.course}
-                                    onChange={e => setFormData({ ...formData, course: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none text-sm dark:text-white"
-                                >
-                                    <option value="">Select Course</option>
-                                    <option value="JEE Mains/Adv">JEE Mains/Adv</option>
-                                    <option value="NEET">NEET</option>
-                                    <option value="CBSE Board (10th)">CBSE Board (10th)</option>
-                                    <option value="CBSE Board (12th)">CBSE Board (12th)</option>
-                                    <option value="ICSE/ISC">ICSE/ISC</option>
-                                    <option value="Foundation (8-10)">Foundation (8-10)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Specific Topic</label>
-                                <input
-                                    required
-                                    placeholder="e.g. Organic Chemistry, Calculus"
-                                    value={formData.topic}
-                                    onChange={e => setFormData({ ...formData, topic: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none text-sm dark:text-white"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Preferred Time Slot</label>
-                                <select
-                                    required
-                                    value={formData.timeSlot}
-                                    onChange={e => setFormData({ ...formData, timeSlot: e.target.value })}
-                                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none text-sm dark:text-white"
-                                >
-                                    <option value="">Select Time Slot</option>
-                                    <option value="Morning (8 AM - 12 PM)">Morning (8 AM - 12 PM)</option>
-                                    <option value="Afternoon (12 PM - 4 PM)">Afternoon (12 PM - 4 PM)</option>
-                                    <option value="Evening (4 PM - 8 PM)">Evening (4 PM - 8 PM)</option>
-                                    <option value="Night (8 PM - 11 PM)">Night (8 PM - 11 PM)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Preferred Teacher (Optional)</label>
-                            <select
-                                value={formData.preferredTeacherId}
-                                onChange={e => {
-                                    const teacher = teachers.find(t => t.id === e.target.value);
-                                    setFormData({
-                                        ...formData,
-                                        preferredTeacherId: e.target.value,
-                                        preferredTeacherName: teacher ? teacher.name : ''
-                                    });
-                                }}
-                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none text-sm dark:text-white"
-                            >
-                                <option value="">Any Teacher</option>
-                                {teachers.map(teacher => (
-                                    <option key={teacher.id} value={teacher.id}>
-                                        {teacher.name} ({teacher.subject})
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div>
-                            <div className="flex justify-between mb-2">
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Budget: ₹{formData.budget}/hr</label>
-                            </div>
-                            <input
-                                type="range"
-                                min="200"
-                                max="2000"
-                                step="50"
-                                value={formData.budget}
-                                onChange={e => setFormData({ ...formData, budget: e.target.value })}
-                                className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-700"
-                            />
-                            <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-                                <span>₹200</span>
-                                <span>₹2000</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Description (Optional)</label>
-                            <textarea
-                                rows={3}
-                                placeholder="Describe what you need help with..."
-                                value={formData.description}
-                                onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none resize-none text-sm dark:text-white"
-                            />
-                        </div>
-
-                        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4">
-                            <button
-                                type="button"
-                                onClick={() => setShowForm(false)}
-                                className="w-full sm:w-auto px-6 py-2.5 text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors text-sm"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={submitting}
-                                className="w-full sm:w-auto px-8 py-2.5 bg-cyan-700 text-white font-bold rounded-xl hover:bg-cyan-700 transition-all disabled:opacity-50 shadow-lg shadow-cyan-100 flex items-center justify-center gap-2 text-sm"
-                            >
-                                {submitting ? <Loader2 className="animate-spin" size={20} /> : (editingId ? 'Update Request' : 'Post Request')}
-                            </button>
-                        </div>
-                    </form>
-                </div >
-            )
-            }
-
-            <div className="grid grid-cols-1 gap-4">
+            <div className="space-y-4">
                 {filteredRequests.length === 0 ? (
-                    <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800">
-                        <MessageSquare className="mx-auto text-slate-300 dark:text-slate-600 mb-3" size={32} />
-                        <p className="text-slate-500 dark:text-slate-400">No requests found matching your criteria.</p>
-                    </div>
+                    <Card className="border-dashed">
+                        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+                            <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                                <MessageSquare className="text-slate-400" size={32} />
+                            </div>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">
+                                No requests found
+                            </h3>
+                            <p className="text-slate-500 dark:text-slate-400 max-w-md mb-6">
+                                Try adjusting your filters or create a new request to get started.
+                            </p>
+                            <Button onClick={() => setOpenDialog(true)} className="bg-cyan-700 hover:bg-cyan-800 text-white">
+                                <Plus size={16} className="mr-2" /> New Request
+                            </Button>
+                        </CardContent>
+                    </Card>
                 ) : (
                     filteredRequests.map(req => (
-                        <div key={req.id} className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div className="min-w-0">
-                                <div className="flex flex-wrap items-center gap-2 mb-1">
-                                    <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base md:text-lg truncate">{req.topic}</h3>
-                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${req.type === 'batch' ? 'bg-purple-100 text-purple-700' : 'bg-cyan-100 text-cyan-700'}`}>
-                                        {req.type || 'tuition'}
-                                    </span>
-                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${req.status === 'open' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' :
-                                        req.status === 'accepted' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                                        }`}>
-                                        {req.status}
-                                    </span>
+                        <Card key={req.id} className="overflow-hidden hover:shadow-md transition-all">
+                            <CardContent className="p-0">
+                                <div className="flex flex-col sm:flex-row">
+                                    <div className={`w-full sm:w-2 bg-gradient-to-b ${req.status === 'accepted' ? 'from-emerald-400 to-emerald-600' : req.status === 'closed' ? 'from-slate-300 to-slate-400' : 'from-cyan-400 to-blue-600'} h-2 sm:h-auto`} />
+
+                                    <div className="flex-1 p-6 space-y-4">
+                                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <Badge variant="outline" className={`${req.type === 'batch' ? 'border-purple-200 bg-purple-50 text-purple-700 dark:bg-purple-900/20' : 'border-cyan-200 bg-cyan-50 text-cyan-700 dark:bg-cyan-900/20'}`}>
+                                                        {req.type === 'batch' ? 'Group Batch' : 'Private Tuition'}
+                                                    </Badge>
+                                                    <Badge variant={req.status === 'accepted' ? 'default' : req.status === 'closed' ? 'secondary' : 'outline'} className={req.status === 'accepted' ? 'bg-emerald-600' : req.status === 'open' ? 'text-blue-600 border-blue-200 bg-blue-50' : ''}>
+                                                        {req.status === 'accepted' && <CheckCircle size={12} className="mr-1" />}
+                                                        {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+                                                    </Badge>
+                                                </div>
+                                                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1">{req.topic}</h3>
+                                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
+                                                    <span className="flex items-center gap-1.5"><BookOpen size={14} /> {req.subject}</span>
+                                                    <span className="flex items-center gap-1.5"><GraduationCap size={14} /> {req.course}</span>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-xl font-bold text-cyan-700 dark:text-cyan-400">₹{req.budget}<span className="text-sm font-normal text-slate-500">/hr</span></div>
+                                                <div className="text-xs text-slate-400 mt-1 flex items-center justify-end gap-1">
+                                                    <Clock size={12} /> {req.timeSlot}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {req.description && (
+                                            <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl text-sm text-slate-600 dark:text-slate-300">
+                                                {req.description}
+                                            </div>
+                                        )}
+
+                                        <div className="flex items-center justify-between pt-2">
+                                            <div className="text-xs text-slate-400">
+                                                Posted on {req.createdAt.toDate().toLocaleDateString()}
+                                            </div>
+                                            {req.status === 'open' && (
+                                                <div className="flex gap-2">
+                                                    <Button variant="ghost" size="sm" onClick={() => handleEdit(req)} className="h-8 w-8 p-0 text-slate-500 hover:text-cyan-700">
+                                                        <Edit2 size={16} />
+                                                    </Button>
+                                                    <Button variant="ghost" size="sm" onClick={() => handleDelete(req.id)} className="h-8 w-8 p-0 text-slate-500 hover:text-red-600">
+                                                        <Trash2 size={16} />
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="flex flex-wrap gap-2 mb-3">
-                                    <span className="text-[10px] md:text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-lg font-medium">{req.subject}</span>
-                                    <span className="text-[10px] md:text-xs bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400 px-2 py-1 rounded-lg font-medium">{req.course}</span>
-                                    <span className="text-[10px] md:text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 px-2 py-1 rounded-lg font-medium">{req.timeSlot}</span>
-                                </div>
-                                <p className="text-slate-500 dark:text-slate-400 mb-3 text-sm line-clamp-2">{req.description}</p>
-                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] md:text-xs text-slate-400">
-                                    <span className="flex items-center gap-1"><Clock size={12} /> {req.createdAt.toDate().toLocaleDateString()}</span>
-                                    {req.budget && <span className="font-bold text-slate-600 dark:text-slate-300">Budget: ₹{req.budget}/hr</span>}
-                                </div>
-                            </div>
-                            {req.status === 'open' && (
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => handleEdit(req)}
-                                        className="p-2 text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-lg transition-all"
-                                        title="Edit Request"
-                                    >
-                                        <Edit2 size={18} />
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(req.id)}
-                                        className="p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
-                                        title="Delete Request"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
-                                </div>
-                            )}
-                            {req.status === 'accepted' && (
-                                <div className="flex sm:justify-end">
-                                    <span className="px-4 py-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-sm font-bold rounded-xl flex items-center gap-2">
-                                        <CheckCircle size={18} /> Accepted
-                                    </span>
-                                </div>
-                            )}
-                        </div>
+                            </CardContent>
+                        </Card>
                     ))
                 )}
             </div>
-        </div >
+        </div>
     );
 }
