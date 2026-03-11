@@ -1,94 +1,73 @@
-import { Link } from 'react-router-dom';
+import Container from '@/components/ui/Container';
+import { Card } from '@/components/ui/card';
 
-// 3D Icons
+// Import local assets
+import BatchesIcon from '@/assets/3d-icons/batches.png';
 import InstantConsultIcon from '@/assets/3d-icons/instant-consult.png';
 import FindTeachersIcon from '@/assets/3d-icons/find-teachers.png';
-import BatchesIcon from '@/assets/3d-icons/batches.png';
-import UpcomingTestsIcon from '@/assets/3d-icons/upcoming-tests.png';
+
+interface ServiceCardData {
+    title: string;
+    subtitle: string;
+    iconUrl: string;
+    bgColor: string;
+}
+
+const serviceCardsData: ServiceCardData[] = [
+    {
+        title: "Manage Courses",
+        subtitle: "Connect within 60 secs",
+        iconUrl: InstantConsultIcon,
+        bgColor: "bg-gradient-to-br from-blue-100 to-blue-50"
+    },
+    {
+        title: "Find Teachers",
+        subtitle: "Confirmed appointments",
+        iconUrl: FindTeachersIcon,
+        bgColor: "bg-gradient-to-br from-teal-100 to-emerald-50"
+    },
+    {
+        title: "Batches",
+        subtitle: "Join a Batch",
+        iconUrl: BatchesIcon,
+        bgColor: "bg-gradient-to-br from-emerald-50/50 to-blue-50/50"
+    }
+];
 
 export default function ServiceCards() {
-    const services = [
-        {
-            title: 'Instant Consult',
-            subtitle: 'Connect within 60 secs',
-            image: InstantConsultIcon,
-            bgImage: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            bg: 'bg-[#eff6ff] dark:bg-blue-900/20',
-            border: 'border-blue-100 dark:border-blue-800',
-            link: '/search?type=consult'
-        },
-        {
-            title: 'Find Teachers',
-            subtitle: 'Confirmed appointments',
-            image: FindTeachersIcon,
-            bgImage: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            bg: 'bg-[#ecfeff] dark:bg-cyan-900/20',
-            border: 'border-cyan-100 dark:border-cyan-800',
-            link: '/search'
-        },
-        {
-            title: 'Batches',
-            subtitle: 'Join a Batch',
-            image: BatchesIcon,
-            bgImage: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            bg: 'bg-[#f5f3ff] dark:bg-purple-900/20',
-            border: 'border-purple-100 dark:border-purple-800',
-            link: '/student/batches'
-        },
-        {
-            title: 'Upcoming Tests',
-            subtitle: 'Safe and trusted',
-            image: UpcomingTestsIcon,
-            bgImage: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            bg: 'bg-[#ecfdf5] dark:bg-emerald-900/20',
-            border: 'border-emerald-100 dark:border-emerald-800',
-            link: '/student/tests'
-        }
-    ];
-
     return (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {services.map((service, index) => (
-                <Link
-                    key={index}
-                    to={service.link}
-                    className={`flex flex-col ${service.bg} rounded-[2.5rem] border ${service.border} shadow-sm hover:shadow-xl hover:scale-[1.03] transition-all duration-700 group relative overflow-hidden h-[280px] md:h-[340px]`}
-                >
-                    {/* Top Section: Integrated Icon Background */}
-                    <div className="relative h-[60%] flex items-center justify-center p-6 overflow-hidden">
-                        {/* Unsplash Background Overlay (Very Subtle) */}
-                        <div className="absolute inset-0 z-0">
-                            <img
-                                src={service.bgImage}
-                                alt=""
-                                className="w-full h-full object-cover opacity-5 dark:opacity-10 group-hover:scale-110 transition-transform duration-1000"
-                            />
-                            <div className={`absolute inset-0 ${service.bg} opacity-50`} />
-                        </div>
+        <section className="relative w-full pt-0 pb-8 md:pb-12 z-20">
+            <Container>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-[24px] lg:gap-[40px] max-w-[1100px] mx-auto px-4 md:px-0">
+                    {serviceCardsData.map((card, idx) => (
+                        <Card
+                            key={idx}
+                            className="group flex flex-col items-center rounded-3xl shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer border border-slate-100 overflow-hidden bg-white"
+                        >
+                            {/* Top Color Half */}
+                            <div className={`w-full h-[180px] flex items-center justify-center relative overflow-hidden ${card.bgColor}`}>
+                                {/* Subtle white gradient overlay at bottom of color section */}
+                                <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-white/20 to-transparent pointer-events-none" />
 
-                        {/* The 3D Icon as the Hero */}
-                        <div className="relative z-10 w-full h-full flex items-center justify-center scale-90 group-hover:scale-100 transition-transform duration-700">
-                            <img
-                                src={service.image}
-                                alt={service.title}
-                                className="w-[85%] h-[85%] object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.15)]"
-                            />
-                        </div>
+                                {/* 3D Icon */}
+                                <div className="relative w-28 h-28 md:w-32 md:h-32 flex items-center justify-center z-10 transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-translate-y-2">
+                                    <img
+                                        src={card.iconUrl}
+                                        alt={card.title}
+                                        className="w-full h-full object-contain filter drop-shadow-lg"
+                                    />
+                                </div>
+                            </div>
 
-                        {/* Decoration */}
-                        <div className="absolute -top-12 -left-12 w-40 h-40 bg-white/40 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                    </div>
-
-                    {/* Bottom Section: Airy Glassmorphism */}
-                    <div className="p-6 pt-2 relative z-10 bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border-t border-white/40 dark:border-white/10 flex-grow flex flex-col justify-center text-center">
-                        <h3 className="font-extrabold text-slate-900 dark:text-slate-100 text-lg md:text-xl mb-1 leading-tight tracking-tight">{service.title}</h3>
-                        <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.12em] opacity-80">{service.subtitle}</p>
-                    </div>
-
-                    {/* Corner Glow */}
-                    <div className="absolute -right-6 -bottom-6 w-36 h-36 bg-white/30 dark:bg-white/5 rounded-full blur-3xl group-hover:scale-110 transition-all duration-700" />
-                </Link>
-            ))}
-        </div>
+                            {/* Text Content - White Bottom Half */}
+                            <div className="text-center w-full bg-white p-6 md:p-8">
+                                <h3 className="text-slate-900 font-bold text-[18px] md:text-[20px] mb-1">{card.title}</h3>
+                                <p className="text-slate-500 text-[13px] md:text-[14px] leading-relaxed font-medium">{card.subtitle}</p>
+                            </div>
+                        </Card>
+                    ))}
+                </div>
+            </Container>
+        </section>
     );
 }

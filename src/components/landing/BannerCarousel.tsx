@@ -52,7 +52,7 @@ export default function BannerCarousel() {
                         {/* Content */}
                         <div className="absolute inset-0 z-20 flex items-center justify-between px-8 md:px-16">
                             <div className="max-w-lg text-white">
-                                <h2 className="text-2xl md:text-4xl font-bold font-serif mb-2 md:mb-4">{banner.title}</h2>
+                                <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">{banner.title}</h2>
                                 <p className="text-sm md:text-lg text-white/90 mb-6">{banner.subtitle}</p>
                                 <button className="px-6 py-2 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-100 transition-colors">
                                     Explore Now

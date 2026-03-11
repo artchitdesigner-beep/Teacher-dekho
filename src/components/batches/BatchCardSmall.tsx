@@ -35,7 +35,7 @@ export default function BatchCardSmall({ batch }: BatchCardSmallProps) {
     return (
         <Card className="w-full overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl">
             {/* Image Header - Compact */}
-            <div className="relative h-32 overflow-hidden">
+            <div className="relative h-[200px] overflow-hidden">
                 <img
                     src={batch.image || "https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"}
                     alt={batch.title}

@@ -1,5 +1,6 @@
 import AppBanner from '@/assets/3d-icons/app-banner.png';
 import { Apple, Play } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function DownloadAppSection() {
     return (
@@ -9,7 +10,7 @@ export default function DownloadAppSection() {
                     <div className="inline-block px-4 py-1.5 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 text-sm font-bold mb-6">
                         Mobile App
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-900 dark:text-slate-100 mb-6 leading-tight">
+                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-6 leading-tight">
                         Learning is better on the <span className="text-cyan-600">TeacherDekho App</span>
                     </h2>
                     <p className="text-slate-500 dark:text-slate-400 text-lg mb-8 leading-relaxed">
@@ -17,20 +18,20 @@ export default function DownloadAppSection() {
                     </p>
 
                     <div className="flex flex-wrap gap-4">
-                        <button className="flex items-center gap-3 px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+                        <Button className="flex items-center gap-3 px-6 py-7 h-auto bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 border-none">
                             <Apple size={24} />
                             <div className="text-left">
                                 <div className="text-[10px] uppercase font-bold opacity-80">Download on the</div>
                                 <div className="text-sm font-bold leading-none">App Store</div>
                             </div>
-                        </button>
-                        <button className="flex items-center gap-3 px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+                        </Button>
+                        <Button className="flex items-center gap-3 px-6 py-7 h-auto bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 border-none">
                             <Play size={24} fill="currentColor" />
                             <div className="text-left">
                                 <div className="text-[10px] uppercase font-bold opacity-80">Get it on</div>
                                 <div className="text-sm font-bold leading-none">Google Play</div>
                             </div>
-                        </button>
+                        </Button>
                     </div>
 
                     <div className="mt-8 flex items-center gap-4 text-sm font-medium text-slate-500 dark:text-slate-400">

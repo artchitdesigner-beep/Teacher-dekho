@@ -57,6 +57,8 @@ const TeacherWallet = lazy(() => import('./pages/teacher/TeacherWallet'));
 const TeacherClassManage = lazy(() => import('./pages/teacher/TeacherClassManage'));
 const Notifications = lazy(() => import('./pages/Notifications'));
 
+import LandingPage from './pages/LandingPage';
+
 // Role-based Home Component
 const Home = () => {
   const { user, userRole } = useAuth();
@@ -65,7 +67,11 @@ const Home = () => {
     return <Navigate to="/teacher/dashboard" replace />;
   }
 
-  return <StudentDashboard />;
+  if (user && userRole === 'student') {
+    return <StudentDashboard />;
+  }
+
+  return <LandingPage />;
 };
 
 function App() {

@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, X, ChevronDown, Bell } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
-import ProfileDropdown from './ProfileDropdown';
-import logoWithBackground from '@/assets/logo.svg';
+import tdLongLogo from '@/assets/td_longlogo.png';
 import { ModeToggle } from '@/components/mode-toggle';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,12 +32,11 @@ export default function Navbar() {
     const studentPrimaryLinks: NavLinkItem[] = [
         { label: 'Batches', to: '/student/batches' },
         { label: 'Find Tutors', to: '/student/search' },
-        { label: 'My Courses', to: '/student/courses' },
     ];
 
     const studentSecondaryLinks: NavLinkItem[] = [
         {
-            label: 'My Learning',
+            label: 'Institution',
             to: '#',
             children: [
                 { label: 'My Teachers', to: '/student/teachers' },
@@ -48,7 +46,7 @@ export default function Navbar() {
             ]
         },
         {
-            label: 'More',
+            label: 'For Teacher Dekho',
             to: '#',
             children: [
                 { label: 'Corporate', to: '/corporate' },
@@ -56,6 +54,14 @@ export default function Navbar() {
                 { label: 'How It Works', to: '/how-it-works' },
                 { label: 'FAQs', to: '/faqs' },
                 { label: 'Become a Teacher', to: '/become-tutor' }
+            ]
+        },
+        {
+            label: 'Corporate',
+            to: '#',
+            children: [
+                { label: 'Corporate', to: '/corporate' },
+                { label: 'About Us', to: '/about-us' },
             ]
         }
     ];
@@ -75,19 +81,41 @@ export default function Navbar() {
     ];
 
     const publicLinks: NavLinkItem[] = [
-        { label: 'Find Tutors', to: '/search' },
         { label: 'Batches', to: '/search?tab=batches' },
-        { label: 'Corporate', to: '/corporate' },
-        { label: 'How It Works', to: '/how-it-works' },
-        { label: 'About Us', to: '/about-us' },
-        { label: 'Become a Teacher', to: '/become-tutor' },
+        { label: 'Find Tutors', to: '/search' },
+    ];
+
+    const publicSecondaryLinks: NavLinkItem[] = [
+        {
+            label: 'Institution',
+            to: '#',
+            children: [
+                { label: 'Partner with us', to: '/institution' },
+            ]
+        },
+        {
+            label: 'For Teacher Dekho',
+            to: '#',
+            children: [
+                { label: 'About Us', to: '/about-us' },
+                { label: 'How It Works', to: '/how-it-works' },
+                { label: 'Become a Teacher', to: '/become-tutor' }
+            ]
+        },
+        {
+            label: 'Corporate',
+            to: '#',
+            children: [
+                { label: 'Enterprise', to: '/corporate' }
+            ]
+        }
     ];
 
     const getNavLinks = () => {
-        if (!user) return { primary: publicLinks, secondary: [] };
+        if (!user) return { primary: publicLinks, secondary: publicSecondaryLinks };
         if (isStudentView) return { primary: studentPrimaryLinks, secondary: studentSecondaryLinks };
         if (isTeacherView) return { primary: teacherLinks, secondary: [] };
-        return { primary: publicLinks, secondary: [] };
+        return { primary: publicLinks, secondary: publicSecondaryLinks };
     };
 
     const { primary: primaryLinks, secondary: secondaryLinks } = getNavLinks();
@@ -117,29 +145,39 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [lastScrollY, location.pathname]);
 
+    const isLandingPage = location.pathname === '/';
+
     return (
         <nav className={cn(
-            "sticky top-0 z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-transform duration-300",
+            "sticky top-0 z-50 backdrop-blur-[6px] transition-transform duration-300",
+            isLandingPage ? "bg-[#172554]/95 border-b border-white/10" : "bg-slate-50/80 dark:bg-slate-950/80 border-b border-slate-100 dark:border-slate-800",
             !isVisible && "-translate-y-full"
         )}>
-            <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div className="max-w-[1440px] mx-auto px-6 lg:px-[140px] h-[80px] flex items-center justify-between">
                 {/* Logo */}
-                <div className="flex-1 flex items-center">
-                    <Link to="/" className="flex items-center gap-2">
-                        <img src={logoWithBackground} alt="TeacherDekho" className="h-10 w-auto rounded-lg" />
-                        <span className="font-bold text-2xl tracking-tight font-serif text-slate-900 dark:text-slate-100">TeacherDekho</span>
-                    </Link>
-                </div>
+                <Link to="/" className="flex items-center">
+                    <img
+                        src={tdLongLogo}
+                        alt="Teacher Dekho"
+                        className={cn(
+                            "h-[32px] w-auto transition-all",
+                            isLandingPage ? "brightness-0 invert" : ""
+                        )}
+                    />
+                </Link>
 
                 {/* Desktop Primary Navigation */}
-                <div className="hidden lg:flex items-center gap-2">
+                <div className="hidden lg:flex items-center gap-[32px] ml-[32px]">
                     {primaryLinks.map((link) => (
-                        <div key={link.label}>
+                        <div key={link.label} className="flex flex-col items-start shrink-0">
                             {link.children ? (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="sm" className="font-semibold text-slate-600 dark:text-slate-300 hover:text-cyan-700 hover:bg-slate-50 dark:hover:bg-slate-800">
-                                            {link.label}
+                                        <Button variant="ghost" size="sm" className={cn(
+                                            "font-semibold hover:bg-white/10 p-0 h-auto",
+                                            isLandingPage ? "text-slate-100 hover:text-white" : "text-slate-600 dark:text-slate-300 hover:text-cyan-700 dark:hover:text-cyan-400"
+                                        )}>
+                                            <span className="text-[14px] leading-[20px]">{link.label}</span>
                                             <ChevronDown size={14} className="ml-1 opacity-50 transition-transform" />
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -160,10 +198,10 @@ export default function Navbar() {
                                 <NavLink
                                     to={link.to}
                                     className={({ isActive }) => cn(
-                                        "px-3 py-2 text-sm font-semibold transition-all duration-200 rounded-lg",
+                                        "font-semibold transition-all duration-200 text-[14px] leading-[20px]",
                                         isActive
-                                            ? 'text-cyan-700 bg-cyan-50/50 dark:bg-cyan-900/20'
-                                            : 'text-slate-600 dark:text-slate-300 hover:text-cyan-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                            ? (isLandingPage ? 'text-cyan-400' : 'text-cyan-700')
+                                            : (isLandingPage ? 'text-slate-100 hover:text-white' : 'text-slate-600 dark:text-slate-300 hover:text-cyan-700 hover:bg-slate-50 dark:hover:bg-slate-800')
                                     )}
                                 >
                                     {link.label}
@@ -174,17 +212,20 @@ export default function Navbar() {
                 </div>
 
                 {/* Right Side: Secondary Nav + Auth */}
-                <div className="flex-1 hidden lg:flex items-center justify-end gap-4">
+                <div className="flex-1 hidden lg:flex items-center justify-end gap-[16px]">
                     {/* Secondary Navigation (Dropdowns) */}
-                    <div className="flex items-center gap-1 border-r border-slate-100 dark:border-slate-800 pr-4">
+                    <div className="flex items-center gap-[32px]">
                         {secondaryLinks.map((link) => (
-                            <div key={link.label}>
+                            <div key={link.label} className="flex items-center gap-[4px]">
                                 {link.children ? (
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" size="sm" className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 hover:text-cyan-700 dark:hover:text-cyan-400 p-2 h-auto">
-                                                {link.label}
-                                                <ChevronDown size={12} className="ml-1 opacity-50" />
+                                            <Button variant="ghost" size="sm" className={cn(
+                                                "font-semibold tracking-[0.18px] p-0 h-auto hover:bg-transparent",
+                                                isLandingPage ? "text-[#DBEAFE] hover:text-white" : "text-slate-600 dark:text-slate-300 hover:text-cyan-700 dark:hover:text-cyan-400"
+                                            )}>
+                                                <span className="text-[12px] leading-[16px]">{link.label}</span>
+                                                <ChevronDown size={16} className="ml-1 opacity-80" />
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end" className="p-2 w-48 rounded-xl border-slate-100 dark:border-slate-800">
@@ -192,7 +233,7 @@ export default function Navbar() {
                                                 <DropdownMenuItem key={child.label} asChild>
                                                     <Link
                                                         to={child.to}
-                                                        className="w-full text-xs font-semibold text-slate-600 dark:text-slate-300 focus:bg-cyan-50 dark:focus:bg-cyan-900/20 focus:text-cyan-700 dark:focus:text-cyan-400 rounded-lg capitalize"
+                                                        className="w-full text-sm font-semibold text-slate-600 dark:text-slate-300 focus:bg-cyan-50 dark:focus:bg-cyan-900/20 focus:text-cyan-700 dark:focus:text-cyan-400 rounded-lg capitalize"
                                                     >
                                                         {child.label}
                                                     </Link>
@@ -204,8 +245,8 @@ export default function Navbar() {
                                     <NavLink
                                         to={link.to}
                                         className={({ isActive }) => cn(
-                                            "text-[11px] font-bold uppercase tracking-wider px-2 py-1 transition-all duration-200",
-                                            isActive ? 'text-cyan-700' : 'text-slate-400 dark:text-slate-500 hover:text-cyan-700 dark:hover:text-cyan-400'
+                                            "text-[12px] leading-[16px] font-semibold tracking-[0.18px] transition-all duration-200",
+                                            isActive ? 'text-cyan-400' : (isLandingPage ? 'text-[#DBEAFE] hover:text-white' : 'text-slate-600 dark:text-slate-300 hover:text-cyan-700 dark:hover:text-cyan-400')
                                         )}
                                     >
                                         {link.label}
@@ -215,23 +256,30 @@ export default function Navbar() {
                         ))}
                     </div>
                     {user ? (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-[16px] ml-[16px]">
                             <Link
                                 to="/notifications"
-                                className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-cyan-700 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all"
+                                className={cn(
+                                    "w-10 h-10 flex items-center justify-center rounded-full transition-all",
+                                    isLandingPage ? "text-slate-300 hover:text-white hover:bg-white/10" : "text-slate-400 hover:text-cyan-700 hover:bg-cyan-50 dark:hover:bg-cyan-900/20"
+                                )}
                                 title="Notifications"
                             >
-                                <Bell size={20} />
+                                <Bell size={24} />
                             </Link>
-                            <ProfileDropdown />
+                            <div className="bg-[#E0F2FE] rounded-[56px] size-[42px] flex items-center justify-center hover:ring-2 hover:ring-cyan-500 transition-all cursor-pointer">
+                                <span className="font-semibold text-[16px] leading-[24px] text-[#007EC3]">H</span>
+                            </div>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-3">
-                            <Link to="/login" className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-cyan-700 border-none bg-transparent h-auto p-0">
-                                Log in
-                            </Link>
-                            <Button asChild className="bg-cyan-700 hover:bg-cyan-800 text-white font-semibold rounded-xl shadow-md shadow-cyan-700/10">
-                                <Link to="/onboarding">Sign up</Link>
+                        <div className="flex items-center gap-[16px] ml-[16px]">
+                            <Button asChild className={cn(
+                                "font-semibold rounded-xl px-6",
+                                isLandingPage
+                                    ? "bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20"
+                                    : "bg-cyan-700 hover:bg-cyan-800 text-white shadow-md shadow-cyan-700/10"
+                            )}>
+                                <Link to="/login">Sign In</Link>
                             </Button>
                         </div>
                     )}
@@ -241,7 +289,10 @@ export default function Navbar() {
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="lg:hidden text-slate-600 dark:text-slate-300"
+                    className={cn(
+                        "lg:hidden",
+                        isLandingPage ? "text-white hover:bg-white/10" : "text-slate-600 dark:text-slate-300"
+                    )}
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
                     {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -250,7 +301,7 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="lg:hidden bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 py-6 px-6 space-y-4 animate-in slide-in-from-top-2 duration-300 h-[calc(100vh-80px)] overflow-y-auto">
+                <div className="lg:hidden bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 py-6 px-6 space-y-4 animate-in slide-in-from-top-2 duration-300 h-[calc(100vh-80px)] overflow-y-auto w-full absolute top-[80px] left-0">
                     <div className="flex items-center justify-between mb-4">
                         <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Theme</span>
                         <ModeToggle />
